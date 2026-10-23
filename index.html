@@ -50,21 +50,17 @@
     <main class="max-w-7xl mx-auto p-4 md:p-6">
         <!-- TAB 1: SCANNER -->
         <section id="tab-scanner" class="space-y-6">
-            <!-- Modern Styled Date & Time Banner -->
+            <!-- Date & Time Banner -->
             <div class="bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-800 border border-amber-500/30 p-5 rounded-2xl flex flex-wrap justify-between items-center shadow-xl gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">
-                        📅
-                    </div>
+                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">📅</div>
                     <div>
                         <p class="text-xs text-slate-400 font-medium">අද දිනය</p>
                         <p id="current-date-display" class="font-bold text-lg md:text-xl text-white">Loading Date...</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">
-                        ⏰
-                    </div>
+                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">⏰</div>
                     <div>
                         <p class="text-xs text-slate-400 font-medium">වෙලාව</p>
                         <p id="current-time-display" class="font-extrabold text-lg md:text-2xl text-amber-400 font-mono tracking-wider">Loading Time...</p>
@@ -103,9 +99,7 @@
                         <label class="block text-sm mb-1 text-slate-300">Student ID / Code</label>
                         <div class="flex gap-2">
                             <input type="text" id="reg-id" required placeholder="Ex: SC101" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
-                            <button type="button" onclick="generateRandomId()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold">
-                                🎲 Auto ID
-                            </button>
+                            <button type="button" onclick="generateRandomId()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold">🎲 Auto ID</button>
                         </div>
                     </div>
                     <div>
@@ -128,7 +122,6 @@
                     <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-3.5 rounded-xl shadow-md transition-all">Save Student & Generate QR</button>
                 </form>
 
-                <!-- Registered Success Modal / Display -->
                 <div id="registration-success-box" class="hidden mt-6 p-5 bg-slate-900 border border-emerald-500 rounded-2xl text-center space-y-3">
                     <p class="text-emerald-400 font-bold text-lg">✅ Student Registered Successfully!</p>
                     <div id="new-qr-container" class="flex justify-center my-3 p-3 bg-white rounded-xl inline-block mx-auto border border-slate-200"></div>
@@ -199,9 +192,7 @@
 
                 <div class="border-t border-slate-700 pt-3">
                     <label class="block text-sm font-semibold text-amber-300 mb-2">All Months Fee Status (June - Dec 2026)</label>
-                    <div id="modal-months-container" class="grid grid-cols-2 gap-2">
-                        <!-- Dynamic month toggles -->
-                    </div>
+                    <div id="modal-months-container" class="grid grid-cols-2 gap-2"></div>
                 </div>
 
                 <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-2.5 rounded-xl mt-4">Save Changes</button>
@@ -343,14 +334,14 @@
                         const fees = foundStudent.fees || {};
                         const currentMonth = getCurrentMonthKey();
                         
-                        // Collect unpaid months UP TO the current month only!
+                        // Strict check: Collect unpaid months up to current month ONLY
                         let unpaidPastMonths = [];
                         for (let m of allMonthsList) {
                             if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
                                 unpaidPastMonths.push(m.name);
                             }
                             if (m.id === currentMonth.key) {
-                                break; // Stop checking past current month
+                                break; // Stop checking further than current month
                             }
                         }
 
@@ -432,7 +423,6 @@
                     fees: feesObj
                 });
 
-                // Display generated QR code
                 const qrContainer = document.getElementById('new-qr-container');
                 qrContainer.innerHTML = "";
                 new QRCode(qrContainer, { text: studentId, width: 150, height: 150 });
@@ -446,7 +436,6 @@
             }
         }
 
-        // Direct Canvas Download for Clean PNG Export
         function downloadQR(containerId, filenamePrefix) {
             const container = document.getElementById(containerId);
             const canvas = container.querySelector('canvas');
@@ -536,7 +525,6 @@
             document.getElementById('edit-id').value = studentId;
             document.getElementById('edit-grade').value = grade;
 
-            // Render QR in modal
             const modalQrContainer = document.getElementById('modal-qr-container');
             modalQrContainer.innerHTML = "";
             new QRCode(modalQrContainer, { text: studentId, width: 140, height: 140 });
