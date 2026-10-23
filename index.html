@@ -100,7 +100,7 @@
                         <input type="text" id="reg-name" required placeholder="Ex: Nethmi Perera" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm mb-1 text-slate-300">Student ID / Code (Auto Generated or Custom)</label>
+                        <label class="block text-sm mb-1 text-slate-300">Student ID / Code</label>
                         <div class="flex gap-2">
                             <input type="text" id="reg-id" required placeholder="Ex: SC101" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
                             <button type="button" onclick="generateRandomId()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold">
@@ -129,11 +129,11 @@
                 </form>
 
                 <!-- Registered Success Modal / Display -->
-                <div id="registration-success-box" class="hidden mt-6 p-4 bg-slate-900 border border-emerald-500 rounded-xl text-center space-y-3">
-                    <p class="text-emerald-400 font-bold">✅ Student Registered Successfully!</p>
-                    <div id="new-qr-container" class="flex justify-center my-2 p-2 bg-white rounded-lg inline-block mx-auto"></div>
-                    <p id="new-qr-text" class="text-xs text-slate-300"></p>
-                    <button onclick="downloadQR('new-qr-container', 'student-qr')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg">📥 Download QR Code Image</button>
+                <div id="registration-success-box" class="hidden mt-6 p-5 bg-slate-900 border border-emerald-500 rounded-2xl text-center space-y-3">
+                    <p class="text-emerald-400 font-bold text-lg">✅ Student Registered Successfully!</p>
+                    <div id="new-qr-container" class="flex justify-center my-3 p-3 bg-white rounded-xl inline-block mx-auto border border-slate-200"></div>
+                    <p id="new-qr-text" class="text-xs text-slate-300 font-semibold"></p>
+                    <button onclick="downloadQR('new-qr-container', 'Student_QR')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow">📥 Download PNG QR Code</button>
                 </div>
             </div>
         </section>
@@ -172,8 +172,8 @@
             <h3 class="text-lg font-semibold text-amber-300 mb-4">👤 Student Details & Generated QR</h3>
             
             <div class="flex flex-col items-center bg-slate-900 p-4 rounded-xl mb-4 border border-slate-700">
-                <div id="modal-qr-container" class="p-2 bg-white rounded-lg mb-2"></div>
-                <button onclick="downloadQR('modal-qr-container', 'student-qr')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold">📥 Download QR Code</button>
+                <div id="modal-qr-container" class="p-3 bg-white rounded-xl mb-3 border border-slate-200"></div>
+                <button onclick="downloadQR('modal-qr-container', 'Student_QR')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold">📥 Download PNG QR Code</button>
             </div>
 
             <form id="edit-form" onsubmit="saveStudentEdit(event)" class="space-y-4">
@@ -224,7 +224,6 @@
             { id: "2026-12", name: "දෙසැම්බර්" }
         ];
 
-        // Format Date nicely in Sinhala (Ex: 2026 ඔක්තෝබර් 24 සිකුරාදා)
         function startLiveClock() {
             function updateClock() {
                 const now = new Date();
@@ -344,14 +343,18 @@
                         const fees = foundStudent.fees || {};
                         const currentMonth = getCurrentMonthKey();
                         
+                        // Collect unpaid months UP TO the current month only!
                         let unpaidPastMonths = [];
                         for (let m of allMonthsList) {
-                            if (fees[m.id] === 'Unpaid') {
+                            if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
                                 unpaidPastMonths.push(m.name);
                             }
-                            if (m.id === currentMonth.key) break;
+                            if (m.id === currentMonth.key) {
+                                break; // Stop checking past current month
+                            }
                         }
 
+                        // Mark attendance
                         const today = new Date().toISOString().split('T')[0];
                         await window.set(window.ref(window.db, `attendance/${today}/${studentKey}`), {
                             name: foundStudent.name,
@@ -429,10 +432,10 @@
                     fees: feesObj
                 });
 
-                // Display QR code on registration success
+                // Display generated QR code
                 const qrContainer = document.getElementById('new-qr-container');
                 qrContainer.innerHTML = "";
-                new QRCode(qrContainer, { text: studentId, width: 140, height: 140 });
+                new QRCode(qrContainer, { text: studentId, width: 150, height: 150 });
                 document.getElementById('new-qr-text').innerText = `Name: ${name} | ID: ${studentId}`;
                 document.getElementById('registration-success-box').classList.remove('hidden');
 
@@ -443,16 +446,28 @@
             }
         }
 
-        function downloadQR(containerId, filename) {
+        // Direct Canvas Download for Clean PNG Export
+        function downloadQR(containerId, filenamePrefix) {
             const container = document.getElementById(containerId);
+            const canvas = container.querySelector('canvas');
             const img = container.querySelector('img');
-            if (img) {
+
+            let imageSrc = "";
+            if (canvas) {
+                imageSrc = canvas.toDataURL("image/png");
+            } else if (img && img.src) {
+                imageSrc = img.src;
+            }
+
+            if (imageSrc) {
                 const a = document.createElement('a');
-                a.href = img.src;
-                a.download = `${filename}.png`;
+                a.href = imageSrc;
+                a.download = `${filenamePrefix}_${Date.now()}.png`;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
             } else {
-                alert("QR Code image not ready yet.");
+                alert("QR Code image is still generating, please click again.");
             }
         }
 
@@ -521,10 +536,10 @@
             document.getElementById('edit-id').value = studentId;
             document.getElementById('edit-grade').value = grade;
 
-            // Generate QR Code in Modal
+            // Render QR in modal
             const modalQrContainer = document.getElementById('modal-qr-container');
             modalQrContainer.innerHTML = "";
-            new QRCode(modalQrContainer, { text: studentId, width: 130, height: 130 });
+            new QRCode(modalQrContainer, { text: studentId, width: 140, height: 140 });
 
             const monthsContainer = document.getElementById('modal-months-container');
             monthsContainer.innerHTML = "";
