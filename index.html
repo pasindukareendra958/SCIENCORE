@@ -227,6 +227,14 @@
             { id: "2026-12", name: "දෙසැම්බර්" }
         ];
 
+        // Dynamic Today PIN Generator (MMDD format. Ex: Oct 24 -> 1024, Sep 06 -> 0906)
+        function getTodaySecurityPin() {
+            const d = new Date();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${mm}${dd}`;
+        }
+
         function startLiveClock() {
             function updateClock() {
                 const now = new Date();
@@ -351,9 +359,7 @@
                             if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
                                 unpaidPastMonths.push(m.name);
                             }
-                            if (m.id === currentMonth.key) {
-                                break;
-                            }
+                            if (m.id === currentMonth.key) break;
                         }
 
                         const today = new Date().toISOString().split('T')[0];
@@ -381,12 +387,18 @@
                         } else {
                             const unpaidStr = unpaidPastMonths.join(', ');
                             displayHtml = `
-                                <div class="text-left bg-slate-900 p-5 rounded-2xl border border-rose-500 space-y-3 shadow-lg shadow-rose-950/40">
+                                <div class="text-left bg-slate-900 p-5 rounded-2xl border border-rose-500 space-y-4 shadow-lg shadow-rose-950/40">
                                     <h3 class="text-xl font-bold text-white">${foundStudent.name}</h3>
                                     <p class="text-sm text-slate-300">Grade: ${foundStudent.grade} | ID: ${foundStudent.studentId}</p>
                                     <div class="p-3 rounded-xl border bg-rose-500/20 text-rose-400 border-rose-500 font-bold text-center">
                                         ⚠️ අනතුරු ඇඟවීමයි: ${unpaidStr} මාසවල පන්ති ගාස්තු ගෙවා නැත!
                                     </div>
+                                    
+                                    <!-- Instant Fee Collection Button -->
+                                    <button onclick="instantPayCurrentMonth('${studentKey}', '${foundStudent.name}', '${searchCode}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                                        💳 Mark Current Month as Paid (ගෙවන ලදී)
+                                    </button>
+
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-2">✅ පැමිණීම සටහන් කරගන්නා ලදී</p>
                                 </div>
                             `;
@@ -408,6 +420,28 @@
             } catch (error) {
                 console.error(error);
                 resultDiv.innerHTML = `<p class="text-rose-400">Database error. Please check connection.</p>`;
+            }
+        }
+
+        // Instant Fee Updating with Daily Calculated Security PIN
+        async function instantPayCurrentMonth(studentKey, studentName, qrCode) {
+            const requiredPin = getTodaySecurityPin();
+            const enteredPin = prompt(`🔐 Admin PIN ආරක්ෂණ පියවර:\n${studentName} ගේ මෙම මාසයේ පන්ති ගාස්තුව ගෙවූ බව සටහන් කිරීමට අද දිනට අදාළ PIN අංකය ඇතුළත් කරන්න:`);
+
+            if (enteredPin === null) return; // Cancelled
+
+            if (enteredPin.trim() === requiredPin) {
+                const currentMonth = getCurrentMonthKey();
+                try {
+                    await window.update(window.ref(window.db, `students/${studentKey}/fees`), { [currentMonth.key]: "Paid" });
+                    alert(`✅ ${studentName} ගේ ${currentMonth.name} මාසයේ පන්ති ගාස්තුව සාර්ථකව ගෙවූ බව සටහන් විය!`);
+                    speakText(`${studentName}. ${currentMonth.name} මාසයේ පන්ති ගාස්තු ගෙවන ලදී.`);
+                    verifyStudentByQR(qrCode); // Re-check to display green success box
+                } catch (error) {
+                    alert("❌ ගෙවීම් යාවත්කාලීන කිරීම අසාර්ථක විය!");
+                }
+            } else {
+                alert("❌ ඇතුළත් කළ PIN අංකය වැරදියි! ගෙවීම් යාවත්කාලීන කළ නොහැක.");
             }
         }
 
@@ -446,7 +480,6 @@
             }
         }
 
-        // Clean white padding download logic
         function downloadQR(containerId, filenamePrefix) {
             const container = document.getElementById(containerId);
             const canvas = container.querySelector('canvas');
