@@ -36,11 +36,13 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-    <!-- Top Navigation with Official Sciencore Logo -->
+    <!-- Navigation Bar with Sciencore Logo -->
     <nav class="bg-slate-800/90 backdrop-blur border-b border-slate-700 p-3 sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
-                <img src="logo.png" alt="Sciencore Logo" class="h-10 md:h-12 w-auto rounded-lg shadow-sm border border-slate-700/50" onerror="this.onerror=null; this.src='https://i.ibb.co/68032L2/sciencore-logo.jpg';">
+                <div class="w-12 h-12 bg-slate-900 rounded-xl border border-amber-500/30 flex items-center justify-center overflow-hidden shadow-inner">
+                    <img src="logo.png" alt="Sciencore" class="object-cover w-full h-full" onerror="this.onerror=null; this.src='https://api.iconify.design/lucide:atom.svg?color=%23f59e0b';">
+                </div>
                 <div>
                     <h1 class="text-lg md:text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200 leading-tight">Sciencore</h1>
                     <p class="text-[10px] text-slate-400 font-semibold tracking-wider">THE CORE OF SCIENCE</p>
@@ -59,14 +61,14 @@
         <section id="tab-scanner" class="space-y-6">
             <div class="bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-800 border border-amber-500/30 p-5 rounded-2xl flex flex-wrap justify-between items-center shadow-xl gap-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">📅</div>
+                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400 text-xl">📅</div>
                     <div>
                         <p class="text-xs text-slate-400 font-medium">අද දිනය</p>
                         <p id="current-date-display" class="font-bold text-lg md:text-xl text-white">Loading Date...</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">⏰</div>
+                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400 text-xl">⏰</div>
                     <div>
                         <p class="text-xs text-slate-400 font-medium">වෙලාව</p>
                         <p id="current-time-display" class="font-extrabold text-lg md:text-2xl text-amber-400 font-mono tracking-wider">Loading Time...</p>
@@ -102,21 +104,21 @@
                         <input type="text" id="reg-name" required placeholder="Ex: Nethmi Perera" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm mb-1 text-slate-300">Student ID / Code</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="reg-id" required placeholder="Ex: SC101" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
-                            <button type="button" onclick="generateRandomId()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold">🎲 Auto ID</button>
-                        </div>
+                        <label class="block text-sm mb-1 text-slate-300">Grade</label>
+                        <select id="reg-grade" onchange="autoGenerateStudentIdByGrade()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
+                            <option value="Grade 7">Grade 7 (O/L 2030)</option>
+                            <option value="Grade 8">Grade 8 (O/L 2029)</option>
+                            <option value="Grade 9">Grade 9 (O/L 2028)</option>
+                            <option value="Grade 10">Grade 10 (O/L 2027)</option>
+                            <option value="Grade 11 (O/L)">Grade 11 (O/L 2026)</option>
+                        </select>
                     </div>
                     <div>
-                        <label class="block text-sm mb-1 text-slate-300">Grade</label>
-                        <select id="reg-grade" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
-                            <option value="Grade 7">Grade 7</option>
-                            <option value="Grade 8">Grade 8</option>
-                            <option value="Grade 9">Grade 9</option>
-                            <option value="Grade 10">Grade 10</option>
-                            <option value="Grade 11 (O/L)">Grade 11 (O/L)</option>
-                        </select>
+                        <label class="block text-sm mb-1 text-slate-300">Student ID (Year-based Auto Code)</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="reg-id" required readonly class="flex-1 bg-slate-900/80 border border-amber-500/40 font-mono text-amber-300 font-bold rounded-xl p-3 outline-none">
+                            <button type="button" onclick="autoGenerateStudentIdByGrade()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold">🔄 Refresh ID</button>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm mb-1 text-slate-300">Current Month Fee Status</label>
@@ -145,4 +147,576 @@
                     <button onclick="loadReports()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-sm">🔄 Refresh</button>
                 </div>
 
-                <div class="flex flex-wrap gap-2 mb-
+                <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-slate-700" id="grade-filters">
+                    <button onclick="filterGrade('All')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-900 transition-all">All Grades</button>
+                    <button onclick="filterGrade('Grade 7')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 7</button>
+                    <button onclick="filterGrade('Grade 8')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 8</button>
+                    <button onclick="filterGrade('Grade 9')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 9</button>
+                    <button onclick="filterGrade('Grade 10')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 10</button>
+                    <button onclick="filterGrade('Grade 11 (O/L)')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 11 (O/L)</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-700 text-slate-400 text-sm">
+                                <th class="p-3">Name</th>
+                                <th class="p-3">Grade</th>
+                                <th class="p-3">Student ID</th>
+                                <th class="p-3">Current Month Fee</th>
+                                <th class="p-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-table-body" class="divide-y divide-slate-700 text-sm">
+                            <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- More Info & Edit Student Modal -->
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 max-w-lg w-full relative max-h-[90vh] overflow-y-auto shadow-2xl">
+            <button onclick="closeEditModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+            <h3 class="text-lg font-semibold text-amber-300 mb-4">👤 Student Details & Generated QR</h3>
+            
+            <div class="flex flex-col items-center bg-slate-900 p-4 rounded-xl mb-4 border border-slate-700">
+                <div id="modal-qr-container" class="p-4 bg-white rounded-xl mb-3 border-2 border-slate-200 shadow-inner"></div>
+                <button onclick="downloadQR('modal-qr-container', 'Student_QR')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold shadow">📥 Download PNG QR Code</button>
+            </div>
+
+            <form id="edit-form" onsubmit="saveStudentEdit(event)" class="space-y-4">
+                <input type="hidden" id="edit-db-key">
+                <div>
+                    <label class="block text-sm mb-1 text-slate-300">Student Name</label>
+                    <input type="text" id="edit-name" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-slate-300">Student ID / Code</label>
+                    <input type="text" id="edit-id" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm mb-1 text-slate-300">Grade</label>
+                    <select id="edit-grade" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
+                        <option value="Grade 7">Grade 7</option>
+                        <option value="Grade 8">Grade 8</option>
+                        <option value="Grade 9">Grade 9</option>
+                        <option value="Grade 10">Grade 10</option>
+                        <option value="Grade 11 (O/L)">Grade 11 (O/L)</option>
+                    </select>
+                </div>
+
+                <div class="border-t border-slate-700 pt-3">
+                    <label class="block text-sm font-semibold text-amber-300 mb-2">All Months Fee Status (June - Dec 2026)</label>
+                    <div id="modal-months-container" class="grid grid-cols-2 gap-2"></div>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-2.5 rounded-xl mt-4">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let html5QrCode = null;
+        let lastScannedId = "";
+        let lastScanTime = 0;
+        let allStudentsCache = [];
+        let currentSelectedGradeFilter = 'All';
+
+        const allMonthsList = [
+            { id: "2026-06", name: "ජූනි" },
+            { id: "2026-07", name: "ජූලි" },
+            { id: "2026-08", name: "අගෝස්තු" },
+            { id: "2026-09", name: "සැප්තැම්බර්" },
+            { id: "2026-10", name: "ඔක්තෝබර්" },
+            { id: "2026-11", name: "නොවැම්බර්" },
+            { id: "2026-12", name: "දෙසැම්බර්" }
+        ];
+
+        // MMDD PIN Generator
+        function getTodaySecurityPin() {
+            const d = new Date();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${mm}${dd}`;
+        }
+
+        // Live Sinhala Clock
+        function startLiveClock() {
+            function updateClock() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const monthNames = ["ජනවාරි", "පෙබරවාරි", "මාර්තු", "අප්‍රේල්", "මැයි", "ජූනි", "ජූලි", "අගෝස්තු", "සැප්තැම්බර්", "ඔක්තෝබර්", "නොවැම්බර්", "දෙසැම්බර්"];
+                const dayNames = ["ඉරිදා", "සඳුදා", "අඟහරුවාදා", "බදාදා", "බ්‍රහස්පතින්දා", "සිකුරාදා", "සෙනසුරාදා"];
+                
+                const dateStr = `${year} ${monthNames[now.getMonth()]} ${now.getDate()} ${dayNames[now.getDay()]}`;
+                document.getElementById('current-date-display').innerText = dateStr;
+                document.getElementById('current-time-display').innerText = now.toLocaleTimeString();
+            }
+            updateClock();
+            setInterval(updateClock, 1000);
+        }
+
+        // Auto Generate Student ID based on O/L Year
+        async function autoGenerateStudentIdByGrade() {
+            const gradeSelect = document.getElementById('reg-grade').value;
+            let yearPrefix = "26"; // Default
+            if (gradeSelect.includes("7")) yearPrefix = "30";      // O/L 2030
+            else if (gradeSelect.includes("8")) yearPrefix = "29"; // O/L 2029
+            else if (gradeSelect.includes("9")) yearPrefix = "28"; // O/L 2028
+            else if (gradeSelect.includes("10")) yearPrefix = "27";// O/L 2027
+            else if (gradeSelect.includes("11")) yearPrefix = "26";// O/L 2026
+
+            let maxSeq = 0;
+            try {
+                const snapshot = await window.get(window.child(window.ref(window.db), 'students'));
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnap => {
+                        const s = childSnap.val();
+                        if (s.studentId && s.studentId.startsWith(yearPrefix)) {
+                            const numPart = parseInt(s.studentId.slice(2), 10);
+                            if (!isNaN(numPart) && numPart > maxSeq) {
+                                maxSeq = numPart;
+                            }
+                        }
+                    });
+                }
+            } catch (e) {
+                console.log(e);
+            }
+
+            const nextNum = String(maxSeq + 1).padStart(4, '0');
+            document.getElementById('reg-id').value = `${yearPrefix}${nextNum}`;
+        }
+
+        function getCurrentMonthKey() {
+            const d = new Date();
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const months = { "06": "ජූනි", "07": "ජූලි", "08": "අගෝස්තු", "09": "සැප්තැම්බර්", "10": "ඔක්තෝබර්", "11": "නොවැම්බර්", "12": "දෙසැම්බර්", "01": "ජනවාරි", "02": "පෙබරවාරි", "03": "මාර්තු", "04": "අප්‍රේල්", "05": "මැයි" };
+            return { key: `${year}-${month}`, name: months[month] || "මෙම මාසය" };
+        }
+
+        function switchTab(tabName) {
+            ['scanner', 'students', 'reports'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).classList.remove('bg-amber-500', 'text-slate-900', 'font-bold');
+                document.getElementById(`btn-${t}`).classList.add('bg-slate-700', 'text-slate-200');
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`btn-${tabName}`).classList.add('bg-amber-500', 'text-slate-900', 'font-bold');
+            document.getElementById(`btn-${tabName}`).classList.remove('bg-slate-700', 'text-slate-200');
+
+            if (tabName === 'scanner') initScanner();
+            else {
+                stopScanner();
+                if (tabName === 'reports') loadReports();
+                if (tabName === 'students') autoGenerateStudentIdByGrade();
+            }
+        }
+
+        function initScanner() {
+            if (!html5QrCode) html5QrCode = new Html5Qrcode("reader");
+            if (!html5QrCode.isScanning) {
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    (decodedText) => {
+                        const cleanCode = decodedText ? decodedText.trim() : "";
+                        const now = Date.now();
+                        if (cleanCode === lastScannedId && now - lastScanTime < 4000) return;
+                        lastScannedId = cleanCode;
+                        lastScanTime = now;
+                        verifyStudentByQR(cleanCode);
+                    },
+                    (error) => {}
+                ).catch(err => console.log(err));
+            }
+        }
+
+        function stopScanner() {
+            if (html5QrCode && html5QrCode.isScanning) {
+                html5QrCode.stop().catch(err => {});
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'si-LK';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function triggerVibration() {
+            if ("vibrate" in navigator) {
+                navigator.vibrate([200, 100, 200]);
+            }
+        }
+
+        async function verifyStudent(qrCode) {
+            if (!qrCode) return;
+            verifyStudentByQR(qrCode.trim());
+        }
+
+        async function verifyStudentByQR(qrCode) {
+            const resultDiv = document.getElementById('student-result');
+            resultDiv.innerHTML = `<p class="text-amber-400 font-semibold">Searching database...</p>`;
+            const searchCode = qrCode ? qrCode.trim() : "";
+
+            try {
+                const dbRef = window.ref(window.db, 'students');
+                const snapshot = await window.get(dbRef);
+                
+                if (snapshot.exists()) {
+                    let foundStudent = null;
+                    let studentKey = null;
+
+                    snapshot.forEach((childSnapshot) => {
+                        const student = childSnapshot.val();
+                        if (student.studentId) {
+                            const dbStudentId = student.studentId.trim();
+                            if (dbStudentId === searchCode || searchCode.includes(dbStudentId) || dbStudentId.includes(searchCode)) {
+                                foundStudent = student;
+                                studentKey = childSnapshot.key;
+                            }
+                        }
+                    });
+
+                    if (foundStudent) {
+                        const fees = foundStudent.fees || {};
+                        const currentMonth = getCurrentMonthKey();
+                        
+                        let unpaidPastMonths = [];
+                        for (let m of allMonthsList) {
+                            if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
+                                unpaidPastMonths.push({ id: m.id, name: m.name });
+                            }
+                            if (m.id === currentMonth.key) break;
+                        }
+
+                        const today = new Date().toISOString().split('T')[0];
+                        await window.set(window.ref(window.db, `attendance/${today}/${studentKey}`), {
+                            name: foundStudent.name,
+                            grade: foundStudent.grade,
+                            time: new Date().toLocaleTimeString()
+                        });
+
+                        let displayHtml = "";
+                        let speechMessage = "";
+
+                        if (unpaidPastMonths.length === 0) {
+                            displayHtml = `
+                                <div class="text-left bg-slate-900 p-5 rounded-2xl border border-emerald-500 space-y-3">
+                                    <h3 class="text-xl font-bold text-white">${foundStudent.name}</h3>
+                                    <p class="text-sm text-slate-300">Grade: ${foundStudent.grade} | ID: ${foundStudent.studentId}</p>
+                                    <div class="p-3 rounded-xl border bg-emerald-500/20 text-emerald-400 border-emerald-500 font-bold text-center">
+                                        පැමිණීම සටහන් කරගන්නා ලදී!
+                                    </div>
+                                    <p class="text-xs text-emerald-400 font-semibold text-center mt-2">✅ Attendance Recorded Successfully</p>
+                                </div>
+                            `;
+                            speechMessage = `${foundStudent.name}. පැමිණීම සටහන් කරගන්නා ලදී.`;
+                        } else {
+                            const unpaidStr = unpaidPastMonths.map(m => m.name).join(', ');
+                            const firstDueMonth = unpaidPastMonths[0]; // Oldest unpaid month
+
+                            displayHtml = `
+                                <div class="text-left bg-slate-900 p-5 rounded-2xl border border-rose-500 space-y-4 shadow-lg shadow-rose-950/40">
+                                    <h3 class="text-xl font-bold text-white">${foundStudent.name}</h3>
+                                    <p class="text-sm text-slate-300">Grade: ${foundStudent.grade} | ID: ${foundStudent.studentId}</p>
+                                    <div class="p-3 rounded-xl border bg-rose-500/20 text-rose-400 border-rose-500 font-bold text-center">
+                                        ⚠️ අනතුරු ඇඟවීමයි: ${unpaidStr} මාසවල පන්ති ගාස්තු ගෙවා නැත!
+                                    </div>
+                                    
+                                    <!-- Dynamic First Due Month Pay Button -->
+                                    <button onclick="instantPayMonth('${studentKey}', '${foundStudent.name}', '${firstDueMonth.id}', '${firstDueMonth.name}', '${searchCode}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold py-3 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                                        💳 Mark ${firstDueMonth.name} as Paid (${firstDueMonth.name} ගෙවන ලදී)
+                                    </button>
+
+                                    <p class="text-xs text-emerald-400 font-semibold text-center mt-2">✅ පැමිණීම සටහන් කරගන්නා ලදී</p>
+                                </div>
+                            `;
+                            speechMessage = `${foundStudent.name}. ${unpaidStr} මාසවල පන්ති ගාස්තු ගෙවා නැත.`;
+                        }
+
+                        resultDiv.innerHTML = displayHtml;
+                        triggerVibration();
+                        speakText(speechMessage);
+
+                    } else {
+                        resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ Student ID / QR Code '${searchCode}' not found!</p>`;
+                        triggerVibration();
+                        speakText("මෙම අංකය සහිත ළමයෙක් හමු නොවීය.");
+                    }
+                } else {
+                    resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ No students registered yet!</p>`;
+                }
+            } catch (error) {
+                console.error(error);
+                resultDiv.innerHTML = `<p class="text-rose-400">Database error. Please check connection.</p>`;
+            }
+        }
+
+        async function instantPayMonth(studentKey, studentName, monthId, monthName, qrCode) {
+            const requiredPin = getTodaySecurityPin();
+            const enteredPin = prompt(`🔐 Admin PIN ආරක්ෂණ පියවර:\n${studentName} ගේ ${monthName} මාසයේ පන්ති ගාස්තුව ගෙවූ බව සටහන් කිරීමට අද දිනට අදාළ PIN අංකය ඇතුළත් කරන්න:`);
+
+            if (enteredPin === null) return;
+
+            if (enteredPin.trim() === requiredPin) {
+                try {
+                    await window.update(window.ref(window.db, `students/${studentKey}/fees`), { [monthId]: "Paid" });
+                    alert(`✅ ${studentName} ගේ ${monthName} මාසයේ පන්ති ගාස්තුව සාර්ථකව ගෙවූ බව සටහන් විය!`);
+                    speakText(`${studentName}. ${monthName} මාසයේ පන්ති ගාස්තු ගෙවන ලදී.`);
+                    verifyStudentByQR(qrCode);
+                } catch (error) {
+                    alert("❌ ගෙවීම් යාවත්කාලීන කිරීම අසාර්ථක විය!");
+                }
+            } else {
+                alert("❌ ඇතුළත් කළ PIN අංකය වැරදියි! ගෙවීම් යාවත්කාලීන කළ නොහැක.");
+            }
+        }
+
+        async function registerStudent(event) {
+            event.preventDefault();
+            const name = document.getElementById('reg-name').value.trim();
+            const studentId = document.getElementById('reg-id').value.trim();
+            const grade = document.getElementById('reg-grade').value;
+            const initialFee = document.getElementById('reg-fee').value;
+            const currentMonth = getCurrentMonthKey();
+
+            let feesObj = {};
+            allMonthsList.forEach(m => {
+                feesObj[m.id] = (m.id === currentMonth.key) ? initialFee : "Unpaid";
+            });
+
+            try {
+                const newStudentRef = window.push(window.ref(window.db, 'students'));
+                await window.set(newStudentRef, {
+                    name: name,
+                    studentId: studentId,
+                    grade: grade,
+                    fees: feesObj
+                });
+
+                const qrContainer = document.getElementById('new-qr-container');
+                qrContainer.innerHTML = "";
+                new QRCode(qrContainer, { text: studentId, width: 160, height: 160, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+                document.getElementById('new-qr-text').innerText = `Name: ${name} | ID: ${studentId}`;
+                document.getElementById('registration-success-box').classList.remove('hidden');
+
+                document.getElementById('reg-form').reset();
+                autoGenerateStudentIdByGrade();
+            } catch (error) {
+                alert("Registration failed.");
+                console.error(error);
+            }
+        }
+
+        function downloadQR(containerId, filenamePrefix) {
+            const container = document.getElementById(containerId);
+            const canvas = container.querySelector('canvas');
+            const img = container.querySelector('img');
+
+            let sourceCanvas = canvas;
+            if (!sourceCanvas && img) {
+                sourceCanvas = document.createElement('canvas');
+                sourceCanvas.width = img.naturalWidth || 160;
+                sourceCanvas.height = img.naturalHeight || 160;
+                const ctx = sourceCanvas.getContext('2d');
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+                ctx.drawImage(img, 0, 0);
+            }
+
+            if (sourceCanvas) {
+                const padding = 20;
+                const paddedCanvas = document.createElement('canvas');
+                paddedCanvas.width = sourceCanvas.width + (padding * 2);
+                paddedCanvas.height = sourceCanvas.height + (padding * 2);
+                const pCtx = paddedCanvas.getContext('2d');
+
+                pCtx.fillStyle = "#FFFFFF";
+                pCtx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+                pCtx.drawImage(sourceCanvas, padding, padding);
+
+                const imageSrc = paddedCanvas.toDataURL("image/png");
+                const a = document.createElement('a');
+                a.href = imageSrc;
+                a.download = `${filenamePrefix}_${Date.now()}.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            } else {
+                alert("QR Code image is still generating, please click again.");
+            }
+        }
+
+        async function loadReports() {
+            const tbody = document.getElementById('reports-table-body');
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Loading...</td></tr>`;
+            try {
+                const snapshot = await window.get(window.child(window.ref(window.db), 'students'));
+                if (snapshot.exists()) {
+                    allStudentsCache = [];
+                    snapshot.forEach((childSnapshot) => {
+                        allStudentsCache.push({ key: childSnapshot.key, ...childSnapshot.val() });
+                    });
+                    renderTableData();
+                } else { 
+                    allStudentsCache = [];
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No students registered.</td></tr>`; 
+                }
+            } catch (error) { 
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading data.</td></tr>`; 
+            }
+        }
+
+        function filterGrade(gradeName) {
+            currentSelectedGradeFilter = gradeName;
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                if (btn.innerText.includes(gradeName) || (gradeName === 'All' && btn.innerText.includes('All'))) {
+                    btn.className = "grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-900 transition-all";
+                } else {
+                    btn.className = "grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all";
+                }
+            });
+            renderTableData();
+        }
+
+        function renderTableData() {
+            const tbody = document.getElementById('reports-table-body');
+            tbody.innerHTML = "";
+            const currentMonth = getCurrentMonthKey();
+
+            const filteredList = allStudentsCache.filter(s => {
+                if (currentSelectedGradeFilter === 'All') return true;
+                return s.grade === currentSelectedGradeFilter;
+            });
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No students found for ${currentSelectedGradeFilter}.</td></tr>`;
+                return;
+            }
+
+            filteredList.forEach((s) => {
+                const key = s.key;
+                const fees = s.fees || {};
+                const currentFeeStatus = fees[currentMonth.key] || 'Unpaid';
+                const isPaid = currentFeeStatus === 'Paid';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-700/50 border-b border-slate-700">
+                        <td class="p-3 font-medium text-amber-300">${s.name}</td>
+                        <td class="p-3"><span class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-amber-200">${s.grade}</span></td>
+                        <td class="p-3 font-mono text-xs text-slate-300">${s.studentId}</td>
+                        <td class="p-3">
+                            <button onclick="toggleCurrentMonthFee('${key}', '${currentFeeStatus}')" class="text-xs px-3 py-1.5 rounded-lg border font-bold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}">
+                                ${currentMonth.name}: ${isPaid ? 'Paid' : 'Unpaid'}
+                            </button>
+                        </td>
+                        <td class="p-3">
+                            <button onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})})' class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg text-white font-medium">More Info / Edit</button>
+                            <button onclick="deleteStudent('${key}')" class="text-xs bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-white ml-2">Delete</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function toggleCurrentMonthFee(studentKey, currentStatus) {
+            const currentMonth = getCurrentMonthKey();
+            const newStatus = currentStatus === 'Paid' ? 'Unpaid' : 'Paid';
+            try {
+                await window.update(window.ref(window.db, `students/${studentKey}/fees`), { [currentMonth.key]: newStatus });
+                loadReports();
+            } catch (error) { alert("Failed to update fee status."); }
+        }
+
+        async function deleteStudent(studentKey) {
+            if (confirm("Are you sure you want to delete this student?")) {
+                try {
+                    await window.remove(window.ref(window.db, `students/${studentKey}`));
+                    loadReports();
+                } catch (error) { alert("Failed to delete."); }
+            }
+        }
+
+        function openEditModal(key, name, studentId, grade, fees) {
+            document.getElementById('edit-modal').classList.remove('hidden');
+            document.getElementById('edit-db-key').value = key;
+            document.getElementById('edit-name').value = name;
+            document.getElementById('edit-id').value = studentId;
+            document.getElementById('edit-grade').value = grade;
+
+            const modalQrContainer = document.getElementById('modal-qr-container');
+            modalQrContainer.innerHTML = "";
+            new QRCode(modalQrContainer, { text: studentId, width: 150, height: 150, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+
+            const monthsContainer = document.getElementById('modal-months-container');
+            monthsContainer.innerHTML = "";
+
+            allMonthsList.forEach(m => {
+                const status = fees[m.id] || 'Unpaid';
+                const isPaid = status === 'Paid';
+                monthsContainer.innerHTML += `
+                    <div class="flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-700">
+                        <span class="text-xs text-slate-300">${m.name}</span>
+                        <button type="button" onclick="toggleModalMonthFee('${key}', '${m.id}', '${status}')" class="text-xs px-2.5 py-1 rounded-lg border font-bold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}">
+                            ${isPaid ? 'Paid' : 'Unpaid'}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        async function toggleModalMonthFee(studentKey, monthKey, currentStatus) {
+            const newStatus = currentStatus === 'Paid' ? 'Unpaid' : 'Paid';
+            try {
+                await window.update(window.ref(window.db, `students/${studentKey}/fees`), { [monthKey]: newStatus });
+                const snapshot = await window.get(window.child(window.ref(window.db), `students/${studentKey}`));
+                if (snapshot.exists()) {
+                    const s = snapshot.val();
+                    openEditModal(studentKey, s.name, s.studentId, s.grade, s.fees || {});
+                }
+                loadReports();
+            } catch (error) { alert("Failed to update month fee."); }
+        }
+
+        function closeEditModal() {
+            document.getElementById('edit-modal').classList.add('hidden');
+        }
+
+        async function saveStudentEdit(event) {
+            event.preventDefault();
+            const key = document.getElementById('edit-db-key').value;
+            const name = document.getElementById('edit-name').value.trim();
+            const studentId = document.getElementById('edit-id').value.trim();
+            const grade = document.getElementById('edit-grade').value;
+
+            try {
+                await window.update(window.ref(window.db, `students/${key}`), {
+                    name: name,
+                    studentId: studentId,
+                    grade: grade
+                });
+                alert("Student details updated successfully!");
+                closeEditModal();
+                loadReports();
+            } catch (error) {
+                alert("Failed to update.");
+            }
+        }
+
+        window.onload = () => { 
+            initScanner(); 
+            startLiveClock();
+            autoGenerateStudentIdByGrade();
+        };
+    </script>
+</body>
+</html>
