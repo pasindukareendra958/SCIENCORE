@@ -50,7 +50,6 @@
     <main class="max-w-7xl mx-auto p-4 md:p-6">
         <!-- TAB 1: SCANNER -->
         <section id="tab-scanner" class="space-y-6">
-            <!-- Date & Time Banner -->
             <div class="bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-800 border border-amber-500/30 p-5 rounded-2xl flex flex-wrap justify-between items-center shadow-xl gap-4">
                 <div class="flex items-center gap-3">
                     <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">📅</div>
@@ -124,7 +123,7 @@
 
                 <div id="registration-success-box" class="hidden mt-6 p-5 bg-slate-900 border border-emerald-500 rounded-2xl text-center space-y-3">
                     <p class="text-emerald-400 font-bold text-lg">✅ Student Registered Successfully!</p>
-                    <div id="new-qr-container" class="flex justify-center my-3 p-3 bg-white rounded-xl inline-block mx-auto border border-slate-200"></div>
+                    <div id="new-qr-container" class="flex justify-center my-3 p-4 bg-white rounded-xl inline-block mx-auto border-2 border-slate-300 shadow-inner"></div>
                     <p id="new-qr-text" class="text-xs text-slate-300 font-semibold"></p>
                     <button onclick="downloadQR('new-qr-container', 'Student_QR')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow">📥 Download PNG QR Code</button>
                 </div>
@@ -134,10 +133,21 @@
         <!-- TAB 3: REPORTS -->
         <section id="tab-reports" class="hidden space-y-6">
             <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
-                <div class="flex justify-between items-center mb-6">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
                     <h2 class="text-xl font-semibold text-amber-300">📊 Database Reports & Fee Manager</h2>
                     <button onclick="loadReports()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-sm">🔄 Refresh</button>
                 </div>
+
+                <!-- Grade Filter Buttons -->
+                <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-slate-700" id="grade-filters">
+                    <button onclick="filterGrade('All')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-900 transition-all">All Grades</button>
+                    <button onclick="filterGrade('Grade 7')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 7</button>
+                    <button onclick="filterGrade('Grade 8')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 8</button>
+                    <button onclick="filterGrade('Grade 9')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 9</button>
+                    <button onclick="filterGrade('Grade 10')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 10</button>
+                    <button onclick="filterGrade('Grade 11 (O/L)')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 11 (O/L)</button>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -165,8 +175,8 @@
             <h3 class="text-lg font-semibold text-amber-300 mb-4">👤 Student Details & Generated QR</h3>
             
             <div class="flex flex-col items-center bg-slate-900 p-4 rounded-xl mb-4 border border-slate-700">
-                <div id="modal-qr-container" class="p-3 bg-white rounded-xl mb-3 border border-slate-200"></div>
-                <button onclick="downloadQR('modal-qr-container', 'Student_QR')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold">📥 Download PNG QR Code</button>
+                <div id="modal-qr-container" class="p-4 bg-white rounded-xl mb-3 border-2 border-slate-200 shadow-inner"></div>
+                <button onclick="downloadQR('modal-qr-container', 'Student_QR')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold shadow">📥 Download PNG QR Code</button>
             </div>
 
             <form id="edit-form" onsubmit="saveStudentEdit(event)" class="space-y-4">
@@ -204,6 +214,8 @@
         let html5QrCode = null;
         let lastScannedId = "";
         let lastScanTime = 0;
+        let allStudentsCache = [];
+        let currentSelectedGradeFilter = 'All';
 
         const allMonthsList = [
             { id: "2026-06", name: "ජූනි" },
@@ -334,18 +346,16 @@
                         const fees = foundStudent.fees || {};
                         const currentMonth = getCurrentMonthKey();
                         
-                        // Strict check: Collect unpaid months up to current month ONLY
                         let unpaidPastMonths = [];
                         for (let m of allMonthsList) {
                             if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
                                 unpaidPastMonths.push(m.name);
                             }
                             if (m.id === currentMonth.key) {
-                                break; // Stop checking further than current month
+                                break;
                             }
                         }
 
-                        // Mark attendance
                         const today = new Date().toISOString().split('T')[0];
                         await window.set(window.ref(window.db, `attendance/${today}/${studentKey}`), {
                             name: foundStudent.name,
@@ -425,7 +435,7 @@
 
                 const qrContainer = document.getElementById('new-qr-container');
                 qrContainer.innerHTML = "";
-                new QRCode(qrContainer, { text: studentId, width: 150, height: 150 });
+                new QRCode(qrContainer, { text: studentId, width: 160, height: 160, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
                 document.getElementById('new-qr-text').innerText = `Name: ${name} | ID: ${studentId}`;
                 document.getElementById('registration-success-box').classList.remove('hidden');
 
@@ -436,19 +446,35 @@
             }
         }
 
+        // Clean white padding download logic
         function downloadQR(containerId, filenamePrefix) {
             const container = document.getElementById(containerId);
             const canvas = container.querySelector('canvas');
             const img = container.querySelector('img');
 
-            let imageSrc = "";
-            if (canvas) {
-                imageSrc = canvas.toDataURL("image/png");
-            } else if (img && img.src) {
-                imageSrc = img.src;
+            let sourceCanvas = canvas;
+            if (!sourceCanvas && img) {
+                sourceCanvas = document.createElement('canvas');
+                sourceCanvas.width = img.naturalWidth || 160;
+                sourceCanvas.height = img.naturalHeight || 160;
+                const ctx = sourceCanvas.getContext('2d');
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+                ctx.drawImage(img, 0, 0);
             }
 
-            if (imageSrc) {
+            if (sourceCanvas) {
+                const padding = 20;
+                const paddedCanvas = document.createElement('canvas');
+                paddedCanvas.width = sourceCanvas.width + (padding * 2);
+                paddedCanvas.height = sourceCanvas.height + (padding * 2);
+                const pCtx = paddedCanvas.getContext('2d');
+
+                pCtx.fillStyle = "#FFFFFF";
+                pCtx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+                pCtx.drawImage(sourceCanvas, padding, padding);
+
+                const imageSrc = paddedCanvas.toDataURL("image/png");
                 const a = document.createElement('a');
                 a.href = imageSrc;
                 a.download = `${filenamePrefix}_${Date.now()}.png`;
@@ -466,38 +492,69 @@
             try {
                 const snapshot = await window.get(window.child(window.ref(window.db), 'students'));
                 if (snapshot.exists()) {
-                    tbody.innerHTML = "";
-                    const currentMonth = getCurrentMonthKey();
-
+                    allStudentsCache = [];
                     snapshot.forEach((childSnapshot) => {
-                        const s = childSnapshot.val();
-                        const key = childSnapshot.key;
-                        const fees = s.fees || {};
-                        const currentFeeStatus = fees[currentMonth.key] || 'Unpaid';
-                        const isPaid = currentFeeStatus === 'Paid';
-
-                        tbody.innerHTML += `
-                            <tr class="hover:bg-slate-700/50 border-b border-slate-700">
-                                <td class="p-3 font-medium text-amber-300">${s.name}</td>
-                                <td class="p-3">${s.grade}</td>
-                                <td class="p-3 font-mono text-xs text-slate-300">${s.studentId}</td>
-                                <td class="p-3">
-                                    <button onclick="toggleCurrentMonthFee('${key}', '${currentFeeStatus}')" class="text-xs px-3 py-1.5 rounded-lg border font-bold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}">
-                                        ${currentMonth.name}: ${isPaid ? 'Paid' : 'Unpaid'}
-                                    </button>
-                                </td>
-                                <td class="p-3">
-                                    <button onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})})' class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg text-white font-medium">More Info / Edit</button>
-                                    <button onclick="deleteStudent('${key}')" class="text-xs bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-white ml-2">Delete</button>
-                                </td>
-                            </tr>`;
+                        allStudentsCache.push({ key: childSnapshot.key, ...childSnapshot.val() });
                     });
+                    renderTableData();
                 } else { 
+                    allStudentsCache = [];
                     tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No students registered.</td></tr>`; 
                 }
             } catch (error) { 
                 tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading data.</td></tr>`; 
             }
+        }
+
+        function filterGrade(gradeName) {
+            currentSelectedGradeFilter = gradeName;
+            document.querySelectorAll('.grade-btn').forEach(btn => {
+                if (btn.innerText.includes(gradeName) || (gradeName === 'All' && btn.innerText.includes('All'))) {
+                    btn.className = "grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-900 transition-all";
+                } else {
+                    btn.className = "grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all";
+                }
+            });
+            renderTableData();
+        }
+
+        function renderTableData() {
+            const tbody = document.getElementById('reports-table-body');
+            tbody.innerHTML = "";
+            const currentMonth = getCurrentMonthKey();
+
+            const filteredList = allStudentsCache.filter(s => {
+                if (currentSelectedGradeFilter === 'All') return true;
+                return s.grade === currentSelectedGradeFilter;
+            });
+
+            if (filteredList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No students found for ${currentSelectedGradeFilter}.</td></tr>`;
+                return;
+            }
+
+            filteredList.forEach((s) => {
+                const key = s.key;
+                const fees = s.fees || {};
+                const currentFeeStatus = fees[currentMonth.key] || 'Unpaid';
+                const isPaid = currentFeeStatus === 'Paid';
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-700/50 border-b border-slate-700">
+                        <td class="p-3 font-medium text-amber-300">${s.name}</td>
+                        <td class="p-3"><span class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-amber-200">${s.grade}</span></td>
+                        <td class="p-3 font-mono text-xs text-slate-300">${s.studentId}</td>
+                        <td class="p-3">
+                            <button onclick="toggleCurrentMonthFee('${key}', '${currentFeeStatus}')" class="text-xs px-3 py-1.5 rounded-lg border font-bold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}">
+                                ${currentMonth.name}: ${isPaid ? 'Paid' : 'Unpaid'}
+                            </button>
+                        </td>
+                        <td class="p-3">
+                            <button onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})})' class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg text-white font-medium">More Info / Edit</button>
+                            <button onclick="deleteStudent('${key}')" class="text-xs bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-white ml-2">Delete</button>
+                        </td>
+                    </tr>`;
+            });
         }
 
         async function toggleCurrentMonthFee(studentKey, currentStatus) {
@@ -527,7 +584,7 @@
 
             const modalQrContainer = document.getElementById('modal-qr-container');
             modalQrContainer.innerHTML = "";
-            new QRCode(modalQrContainer, { text: studentId, width: 140, height: 140 });
+            new QRCode(modalQrContainer, { text: studentId, width: 150, height: 150, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
 
             const monthsContainer = document.getElementById('modal-months-container');
             monthsContainer.innerHTML = "";
