@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PK Science Class - Attendance & Management System</title>
+    <title>Sciencore Class Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script type="module">
@@ -36,13 +36,13 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-    <nav class="bg-slate-800 border-b border-slate-700 p-4 sticky top-0 z-50">
+    <nav class="bg-slate-800/90 backdrop-blur border-b border-slate-700 p-4 sticky top-0 z-50 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-            <h1 class="text-xl font-bold text-amber-400">⚡ PK Science Class Manager</h1>
+            <h1 class="text-xl md:text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-200">⚡ Sciencore Class Management System</h1>
             <div class="flex gap-2">
-                <button onclick="switchTab('scanner')" id="btn-scanner" class="px-4 py-2 bg-amber-500 text-slate-900 font-semibold rounded-lg">Scanner</button>
-                <button onclick="switchTab('students')" id="btn-students" class="px-4 py-2 bg-slate-700 text-slate-200 rounded-lg">Register</button>
-                <button onclick="switchTab('reports')" id="btn-reports" class="px-4 py-2 bg-slate-700 text-slate-200 rounded-lg">Reports</button>
+                <button onclick="switchTab('scanner')" id="btn-scanner" class="px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded-xl shadow-md transition-all">Scanner</button>
+                <button onclick="switchTab('students')" id="btn-students" class="px-4 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all">Register</button>
+                <button onclick="switchTab('reports')" id="btn-reports" class="px-4 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all">Reports</button>
             </div>
         </div>
     </nav>
@@ -50,28 +50,38 @@
     <main class="max-w-7xl mx-auto p-4 md:p-6">
         <!-- TAB 1: SCANNER -->
         <section id="tab-scanner" class="space-y-6">
-            <!-- Date & Time Banner -->
-            <div class="bg-slate-800/80 border border-slate-700 p-4 rounded-xl flex flex-wrap justify-between items-center text-slate-300">
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">📅</span>
-                    <span id="current-date-display" class="font-semibold text-white">Loading Date...</span>
+            <!-- Modern Styled Date & Time Banner -->
+            <div class="bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-800 border border-amber-500/30 p-5 rounded-2xl flex flex-wrap justify-between items-center shadow-xl gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">
+                        📅
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">අද දිනය</p>
+                        <p id="current-date-display" class="font-bold text-lg md:text-xl text-white">Loading Date...</p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xl">⏰</span>
-                    <span id="current-time-display" class="font-bold text-amber-400 font-mono text-lg">Loading Time...</span>
+                <div class="flex items-center gap-3">
+                    <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400">
+                        ⏰
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">වෙලාව</p>
+                        <p id="current-time-display" class="font-extrabold text-lg md:text-2xl text-amber-400 font-mono tracking-wider">Loading Time...</p>
+                    </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-lg">
                     <h2 class="text-lg font-semibold mb-4 text-amber-300">📷 Attendance QR Scanner</h2>
-                    <div id="reader" class="w-full bg-slate-900 rounded-lg overflow-hidden border border-slate-700"></div>
+                    <div id="reader" class="w-full bg-slate-900 rounded-xl overflow-hidden border border-slate-700"></div>
                     <div class="mt-4 flex gap-2">
-                        <input type="text" id="manual-id" placeholder="Enter QR Code / Student ID..." class="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-white">
-                        <button onclick="verifyStudent(document.getElementById('manual-id').value)" class="bg-amber-500 text-slate-900 font-semibold px-6 py-2 rounded-lg">Check</button>
+                        <input type="text" id="manual-id" placeholder="Enter Student ID / QR Code..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:border-amber-400 outline-none">
+                        <button onclick="verifyStudent(document.getElementById('manual-id').value)" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold px-6 py-2.5 rounded-xl transition-all">Check</button>
                     </div>
                 </div>
-                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 flex flex-col justify-between">
+                <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-lg flex flex-col justify-between">
                     <div>
                         <h2 class="text-lg font-semibold mb-4 text-amber-300">👤 Student Verification & Attendance</h2>
                         <div id="student-result" class="text-center py-12 text-slate-400">Scan a QR code to view details and mark attendance automatically.</div>
@@ -82,25 +92,25 @@
 
         <!-- TAB 2: REGISTER -->
         <section id="tab-students" class="hidden space-y-6">
-            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 max-w-2xl mx-auto">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 max-w-2xl mx-auto shadow-xl">
                 <h2 class="text-xl font-semibold mb-4 text-amber-300">📝 Register Student</h2>
                 <form id="reg-form" onsubmit="registerStudent(event)" class="space-y-4">
                     <div>
-                        <label class="block text-sm mb-1">Full Name</label>
-                        <input type="text" id="reg-name" required placeholder="Ex: Nethmi Perera" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white">
+                        <label class="block text-sm mb-1 text-slate-300">Full Name</label>
+                        <input type="text" id="reg-name" required placeholder="Ex: Nethmi Perera" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm mb-1">Physical QR Code / Card Number</label>
+                        <label class="block text-sm mb-1 text-slate-300">Student ID / Code (Auto Generated or Custom)</label>
                         <div class="flex gap-2">
-                            <input type="text" id="reg-id" required placeholder="Scan QR Card or type code" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-3 text-white">
-                            <button type="button" onclick="startScannerForInput('reg-id')" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-4 py-3 rounded-lg text-sm flex items-center gap-1">
-                                📷 Scan QR
+                            <input type="text" id="reg-id" required placeholder="Ex: SC101" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
+                            <button type="button" onclick="generateRandomId()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold">
+                                🎲 Auto ID
                             </button>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-sm mb-1">Grade</label>
-                        <select id="reg-grade" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white">
+                        <label class="block text-sm mb-1 text-slate-300">Grade</label>
+                        <select id="reg-grade" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
                             <option value="Grade 7">Grade 7</option>
                             <option value="Grade 8">Grade 8</option>
                             <option value="Grade 9">Grade 9</option>
@@ -109,23 +119,31 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-sm mb-1">Current Month Fee Status</label>
-                        <select id="reg-fee" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-white">
+                        <label class="block text-sm mb-1 text-slate-300">Current Month Fee Status</label>
+                        <select id="reg-fee" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
                             <option value="Paid">Paid (ගෙවා ඇත)</option>
                             <option value="Unpaid">Unpaid (ගෙවා නැත)</option>
                         </select>
                     </div>
-                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-3 rounded-lg">Save Student</button>
+                    <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-3.5 rounded-xl shadow-md transition-all">Save Student & Generate QR</button>
                 </form>
+
+                <!-- Registered Success Modal / Display -->
+                <div id="registration-success-box" class="hidden mt-6 p-4 bg-slate-900 border border-emerald-500 rounded-xl text-center space-y-3">
+                    <p class="text-emerald-400 font-bold">✅ Student Registered Successfully!</p>
+                    <div id="new-qr-container" class="flex justify-center my-2 p-2 bg-white rounded-lg inline-block mx-auto"></div>
+                    <p id="new-qr-text" class="text-xs text-slate-300"></p>
+                    <button onclick="downloadQR('new-qr-container', 'student-qr')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2 rounded-lg">📥 Download QR Code Image</button>
+                </div>
             </div>
         </section>
 
         <!-- TAB 3: REPORTS -->
         <section id="tab-reports" class="hidden space-y-6">
-            <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-semibold text-amber-300">📊 Database Reports & Fee Manager</h2>
-                    <button onclick="loadReports()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm">🔄 Refresh</button>
+                    <button onclick="loadReports()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-sm">🔄 Refresh</button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
@@ -133,12 +151,13 @@
                             <tr class="border-b border-slate-700 text-slate-400 text-sm">
                                 <th class="p-3">Name</th>
                                 <th class="p-3">Grade</th>
-                                <th class="p-3">Current Month Fee Status</th>
+                                <th class="p-3">Student ID</th>
+                                <th class="p-3">Current Month Fee</th>
                                 <th class="p-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="reports-table-body" class="divide-y divide-slate-700 text-sm">
-                            <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading...</td></tr>
+                            <tr><td colspan="5" class="p-4 text-center text-slate-400">Loading...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -146,40 +165,30 @@
         </section>
     </main>
 
-    <!-- Camera Scan Modal for Inputs -->
-    <div id="card-scanner-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 max-w-md w-full text-center relative shadow-2xl">
-            <button onclick="closeCardScannerModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white font-bold text-xl">&times;</button>
-            <h3 class="text-lg font-semibold text-amber-300 mb-4">📷 Scan Physical QR Card</h3>
-            <div id="input-reader" class="w-full bg-slate-900 rounded-lg overflow-hidden border border-slate-700"></div>
-            <p class="text-xs text-slate-400 mt-3">Point camera at the student QR card.</p>
-        </div>
-    </div>
-
     <!-- More Info & Edit Student Modal -->
-    <div id="edit-modal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
-            <button onclick="closeEditModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl">&times;</button>
-            <h3 class="text-lg font-semibold text-amber-300 mb-4">👤 Student Details & All Months Fees</h3>
+    <div id="edit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 max-w-lg w-full relative max-h-[90vh] overflow-y-auto shadow-2xl">
+            <button onclick="closeEditModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
+            <h3 class="text-lg font-semibold text-amber-300 mb-4">👤 Student Details & Generated QR</h3>
             
+            <div class="flex flex-col items-center bg-slate-900 p-4 rounded-xl mb-4 border border-slate-700">
+                <div id="modal-qr-container" class="p-2 bg-white rounded-lg mb-2"></div>
+                <button onclick="downloadQR('modal-qr-container', 'student-qr')" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold">📥 Download QR Code</button>
+            </div>
+
             <form id="edit-form" onsubmit="saveStudentEdit(event)" class="space-y-4">
                 <input type="hidden" id="edit-db-key">
                 <div>
-                    <label class="block text-sm mb-1">Student Name</label>
-                    <input type="text" id="edit-name" required class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+                    <label class="block text-sm mb-1 text-slate-300">Student Name</label>
+                    <input type="text" id="edit-name" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm mb-1">QR Code / Card ID</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="edit-id" required class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
-                        <button type="button" onclick="startScannerForInput('edit-id')" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-3 py-2 rounded-lg text-xs">
-                            📷 Scan QR
-                        </button>
-                    </div>
+                    <label class="block text-sm mb-1 text-slate-300">Student ID / Code</label>
+                    <input type="text" id="edit-id" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm mb-1">Grade</label>
-                    <select id="edit-grade" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white">
+                    <label class="block text-sm mb-1 text-slate-300">Grade</label>
+                    <select id="edit-grade" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
                         <option value="Grade 7">Grade 7</option>
                         <option value="Grade 8">Grade 8</option>
                         <option value="Grade 9">Grade 9</option>
@@ -191,19 +200,17 @@
                 <div class="border-t border-slate-700 pt-3">
                     <label class="block text-sm font-semibold text-amber-300 mb-2">All Months Fee Status (June - Dec 2026)</label>
                     <div id="modal-months-container" class="grid grid-cols-2 gap-2">
-                        <!-- Dynamic month toggles will load here -->
+                        <!-- Dynamic month toggles -->
                     </div>
                 </div>
 
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-2.5 rounded-lg mt-4">Save Changes</button>
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-2.5 rounded-xl mt-4">Save Changes</button>
             </form>
         </div>
     </div>
 
     <script>
         let html5QrCode = null;
-        let inputQrCodeScanner = null;
-        let activeTargetInputId = null;
         let lastScannedId = "";
         let lastScanTime = 0;
 
@@ -217,16 +224,25 @@
             { id: "2026-12", name: "දෙසැම්බර්" }
         ];
 
-        // Update Clock and Date Live
+        // Format Date nicely in Sinhala (Ex: 2026 ඔක්තෝබර් 24 සිකුරාදා)
         function startLiveClock() {
             function updateClock() {
                 const now = new Date();
-                const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                document.getElementById('current-date-display').innerText = now.toLocaleDateString('si-LK', optionsDate);
+                const year = now.getFullYear();
+                const monthNames = ["ජනවාරි", "පෙබරවාරි", "මාර්තු", "අප්‍රේල්", "මැයි", "ජූනි", "ජූලි", "අගෝස්තු", "සැප්තැම්බර්", "ඔක්තෝබර්", "නොවැම්බර්", "දෙසැම්බර්"];
+                const dayNames = ["ඉරිදා", "සඳුදා", "අඟහරුවාදා", "බදාදා", "බ්‍රහස්පතින්දා", "සිකුරාදා", "සෙනසුරාදා"];
+                
+                const dateStr = `${year} ${monthNames[now.getMonth()]} ${now.getDate()} ${dayNames[now.getDay()]}`;
+                document.getElementById('current-date-display').innerText = dateStr;
                 document.getElementById('current-time-display').innerText = now.toLocaleTimeString();
             }
             updateClock();
             setInterval(updateClock, 1000);
+        }
+
+        function generateRandomId() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('reg-id').value = "SC" + randomNum;
         }
 
         function getCurrentMonthKey() {
@@ -240,11 +256,11 @@
         function switchTab(tabName) {
             ['scanner', 'students', 'reports'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`btn-${t}`).classList.remove('bg-amber-500', 'text-slate-900', 'font-semibold');
+                document.getElementById(`btn-${t}`).classList.remove('bg-amber-500', 'text-slate-900', 'font-bold');
                 document.getElementById(`btn-${t}`).classList.add('bg-slate-700', 'text-slate-200');
             });
             document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-            document.getElementById(`btn-${tabName}`).classList.add('bg-amber-500', 'text-slate-900', 'font-semibold');
+            document.getElementById(`btn-${tabName}`).classList.add('bg-amber-500', 'text-slate-900', 'font-bold');
             document.getElementById(`btn-${tabName}`).classList.remove('bg-slate-700', 'text-slate-200');
 
             if (tabName === 'scanner') initScanner();
@@ -279,44 +295,6 @@
             }
         }
 
-        function startScannerForInput(inputId) {
-            activeTargetInputId = inputId;
-            stopScanner();
-            document.getElementById('card-scanner-modal').classList.remove('hidden');
-
-            if (!inputQrCodeScanner) inputQrCodeScanner = new Html5Qrcode("input-reader");
-            
-            if (!inputQrCodeScanner.isScanning) {
-                inputQrCodeScanner.start(
-                    { facingMode: "environment" },
-                    { fps: 10, qrbox: { width: 220, height: 220 } },
-                    (decodedText) => {
-                        if (activeTargetInputId) {
-                            document.getElementById(activeTargetInputId).value = decodedText ? decodedText.trim() : "";
-                            triggerVibration();
-                            closeCardScannerModal();
-                        }
-                    },
-                    (error) => {}
-                ).catch(err => console.log(err));
-            }
-        }
-
-        function closeCardScannerModal() {
-            if (inputQrCodeScanner && inputQrCodeScanner.isScanning) {
-                inputQrCodeScanner.stop().then(() => {
-                    document.getElementById('card-scanner-modal').classList.add('hidden');
-                    if (!document.getElementById('tab-scanner').classList.contains('hidden')) {
-                        initScanner();
-                    }
-                }).catch(() => {
-                    document.getElementById('card-scanner-modal').classList.add('hidden');
-                });
-            } else {
-                document.getElementById('card-scanner-modal').classList.add('hidden');
-            }
-        }
-
         function speakText(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -335,8 +313,7 @@
 
         async function verifyStudent(qrCode) {
             if (!qrCode) return;
-            qrCode = qrCode.trim();
-            verifyStudentByQR(qrCode);
+            verifyStudentByQR(qrCode.trim());
         }
 
         async function verifyStudentByQR(qrCode) {
@@ -367,18 +344,14 @@
                         const fees = foundStudent.fees || {};
                         const currentMonth = getCurrentMonthKey();
                         
-                        // Check unpaid months ONLY UP TO Current Month (Ignore future months)
                         let unpaidPastMonths = [];
                         for (let m of allMonthsList) {
                             if (fees[m.id] === 'Unpaid') {
                                 unpaidPastMonths.push(m.name);
                             }
-                            if (m.id === currentMonth.key) {
-                                break; // Stop checking past the current month!
-                            }
+                            if (m.id === currentMonth.key) break;
                         }
 
-                        // Mark attendance automatically
                         const today = new Date().toISOString().split('T')[0];
                         await window.set(window.ref(window.db, `attendance/${today}/${studentKey}`), {
                             name: foundStudent.name,
@@ -390,12 +363,11 @@
                         let speechMessage = "";
 
                         if (unpaidPastMonths.length === 0) {
-                            // All past & current months paid
                             displayHtml = `
-                                <div class="text-left bg-slate-900 p-5 rounded-xl border border-emerald-500 space-y-3">
+                                <div class="text-left bg-slate-900 p-5 rounded-2xl border border-emerald-500 space-y-3">
                                     <h3 class="text-xl font-bold text-white">${foundStudent.name}</h3>
                                     <p class="text-sm text-slate-300">Grade: ${foundStudent.grade} | ID: ${foundStudent.studentId}</p>
-                                    <div class="p-3 rounded-lg border bg-emerald-500/20 text-emerald-400 border-emerald-500 font-semibold text-center">
+                                    <div class="p-3 rounded-xl border bg-emerald-500/20 text-emerald-400 border-emerald-500 font-bold text-center">
                                         පැමිණීම සටහන් කරගන්නා ලදී!
                                     </div>
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-2">✅ Attendance Recorded Successfully</p>
@@ -403,13 +375,12 @@
                             `;
                             speechMessage = `${foundStudent.name}. පැමිණීම සටහන් කරගන්නා ලදී.`;
                         } else {
-                            // Dues present up to current month (Warning Alert)
                             const unpaidStr = unpaidPastMonths.join(', ');
                             displayHtml = `
-                                <div class="text-left bg-slate-900 p-5 rounded-xl border border-rose-500 space-y-3 shadow-lg shadow-rose-950/40">
+                                <div class="text-left bg-slate-900 p-5 rounded-2xl border border-rose-500 space-y-3 shadow-lg shadow-rose-950/40">
                                     <h3 class="text-xl font-bold text-white">${foundStudent.name}</h3>
                                     <p class="text-sm text-slate-300">Grade: ${foundStudent.grade} | ID: ${foundStudent.studentId}</p>
-                                    <div class="p-3 rounded-lg border bg-rose-500/20 text-rose-400 border-rose-500 font-semibold text-center">
+                                    <div class="p-3 rounded-xl border bg-rose-500/20 text-rose-400 border-rose-500 font-bold text-center">
                                         ⚠️ අනතුරු ඇඟවීමයි: ${unpaidStr} මාසවල පන්ති ගාස්තු ගෙවා නැත!
                                     </div>
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-2">✅ පැමිණීම සටහන් කරගන්නා ලදී</p>
@@ -423,7 +394,7 @@
                         speakText(speechMessage);
 
                     } else {
-                        resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ QR Code / ID '${searchCode}' not found in database!</p>`;
+                        resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ Student ID / QR Code '${searchCode}' not found!</p>`;
                         triggerVibration();
                         speakText("මෙම අංකය සහිත ළමයෙක් හමු නොවීය.");
                     }
@@ -458,7 +429,13 @@
                     fees: feesObj
                 });
 
-                alert("Student registered successfully!");
+                // Display QR code on registration success
+                const qrContainer = document.getElementById('new-qr-container');
+                qrContainer.innerHTML = "";
+                new QRCode(qrContainer, { text: studentId, width: 140, height: 140 });
+                document.getElementById('new-qr-text').innerText = `Name: ${name} | ID: ${studentId}`;
+                document.getElementById('registration-success-box').classList.remove('hidden');
+
                 document.getElementById('reg-form').reset();
             } catch (error) {
                 alert("Registration failed.");
@@ -466,9 +443,22 @@
             }
         }
 
+        function downloadQR(containerId, filename) {
+            const container = document.getElementById(containerId);
+            const img = container.querySelector('img');
+            if (img) {
+                const a = document.createElement('a');
+                a.href = img.src;
+                a.download = `${filename}.png`;
+                a.click();
+            } else {
+                alert("QR Code image not ready yet.");
+            }
+        }
+
         async function loadReports() {
             const tbody = document.getElementById('reports-table-body');
-            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Loading...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">Loading...</td></tr>`;
             try {
                 const snapshot = await window.get(window.child(window.ref(window.db), 'students'));
                 if (snapshot.exists()) {
@@ -486,22 +476,23 @@
                             <tr class="hover:bg-slate-700/50 border-b border-slate-700">
                                 <td class="p-3 font-medium text-amber-300">${s.name}</td>
                                 <td class="p-3">${s.grade}</td>
+                                <td class="p-3 font-mono text-xs text-slate-300">${s.studentId}</td>
                                 <td class="p-3">
-                                    <button onclick="toggleCurrentMonthFee('${key}', '${currentFeeStatus}')" class="text-xs px-3 py-1.5 rounded border font-semibold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}" title="Click to toggle current month fee">
+                                    <button onclick="toggleCurrentMonthFee('${key}', '${currentFeeStatus}')" class="text-xs px-3 py-1.5 rounded-lg border font-bold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}">
                                         ${currentMonth.name}: ${isPaid ? 'Paid' : 'Unpaid'}
                                     </button>
                                 </td>
                                 <td class="p-3">
-                                    <button onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})})' class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded text-white font-medium">More Info / Edit</button>
-                                    <button onclick="deleteStudent('${key}')" class="text-xs bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded text-white ml-2">Delete</button>
+                                    <button onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})})' class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg text-white font-medium">More Info / Edit</button>
+                                    <button onclick="deleteStudent('${key}')" class="text-xs bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-white ml-2">Delete</button>
                                 </td>
                             </tr>`;
                     });
                 } else { 
-                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No students registered.</td></tr>`; 
+                    tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No students registered.</td></tr>`; 
                 }
             } catch (error) { 
-                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-rose-400">Error loading data.</td></tr>`; 
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-rose-400">Error loading data.</td></tr>`; 
             }
         }
 
@@ -530,6 +521,11 @@
             document.getElementById('edit-id').value = studentId;
             document.getElementById('edit-grade').value = grade;
 
+            // Generate QR Code in Modal
+            const modalQrContainer = document.getElementById('modal-qr-container');
+            modalQrContainer.innerHTML = "";
+            new QRCode(modalQrContainer, { text: studentId, width: 130, height: 130 });
+
             const monthsContainer = document.getElementById('modal-months-container');
             monthsContainer.innerHTML = "";
 
@@ -537,9 +533,9 @@
                 const status = fees[m.id] || 'Unpaid';
                 const isPaid = status === 'Paid';
                 monthsContainer.innerHTML += `
-                    <div class="flex items-center justify-between bg-slate-900 p-2 rounded border border-slate-700">
+                    <div class="flex items-center justify-between bg-slate-900 p-2 rounded-lg border border-slate-700">
                         <span class="text-xs text-slate-300">${m.name}</span>
-                        <button type="button" onclick="toggleModalMonthFee('${key}', '${m.id}', '${status}')" class="text-xs px-2.5 py-1 rounded border font-semibold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}">
+                        <button type="button" onclick="toggleModalMonthFee('${key}', '${m.id}', '${status}')" class="text-xs px-2.5 py-1 rounded-lg border font-bold ${isPaid ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500' : 'bg-rose-500/20 text-rose-400 border-rose-500'}">
                             ${isPaid ? 'Paid' : 'Unpaid'}
                         </button>
                     </div>
@@ -588,6 +584,7 @@
         window.onload = () => { 
             initScanner(); 
             startLiveClock();
+            generateRandomId();
         };
     </script>
 </body>
