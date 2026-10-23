@@ -35,7 +35,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         @media print {
-            nav, button, input, select, #tab-scanner, #tab-students, .no-print { display: none !important; }
+            nav, button, input, select, #tab-scanner, #tab-students, #tab-income, .no-print { display: none !important; }
             #tab-reports { display: block !important; }
             body { background: white !important; color: black !important; }
             .bg-slate-800, .bg-slate-900 { background: white !important; border: 1px solid #ccc !important; color: black !important; }
@@ -45,7 +45,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
 
-    <!-- Top Navigation Bar with Official Sciencore Logo -->
+    <!-- Navigation Bar -->
     <nav class="bg-slate-800/90 backdrop-blur border-b border-slate-700 p-3 sticky top-0 z-50 shadow-lg no-print">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -57,10 +57,11 @@
                     <p class="text-[10px] text-slate-400 font-semibold tracking-wider">THE CORE OF SCIENCE</p>
                 </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="switchTab('scanner')" id="btn-scanner" class="px-4 py-2 bg-amber-500 text-slate-900 font-bold rounded-xl shadow-md transition-all">Scanner</button>
-                <button onclick="switchTab('students')" id="btn-students" class="px-4 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all">Register</button>
-                <button onclick="switchTab('reports')" id="btn-reports" class="px-4 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all">Reports</button>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="switchTab('scanner')" id="btn-scanner" class="px-3.5 py-2 bg-amber-500 text-slate-900 font-bold rounded-xl shadow-md transition-all text-xs md:text-sm">Scanner</button>
+                <button onclick="switchTab('students')" id="btn-students" class="px-3.5 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-xs md:text-sm">Register</button>
+                <button onclick="switchTab('reports')" id="btn-reports" class="px-3.5 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-xs md:text-sm">Reports</button>
+                <button onclick="switchTab('income')" id="btn-income" class="px-3.5 py-2 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-xs md:text-sm">💰 Income</button>
             </div>
         </div>
     </nav>
@@ -68,7 +69,6 @@
     <main class="max-w-7xl mx-auto p-4 md:p-6">
         <!-- TAB 1: SCANNER -->
         <section id="tab-scanner" class="space-y-6">
-            <!-- Date & Time & Live Attendance Counter Banner -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-slate-800 border border-amber-500/30 p-4 rounded-2xl flex items-center gap-3 shadow-lg">
                     <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400 text-xl">📅</div>
@@ -124,8 +124,11 @@
                         <input type="text" id="reg-name" required placeholder="Ex: Nethmi Perera" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm mb-1 text-slate-300">Parent Phone Number (WhatsApp)</label>
-                        <input type="tel" id="reg-phone" placeholder="Ex: 0771234567" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:border-amber-400 outline-none">
+                        <label class="block text-sm mb-1 text-slate-300">Parent WhatsApp Number (Auto +94)</label>
+                        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                            <span class="px-3 bg-slate-800 text-amber-400 font-bold border-r border-slate-700 text-sm">+94</span>
+                            <input type="tel" id="reg-phone" placeholder="771234567 (බිංදුව නොමැතිව)" class="w-full bg-transparent p-3 text-white focus:outline-none">
+                        </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -173,24 +176,21 @@
             </div>
         </section>
 
-        <!-- TAB 3: REPORTS -->
+        <!-- TAB 3: REPORTS & ATTENDANCE LOGS -->
         <section id="tab-reports" class="hidden space-y-6">
-            <!-- Grade Fee Reports -->
             <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
                 <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
-                    <h2 class="text-xl font-semibold text-amber-300">📊 Database Reports & Fee Manager</h2>
+                    <h2 class="text-xl font-semibold text-amber-300">📊 Student Database Reports</h2>
                     <div class="flex gap-2">
-                        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all shadow">🖨️ Print / Save PDF</button>
+                        <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2 rounded-xl text-sm transition-all shadow">🖨️ Print Report</button>
                         <button onclick="loadReports()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-sm">🔄 Refresh Data</button>
                     </div>
                 </div>
 
-                <!-- Fast Search Bar -->
                 <div class="mb-4">
                     <input type="text" id="search-input" onkeyup="renderTableData()" placeholder="🔍 Search student name or ID..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:border-amber-400 outline-none">
                 </div>
 
-                <!-- Grade Filter Buttons -->
                 <div class="flex flex-wrap gap-2 mb-6 pb-4 border-b border-slate-700" id="grade-filters">
                     <button onclick="filterGrade('All')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-900 transition-all">All Grades</button>
                     <button onclick="filterGrade('Grade 7')" class="grade-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-700 text-slate-300 hover:bg-slate-600 transition-all">Grade 7</button>
@@ -219,9 +219,19 @@
                 </div>
             </div>
 
-            <!-- Attendance History Logs -->
+            <!-- Grade-wise Attendance History Logs -->
             <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
-                <h2 class="text-xl font-semibold text-amber-300 mb-4">📅 Today's Attendance Log (අද දින පැමිණීම)</h2>
+                <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                    <h2 class="text-xl font-semibold text-amber-300">📅 Today's Attendance Log (ශ්‍රේණි අනුව)</h2>
+                    <select id="att-grade-filter" onchange="loadTodayAttendanceLog()" class="bg-slate-900 border border-slate-700 text-xs text-amber-300 rounded-xl px-3 py-2 outline-none">
+                        <option value="All">All Grades (සියලුම ශ්‍රේණි)</option>
+                        <option value="Grade 7">Grade 7</option>
+                        <option value="Grade 8">Grade 8</option>
+                        <option value="Grade 9">Grade 9</option>
+                        <option value="Grade 10">Grade 10</option>
+                        <option value="Grade 11 (O/L)">Grade 11 (O/L)</option>
+                    </select>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -229,22 +239,56 @@
                                 <th class="p-3">Student Name</th>
                                 <th class="p-3">Grade</th>
                                 <th class="p-3">Time Arrived</th>
+                                <th class="p-3 no-print">Action</th>
                             </tr>
                         </thead>
                         <tbody id="attendance-log-body" class="divide-y divide-slate-700 text-sm">
-                            <tr><td colspan="3" class="p-4 text-center text-slate-400">Loading attendance...</td></tr>
+                            <tr><td colspan="4" class="p-4 text-center text-slate-400">Loading attendance...</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </section>
+
+        <!-- TAB 4: INCOME TRACKER -->
+        <section id="tab-income" class="hidden space-y-6">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <div class="flex flex-wrap justify-between items-center mb-6 gap-4 border-b border-slate-700 pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-amber-300">💰 Class Fee & Monthly Income Tracker</h2>
+                        <p class="text-xs text-slate-400">මෙම මාසයේ පන්ති ගාස්තු ආදායම් වාර්තාව</p>
+                    </div>
+                    <button onclick="loadIncomeReport()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-xl text-sm">🔄 Refresh Income</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="bg-gradient-to-br from-emerald-950 to-slate-900 border border-emerald-500/40 p-5 rounded-2xl shadow-lg">
+                        <p class="text-xs text-emerald-400 font-semibold mb-1">මෙම මාසයේ එකතු වූ මුළු ආදායම</p>
+                        <h3 id="inc-total-amount" class="text-3xl font-black text-emerald-400 font-mono">රු. 0</h3>
+                    </div>
+                    <div class="bg-slate-900 border border-slate-700 p-5 rounded-2xl shadow-lg">
+                        <p class="text-xs text-slate-400 font-semibold mb-1">ගෙවීම් කළ මුළු ළමුන් ගණන</p>
+                        <h3 id="inc-paid-count" class="text-2xl font-bold text-white font-mono">0</h3>
+                    </div>
+                    <div class="bg-slate-900 border border-rose-500/30 p-5 rounded-2xl shadow-lg">
+                        <p class="text-xs text-rose-400 font-semibold mb-1">තවම නොගෙවූ ළමුන් ගණන</p>
+                        <h3 id="inc-unpaid-count" class="text-2xl font-bold text-rose-400 font-mono">0</h3>
+                    </div>
+                </div>
+
+                <h3 class="text-md font-semibold text-amber-300 mb-3">📊 Grade-wise Monthly Income Breakdown</h3>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-3" id="grade-income-cards">
+                    <!-- Grade Income Dynamic Cards -->
+                </div>
+            </div>
+        </section>
     </main>
 
-    <!-- More Info Modal -->
+    <!-- Student Profile Modal -->
     <div id="edit-modal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4 no-print">
-        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 max-w-lg w-full relative max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 max-w-xl w-full relative max-h-[90vh] overflow-y-auto shadow-2xl">
             <button onclick="closeEditModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-xl font-bold">&times;</button>
-            <h3 class="text-lg font-semibold text-amber-300 mb-4">👤 Student Details & Generated QR</h3>
+            <h3 class="text-lg font-semibold text-amber-300 mb-4">👤 Full Student Profile & History</h3>
             
             <div class="flex flex-col items-center bg-slate-900 p-4 rounded-xl mb-4 border border-slate-700">
                 <div id="modal-qr-container" class="p-4 bg-white rounded-xl mb-3 border-2 border-slate-200 shadow-inner"></div>
@@ -258,8 +302,11 @@
                     <input type="text" id="edit-name" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
                 </div>
                 <div>
-                    <label class="block text-sm mb-1 text-slate-300">Parent Phone Number</label>
-                    <input type="tel" id="edit-phone" placeholder="Ex: 0771234567" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
+                    <label class="block text-sm mb-1 text-slate-300">Parent WhatsApp Number (Auto +94)</label>
+                    <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl overflow-hidden">
+                        <span class="px-3 bg-slate-800 text-amber-400 font-bold border-r border-slate-700 text-sm">+94</span>
+                        <input type="tel" id="edit-phone" placeholder="771234567" class="w-full bg-transparent p-2.5 text-white focus:outline-none">
+                    </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <div>
@@ -291,7 +338,15 @@
                     <div id="modal-months-container" class="grid grid-cols-2 gap-2"></div>
                 </div>
 
-                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-2.5 rounded-xl mt-4">Save Changes</button>
+                <!-- Past Attendance History Section -->
+                <div class="border-t border-slate-700 pt-3">
+                    <label class="block text-sm font-semibold text-emerald-400 mb-2">📜 Past Attendance Dates (පන්ති පැමිණි දින)</label>
+                    <div id="modal-attendance-history" class="bg-slate-900 p-3 rounded-xl border border-slate-700 max-h-32 overflow-y-auto text-xs space-y-1 text-slate-300">
+                        Loading history...
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold py-2.5 rounded-xl mt-4">Save Profile Changes</button>
             </form>
         </div>
     </div>
@@ -302,6 +357,9 @@
         let lastScanTime = 0;
         let allStudentsCache = [];
         let currentSelectedGradeFilter = 'All';
+
+        const CLASS_FEE_FULL = 1500;
+        const CLASS_FEE_HALF = 750;
 
         const allMonthsList = [
             { id: "2026-06", name: "ජූනි" },
@@ -318,6 +376,14 @@
             const mm = String(d.getMonth() + 1).padStart(2, '0');
             const dd = String(d.getDate()).padStart(2, '0');
             return `${mm}${dd}`;
+        }
+
+        function formatPhoneForWhatsApp(phoneStr) {
+            if (!phoneStr) return '';
+            let cleaned = phoneStr.replace(/[^0-9]/g, '');
+            if (cleaned.startsWith('0')) cleaned = cleaned.substring(1);
+            if (!cleaned.startsWith('94')) cleaned = '94' + cleaned;
+            return cleaned;
         }
 
         function startLiveClock() {
@@ -373,7 +439,7 @@
         }
 
         function switchTab(tabName) {
-            ['scanner', 'students', 'reports'].forEach(t => {
+            ['scanner', 'students', 'reports', 'income'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
                 document.getElementById(`btn-${t}`).classList.remove('bg-amber-500', 'text-slate-900', 'font-bold');
                 document.getElementById(`btn-${t}`).classList.add('bg-slate-700', 'text-slate-200');
@@ -392,6 +458,7 @@
                     loadTodayAttendanceLog();
                 }
                 if (tabName === 'students') autoGenerateStudentIdByGrade();
+                if (tabName === 'income') loadIncomeReport();
             }
         }
 
@@ -480,22 +547,27 @@
                             }
                         }
 
-                        // Save attendance record
+                        // Save Attendance ONLY ONCE PER DAY
                         const today = new Date().toISOString().split('T')[0];
-                        await window.set(window.ref(window.db, `attendance/${today}/${studentKey}`), {
-                            name: foundStudent.name,
-                            grade: foundStudent.grade,
-                            time: new Date().toLocaleTimeString()
-                        });
+                        const attRef = window.ref(window.db, `attendance/${today}/${studentKey}`);
+                        const attSnap = await window.get(attRef);
+                        
+                        if (!attSnap.exists()) {
+                            await window.set(attRef, {
+                                name: foundStudent.name,
+                                grade: foundStudent.grade,
+                                time: new Date().toLocaleTimeString()
+                            });
+                        }
 
                         loadTodayAttendanceLog();
 
                         let displayHtml = "";
                         let speechMessage = "";
 
-                        const parentPhone = foundStudent.phone ? foundStudent.phone.replace(/[^0-9]/g, '') : '';
-                        const waMsg = encodeURIComponent(`Hi, Sciencore Class Notice: Your child ${foundStudent.name} arrived at class today at ${new Date().toLocaleTimeString()}.`);
-                        const waBtn = parentPhone ? `<a href="https://wa.me/${parentPhone}?text=${waMsg}" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 mt-2">📲 Send WhatsApp Arrival Alert to Parent</a>` : '';
+                        const formattedPhone = formatPhoneForWhatsApp(foundStudent.phone);
+                        const waMsg = encodeURIComponent(`Hi, Sciencore Notice: Your child ${foundStudent.name} arrived at class today at ${new Date().toLocaleTimeString()}.`);
+                        const waBtn = formattedPhone ? `<a href="https://wa.me/${formattedPhone}?text=${waMsg}" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center justify-center gap-2 mt-2">📲 Send WhatsApp Arrival Alert to Parent</a>` : '';
 
                         if (unpaidPastMonths.length === 0 || cardType === "Free") {
                             displayHtml = `
@@ -584,12 +656,14 @@
         async function registerStudent(event) {
             event.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
-            const phone = document.getElementById('reg-phone').value.trim();
+            const rawPhone = document.getElementById('reg-phone').value.trim();
             const studentId = document.getElementById('reg-id').value.trim();
             const grade = document.getElementById('reg-grade').value;
             const cardType = document.getElementById('reg-card-type').value;
             const initialFee = document.getElementById('reg-fee').value;
             const currentMonth = getCurrentMonthKey();
+
+            const phone = formatPhoneForWhatsApp(rawPhone);
 
             let feesObj = {};
             allMonthsList.forEach(m => {
@@ -682,32 +756,99 @@
 
         async function loadTodayAttendanceLog() {
             const tbody = document.getElementById('attendance-log-body');
-            tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">Loading today's attendance...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Loading today's attendance...</td></tr>`;
             const today = new Date().toISOString().split('T')[0];
+            const filterGradeVal = document.getElementById('att-grade-filter') ? document.getElementById('att-grade-filter').value : 'All';
+
             try {
                 const snapshot = await window.get(window.child(window.ref(window.db), `attendance/${today}`));
                 if (snapshot.exists()) {
                     tbody.innerHTML = "";
                     let count = 0;
                     snapshot.forEach((childSnap) => {
-                        count++;
+                        const studentKey = childSnap.key;
                         const att = childSnap.val();
-                        tbody.innerHTML += `
-                            <tr class="hover:bg-slate-700/50 border-b border-slate-700">
-                                <td class="p-3 font-semibold text-amber-300">${att.name}</td>
-                                <td class="p-3"><span class="px-2 py-0.5 bg-slate-900 border border-slate-700 rounded text-xs text-amber-200">${att.grade}</span></td>
-                                <td class="p-3 font-mono text-xs text-emerald-400 font-bold">${att.time}</td>
-                            </tr>
-                        `;
+                        if (filterGradeVal === 'All' || att.grade === filterGradeVal) {
+                            count++;
+                            tbody.innerHTML += `
+                                <tr class="hover:bg-slate-700/50 border-b border-slate-700">
+                                    <td class="p-3 font-semibold text-amber-300">${att.name}</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-slate-900 border border-slate-700 rounded text-xs text-amber-200">${att.grade}</span></td>
+                                    <td class="p-3 font-mono text-xs text-emerald-400 font-bold">${att.time}</td>
+                                    <td class="p-3 no-print">
+                                        <button onclick="deleteAttendanceRecord('${today}', '${studentKey}', '${att.name}')" class="text-xs bg-rose-600/80 hover:bg-rose-600 text-white px-2.5 py-1 rounded-lg">🗑️ Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        }
                     });
                     document.getElementById('today-count-display').innerText = count;
+                    if (count === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No attendance for ${filterGradeVal}.</td></tr>`;
+                    }
                 } else {
-                    tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-slate-400">අද දින කිසිදු පැමිණීමක් සටහන් වී නැත.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">අද දින කිසිදු පැමිණීමක් සටහන් වී නැත.</td></tr>`;
                     document.getElementById('today-count-display').innerText = "0";
                 }
             } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-rose-400">Failed to load attendance log.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-rose-400">Failed to load attendance log.</td></tr>`;
             }
+        }
+
+        async function deleteAttendanceRecord(dateStr, studentKey, studentName) {
+            if (confirm(`${studentName} ගේ ${dateStr} දින පැමිණීම් සටහන පද්ධතියෙන් ඉවත් කිරීමට අවශ්‍යද?`)) {
+                try {
+                    await window.remove(window.ref(window.db, `attendance/${dateStr}/${studentKey}`));
+                    alert("✅ පැමිණීම් සටහන සාර්ථකව ඉවත් කරන ලදී!");
+                    loadTodayAttendanceLog();
+                } catch (e) {
+                    alert("❌ පැමිණීම ඉවත් කිරීම අසාර්ථක විය!");
+                }
+            }
+        }
+
+        async function loadIncomeReport() {
+            const currentMonth = getCurrentMonthKey();
+            let totalIncome = 0;
+            let paidCount = 0;
+            let unpaidCount = 0;
+            let gradeTotals = { "Grade 7": 0, "Grade 8": 0, "Grade 9": 0, "Grade 10": 0, "Grade 11 (O/L)": 0 };
+
+            try {
+                const snapshot = await window.get(window.child(window.ref(window.db), 'students'));
+                if (snapshot.exists()) {
+                    snapshot.forEach(childSnap => {
+                        const s = childSnap.val();
+                        const fees = s.fees || {};
+                        const cardType = s.cardType || "Full";
+                        const status = fees[currentMonth.key] || 'Unpaid';
+
+                        if (status === 'Paid') {
+                            paidCount++;
+                            let feeAmount = (cardType === 'Half') ? CLASS_FEE_HALF : (cardType === 'Free' ? 0 : CLASS_FEE_FULL);
+                            totalIncome += feeAmount;
+                            if (gradeTotals[s.grade] !== undefined) gradeTotals[s.grade] += feeAmount;
+                        } else {
+                            if (cardType !== 'Free') unpaidCount++;
+                        }
+                    });
+
+                    document.getElementById('inc-total-amount').innerText = `රු. ${totalIncome.toLocaleString()}/-`;
+                    document.getElementById('inc-paid-count').innerText = paidCount;
+                    document.getElementById('inc-unpaid-count').innerText = unpaidCount;
+
+                    const cardsDiv = document.getElementById('grade-income-cards');
+                    cardsDiv.innerHTML = "";
+                    for (let g in gradeTotals) {
+                        cardsDiv.innerHTML += `
+                            <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-center">
+                                <p class="text-xs text-amber-300 font-bold mb-1">${g}</p>
+                                <p class="text-lg font-black text-emerald-400 font-mono">රු. ${gradeTotals[g].toLocaleString()}</p>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (e) { console.log(e); }
         }
 
         function filterGrade(gradeName) {
@@ -748,7 +889,7 @@
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-700/50 border-b border-slate-700">
-                        <td class="p-3 font-medium text-amber-300">${s.name}</td>
+                        <td class="p-3 font-medium text-amber-300 cursor-pointer hover:underline" onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})}, ${JSON.stringify(s.phone || '')}, ${JSON.stringify(s.cardType || 'Full')})'>${s.name}</td>
                         <td class="p-3"><span class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs text-amber-200">${s.grade}</span></td>
                         <td class="p-3"><span class="px-2 py-0.5 rounded text-[11px] font-bold ${cardType==='Free'?'bg-purple-500/20 text-purple-300 border border-purple-500':cardType==='Half'?'bg-blue-500/20 text-blue-300 border border-blue-500':'bg-slate-900 text-slate-400'}">${cardType}</span></td>
                         <td class="p-3 font-mono text-xs text-slate-300">${s.studentId}</td>
@@ -758,7 +899,7 @@
                             </button>
                         </td>
                         <td class="p-3 no-print">
-                            <button onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})}, ${JSON.stringify(s.phone || '')}, ${JSON.stringify(s.cardType || 'Full')})' class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg text-white font-medium">More Info / Edit</button>
+                            <button onclick='openEditModal(${JSON.stringify(key)}, ${JSON.stringify(s.name)}, ${JSON.stringify(s.studentId)}, ${JSON.stringify(s.grade)}, ${JSON.stringify(s.fees || {})}, ${JSON.stringify(s.phone || '')}, ${JSON.stringify(s.cardType || 'Full')})' class="text-xs bg-blue-600 hover:bg-blue-500 px-3 py-1.5 rounded-lg text-white font-medium">View Profile / Edit</button>
                             <button onclick="deleteStudent('${key}')" class="text-xs bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded-lg text-white ml-2">Delete</button>
                         </td>
                     </tr>`;
@@ -783,11 +924,15 @@
             }
         }
 
-        function openEditModal(key, name, studentId, grade, fees, phone, cardType) {
+        async function openEditModal(key, name, studentId, grade, fees, phone, cardType) {
             document.getElementById('edit-modal').classList.remove('hidden');
             document.getElementById('edit-db-key').value = key;
             document.getElementById('edit-name').value = name;
-            document.getElementById('edit-phone').value = phone || '';
+            
+            let rawPhone = phone || '';
+            if (rawPhone.startsWith('94')) rawPhone = rawPhone.substring(2);
+            document.getElementById('edit-phone').value = rawPhone;
+
             document.getElementById('edit-id').value = studentId;
             document.getElementById('edit-grade').value = grade;
             document.getElementById('edit-card-type').value = cardType || 'Full';
@@ -811,6 +956,28 @@
                     </div>
                 `;
             });
+
+            const historyContainer = document.getElementById('modal-attendance-history');
+            historyContainer.innerHTML = "Fetching attendance records...";
+
+            try {
+                const snapshot = await window.get(window.child(window.ref(window.db), 'attendance'));
+                if (snapshot.exists()) {
+                    let historyHtml = "";
+                    snapshot.forEach(dateSnap => {
+                        const dateKey = dateSnap.key;
+                        if (dateSnap.hasChild(key)) {
+                            const rec = dateSnap.child(key).val();
+                            historyHtml += `<div class="flex justify-between border-b border-slate-800 pb-1"><span>📅 ${dateKey}</span><span class="text-emerald-400 font-mono">${rec.time}</span></div>`;
+                        }
+                    });
+                    historyContainer.innerHTML = historyHtml || "<p class='text-slate-500'>කිසිදු පැමිණීමේ සටහනක් හමු නොවීය.</p>";
+                } else {
+                    historyContainer.innerHTML = "<p class='text-slate-500'>කිසිදු පැමිණීමේ සටහනක් හමු නොවීය.</p>";
+                }
+            } catch (e) {
+                historyContainer.innerHTML = "Error loading attendance history.";
+            }
         }
 
         async function toggleModalMonthFee(studentKey, monthKey, currentStatus) {
@@ -834,10 +1001,12 @@
             event.preventDefault();
             const key = document.getElementById('edit-db-key').value;
             const name = document.getElementById('edit-name').value.trim();
-            const phone = document.getElementById('edit-phone').value.trim();
+            const rawPhone = document.getElementById('edit-phone').value.trim();
             const studentId = document.getElementById('edit-id').value.trim();
             const grade = document.getElementById('edit-grade').value;
             const cardType = document.getElementById('edit-card-type').value;
+
+            const phone = formatPhoneForWhatsApp(rawPhone);
 
             try {
                 await window.update(window.ref(window.db, `students/${key}`), {
@@ -847,7 +1016,7 @@
                     grade: grade,
                     cardType: cardType
                 });
-                alert("Student details updated successfully!");
+                alert("Student profile updated successfully!");
                 closeEditModal();
                 loadReports();
             } catch (error) {
