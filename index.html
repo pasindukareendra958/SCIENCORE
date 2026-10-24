@@ -163,7 +163,6 @@
                 </div>
             </div>
 
-            <!-- Grade-wise Attendance History Logs -->
             <div class="bg-slate-800/90 p-6 rounded-2xl border border-slate-700 shadow-xl">
                 <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
                     <h2 class="text-xl font-semibold text-amber-300">📅 Today's Attendance Log (ශ්‍රේණි අනුව)</h2>
@@ -303,14 +302,12 @@
                     </div>
                 </div>
 
-                <!-- Chat Log Box -->
                 <div id="ai-chat-box" class="flex-1 my-4 p-4 bg-slate-900 rounded-xl border border-slate-700/80 overflow-y-auto space-y-3 text-sm">
                     <div class="bg-indigo-950/60 border border-indigo-500/30 p-3 rounded-xl max-w-lg text-indigo-200">
                         👋 ආයුබෝවන්! මම Sciencore AI සහායකයා. පන්තියේ ළමයින්ගේ පැමිණීම, ගෙවීම් හිඟයන් හෝ වෙනත් ඕනෑම තොරතුරක් ගැන මගෙන් විමසන්න.
                     </div>
                 </div>
 
-                <!-- Input Box -->
                 <div class="flex gap-2">
                     <input type="text" id="ai-input" placeholder="උදා: Grade 10 පන්තියේ අද පැමිණි ළමයින් කවුද?" class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:border-indigo-400 outline-none transition-all" onkeypress="if(event.key==='Enter') askGeminiAI()">
                     <button onclick="askGeminiAI()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold px-6 py-3 rounded-xl shadow-md transition-all active:scale-95">Send 🚀</button>
@@ -399,7 +396,6 @@
     </div>
 
     <script>
-        // Integrated API Key
         const GEMINI_API_KEY = "AQ.Ab8RN6K90r4jvn3heJjzIBw8LW7fDkW2_7oeHpQg94p4rFoBBg";
 
         let html5QrCode = null;
@@ -417,6 +413,20 @@
             { id: "2026-11", name: "නොවැම්බර්" },
             { id: "2026-12", name: "දෙසැම්බර්" }
         ];
+
+        // Helper function to format array of month names smoothly into Sinhala text
+        function formatMonthsInSinhala(monthsArr) {
+            if (!monthsArr || monthsArr.length === 0) return "";
+            if (monthsArr.length === 1) {
+                return `${monthsArr[0]} මාසයේ`;
+            } else if (monthsArr.length === 2) {
+                return `${monthsArr[0]} සහ ${monthsArr[1]} මාසවල`;
+            } else {
+                const last = monthsArr[monthsArr.length - 1];
+                const rest = monthsArr.slice(0, monthsArr.length - 1).join(', ');
+                return `${rest} සහ ${last} මාසවල`;
+            }
+        }
 
         function getClassFeeByGrade(grade) {
             if (grade.includes("10") || grade.includes("11")) return 1200;
@@ -640,7 +650,8 @@
                             `;
                             speechMessage = `${foundStudent.name}. පැමිණීම සටහන් කරගන්නා ලදී.`;
                         } else {
-                            const unpaidStr = unpaidPastMonths.map(m => m.name).join(', ');
+                            const monthNamesOnly = unpaidPastMonths.map(m => m.name);
+                            const formattedUnpaidMonthsStr = formatMonthsInSinhala(monthNamesOnly);
                             const singleFee = getClassFeeByGrade(foundStudent.grade);
 
                             displayHtml = `
@@ -653,7 +664,7 @@
                                         <span class="px-2.5 py-1 bg-rose-500/20 border border-rose-500 text-rose-300 text-xs font-bold rounded-lg">${cardType} Card</span>
                                     </div>
                                     <div class="p-3 rounded-xl border bg-rose-500/20 text-rose-400 border-rose-500 font-bold text-center">
-                                        ⚠️ අනතුරු ඇඟවීමයි: ${unpaidStr} මාසවල පන්ති ගාස්තු ගෙවා නැත!
+                                        ⚠️ අනතුරු ඇඟවීමයි: ${formattedUnpaidMonthsStr} මුදල් ගෙවා නැත!
                                     </div>
                                     
                                     <button onclick="instantMultiPayMonths('${studentKey}', '${foundStudent.name}', '${foundStudent.grade}', '${searchCode}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold py-3 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -664,7 +675,7 @@
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-1">✅ පැමිණීම සටහන් කරගන්නා ලදී</p>
                                 </div>
                             `;
-                            speechMessage = `${foundStudent.name}. ${unpaidStr} මාසවල පන්ති ගාස්තු ගෙවා නැත. පැමිණීම සටහන් කරගන්නා ලදී.`;
+                            speechMessage = `${foundStudent.name}. ${formattedUnpaidMonthsStr} මුදල් ගෙවා නැත. පැමිණීම සටහන් කරගන්නා ලදී.`;
                         }
 
                         resultDiv.innerHTML = displayHtml;
@@ -731,9 +742,25 @@
 
                     if (Object.keys(updates).length > 0) {
                         await window.update(window.ref(window.db), updates);
-                        const paidStr = paidMonthNames.join(' සහ ');
-                        alert(`✅ ${studentName} ගේ ${paidStr} මාසවල පන්ති ගාස්තු සාර්ථකව ගෙවූ බව සටහන් විය!`);
-                        speakText(`${studentName}. ${paidStr} මාසවල පන්ති ගාස්තු ගෙවන ලදී.`);
+
+                        // Check remaining unpaid months after payment
+                        let remainingUnpaidNames = [];
+                        for (let i = monthsToPayCount; i < unpaidMonths.length; i++) {
+                            remainingUnpaidNames.push(unpaidMonths[i].name);
+                        }
+
+                        const paidStrFormatted = formatMonthsInSinhala(paidMonthNames);
+                        let voiceMsg = `${studentName}. ${paidStrFormatted} මුදල් භාර ගන්නා ලදී. `;
+
+                        if (remainingUnpaidNames.length > 0) {
+                            const remainingStrFormatted = formatMonthsInSinhala(remainingUnpaidNames);
+                            voiceMsg += `තවදුරටත් ${remainingStrFormatted} පන්ති ගාස්තු ඉතිරිව පවතී.`;
+                        } else {
+                            voiceMsg += `ඒ අනුව සියලුම මාසවල පන්ති ගාස්තු ගෙවා ඇත.`;
+                        }
+
+                        alert(`✅ ${studentName} ගේ ${paidMonthNames.join(', ')} ගෙවීම් සාර්ථකව සටහන් විය!`);
+                        speakText(voiceMsg);
                         verifyStudentByQR(qrCode);
                     } else {
                         alert("⚠️ ගෙවීමට හිඟ මාස හමු නොවීය!");
@@ -1182,7 +1209,6 @@
 
             if (!userQuery) return;
 
-            // Append User Question to UI
             chatBox.innerHTML += `
                 <div class="flex justify-end">
                     <div class="bg-amber-500 text-slate-900 font-medium p-3 rounded-xl max-w-lg shadow">
@@ -1244,7 +1270,7 @@
                         </div>
                     `;
                 } else {
-                    chatBox.innerHTML += `<div class="text-rose-400 text-xs">❌ AI එකෙන් පිළිතුරක් ලබා ගැනීමට නොහැකි විය. (කරුණාකර API Key එක නිවැරදි දැයි පරීක්ෂා කරන්න).</div>`;
+                    chatBox.innerHTML += `<div class="text-rose-400 text-xs">❌ AI එකෙන් පිළිතුරක් ලබා ගැනීමට නොහැකි විය.</div>`;
                 }
             } catch (error) {
                 console.error(error);
