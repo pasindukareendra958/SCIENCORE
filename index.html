@@ -61,7 +61,7 @@
                     <p class="text-[10px] text-slate-400 font-semibold tracking-widest">THE CORE OF SCIENCE</p>
                 </div>
             </div>
-            <!-- Dynamic Navigation Tabs -->
+            <!-- Navigation Tabs -->
             <div class="flex flex-wrap gap-2">
                 <button onclick="switchTab('scanner')" id="btn-scanner" class="px-3 py-2 bg-amber-500 text-slate-900 font-extrabold rounded-xl shadow-md transition-all text-xs md:text-sm active:scale-95">📷 Scanner</button>
                 <button onclick="switchTab('reports')" id="btn-reports" class="px-3 py-2 bg-slate-700/80 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-xs md:text-sm active:scale-95">📊 Reports</button>
@@ -414,18 +414,29 @@
             { id: "2026-12", name: "දෙසැම්බර්" }
         ];
 
-        // Helper function to format array of month names smoothly into Sinhala text
-        function formatMonthsInSinhala(monthsArr) {
+        // Advanced Sinhala Grammar Month Formatter for Voice Output
+        function formatMonthsForVoice(monthsArr, suffixType = "unpaid") {
             if (!monthsArr || monthsArr.length === 0) return "";
+            
+            let monthsText = "";
             if (monthsArr.length === 1) {
-                return `${monthsArr[0]} මාසයේ`;
+                monthsText = `${monthsArr[0]} මාසයේ`;
             } else if (monthsArr.length === 2) {
-                return `${monthsArr[0]} සහ ${monthsArr[1]} මාසවල`;
+                monthsText = `${monthsArr[0]} සහ ${monthsArr[1]} මාසවල`;
             } else {
                 const last = monthsArr[monthsArr.length - 1];
                 const rest = monthsArr.slice(0, monthsArr.length - 1).join(', ');
-                return `${rest} සහ ${last} මාසවල`;
+                monthsText = `${rest} සහ ${last} මාසවල`;
             }
+
+            if (suffixType === "unpaid") {
+                return `${monthsText} මුදල් ගෙවා නැත`;
+            } else if (suffixType === "received") {
+                return `${monthsText} මුදල් භාර ගන්නා ලදී`;
+            } else if (suffixType === "remaining") {
+                return `${monthsText} පන්ති ගාස්තු ඉතිරිව පවතී`;
+            }
+            return monthsText;
         }
 
         function getClassFeeByGrade(grade) {
@@ -604,7 +615,7 @@
                         if (cardType !== "Free") {
                             for (let m of allMonthsList) {
                                 if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
-                                    unpaidPastMonths.push({ id: m.id, name: m.name });
+                                    unpaidPastMonths.push(m.name);
                                 }
                                 if (m.id === currentMonth.key) break;
                             }
@@ -650,8 +661,7 @@
                             `;
                             speechMessage = `${foundStudent.name}. පැමිණීම සටහන් කරගන්නා ලදී.`;
                         } else {
-                            const monthNamesOnly = unpaidPastMonths.map(m => m.name);
-                            const formattedUnpaidMonthsStr = formatMonthsInSinhala(monthNamesOnly);
+                            const unpaidSentence = formatMonthsForVoice(unpaidPastMonths, "unpaid");
                             const singleFee = getClassFeeByGrade(foundStudent.grade);
 
                             displayHtml = `
@@ -664,7 +674,7 @@
                                         <span class="px-2.5 py-1 bg-rose-500/20 border border-rose-500 text-rose-300 text-xs font-bold rounded-lg">${cardType} Card</span>
                                     </div>
                                     <div class="p-3 rounded-xl border bg-rose-500/20 text-rose-400 border-rose-500 font-bold text-center">
-                                        ⚠️ අනතුරු ඇඟවීමයි: ${formattedUnpaidMonthsStr} මුදල් ගෙවා නැත!
+                                        ⚠️ අනතුරු ඇඟවීමයි: ${unpaidSentence}!
                                     </div>
                                     
                                     <button onclick="instantMultiPayMonths('${studentKey}', '${foundStudent.name}', '${foundStudent.grade}', '${searchCode}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold py-3 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
@@ -675,7 +685,7 @@
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-1">✅ පැමිණීම සටහන් කරගන්නා ලදී</p>
                                 </div>
                             `;
-                            speechMessage = `${foundStudent.name}. ${formattedUnpaidMonthsStr} මුදල් ගෙවා නැත. පැමිණීම සටහන් කරගන්නා ලදී.`;
+                            speechMessage = `${foundStudent.name}. ${unpaidSentence}. පැමිණීම සටහන් කරගන්නා ලදී.`;
                         }
 
                         resultDiv.innerHTML = displayHtml;
@@ -743,24 +753,25 @@
                     if (Object.keys(updates).length > 0) {
                         await window.update(window.ref(window.db), updates);
 
-                        // Check remaining unpaid months after payment
+                        // Calculate remaining unpaid months after this payment
                         let remainingUnpaidNames = [];
                         for (let i = monthsToPayCount; i < unpaidMonths.length; i++) {
                             remainingUnpaidNames.push(unpaidMonths[i].name);
                         }
 
-                        const paidStrFormatted = formatMonthsInSinhala(paidMonthNames);
-                        let voiceMsg = `${studentName}. ${paidStrFormatted} මුදල් භාර ගන්නා ලදී. `;
+                        // Build Voice Command Sentence
+                        const paidSentence = formatMonthsForVoice(paidMonthNames, "received");
+                        let fullVoiceMsg = `${studentName}. ${paidSentence}. `;
 
                         if (remainingUnpaidNames.length > 0) {
-                            const remainingStrFormatted = formatMonthsInSinhala(remainingUnpaidNames);
-                            voiceMsg += `තවදුරටත් ${remainingStrFormatted} පන්ති ගාස්තු ඉතිරිව පවතී.`;
+                            const remainingSentence = formatMonthsForVoice(remainingUnpaidNames, "remaining");
+                            fullVoiceMsg += `තවදුරටත් ${remainingSentence}.`;
                         } else {
-                            voiceMsg += `ඒ අනුව සියලුම මාසවල පන්ති ගාස්තු ගෙවා ඇත.`;
+                            fullVoiceMsg += `ඒ අනුව සියලුම මාසවල පන්ති ගාස්තු ගෙවා ඇත.`;
                         }
 
                         alert(`✅ ${studentName} ගේ ${paidMonthNames.join(', ')} ගෙවීම් සාර්ථකව සටහන් විය!`);
-                        speakText(voiceMsg);
+                        speakText(fullVoiceMsg);
                         verifyStudentByQR(qrCode);
                     } else {
                         alert("⚠️ ගෙවීමට හිඟ මාස හමු නොවීය!");
