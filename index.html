@@ -74,7 +74,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
 @media print{.sc-hero,#dashboard-scanner,#tab-dashboard{display:none!important}}
     </style>
 <style id="sciencore-v3-style">
-.ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px}.ops-card{background:linear-gradient(145deg,#0e2343,#091425);border:1px solid #254a75;border-radius:22px;padding:20px;box-shadow:0 12px 32px #0004;transition:transform .22s,border-color .22s}.ops-card:hover{transform:translateY(-3px);border-color:#38bdf8}.ops-card h3{font-size:1.12rem;font-weight:850;color:#fff;margin-bottom:12px}.ops-muted{font-size:.78rem;color:#a6b8d1;margin:6px 0}.ops-scroll{max-height:260px;overflow:auto;margin-top:12px}.ops-row{padding:10px 0;border-bottom:1px solid #294461;font-size:.84rem;overflow-wrap:anywhere}.ops-btn,.ops-mini{background:#164b77;color:#e7f7ff;padding:9px 13px;border-radius:11px;font-weight:700;font-size:.8rem;display:inline-block}.ops-mini{margin:5px 0 0 8px;background:#234363}.ops-btn:hover,.ops-mini:hover{background:#226fa4}.ops-label{display:block;font-size:.76rem;color:#b4c8e4;margin:12px 0 5px}.ops-check{display:block;margin:9px 0;color:#dbeafe;font-size:.86rem}.ops-status{margin-top:12px;padding:12px;border:1px solid #30537a;background:#0a1b33;border-radius:12px;font-size:.82rem;color:#a8ddff}.sc-toast{position:fixed;bottom:25px;right:25px;z-index:99999;max-width:340px;padding:15px 22px;border:1px solid #38bdf8;border-radius:15px;background:#0b2d51;color:white;box-shadow:0 15px 40px #0009;opacity:0;transform:translateY(20px);pointer-events:none;transition:all .25s}.sc-toast.show{opacity:1;transform:translateY(0)}.sc-toast-error{border-color:#fb7185}#dashboard-stats [draggable=true],#dashboard-grades [draggable=true]{outline:1px dashed #ffcf39;outline-offset:2px}.sc-no-motion *, .sc-no-motion *::before,.sc-no-motion *::after{animation:none!important;transition:none!important}#dashboard-scanner:fullscreen{background:#061326;padding:28px;overflow:auto}#dashboard-scanner:fullscreen #reader{max-height:60vh}
+.ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px}.ops-card{background:linear-gradient(145deg,#0e2343,#091425);border:1px solid #254a75;border-radius:22px;padding:20px;box-shadow:0 12px 32px #0004;transition:transform .22s,border-color .22s}.ops-card:hover{transform:translateY(-3px);border-color:#38bdf8}.ops-card h3{font-size:1.12rem;font-weight:850;color:#fff;margin-bottom:12px}.ops-muted{font-size:.78rem;color:#a6b8d1;margin:6px 0}.ops-scroll{max-height:260px;overflow:auto;margin-top:12px}.ops-row{padding:10px 0;border-bottom:1px solid #294461;font-size:.84rem;overflow-wrap:anywhere}.ops-btn,.ops-mini{background:#164b77;color:#e7f7ff;padding:9px 13px;border-radius:11px;font-weight:700;font-size:.8rem;display:inline-block}.ops-mini{margin:5px 0 0 8px;background:#234363}.ops-btn:hover,.ops-mini:hover{background:#226fa4}.ops-label{display:block;font-size:.76rem;color:#b4c8e4;margin:12px 0 5px}.ops-check{display:block;margin:9px 0;color:#dbeafe;font-size:.86rem}.ops-status{margin-top:12px;padding:12px;border:1px solid #30537a;background:#0a1b33;border-radius:12px;font-size:.82rem;color:#a8ddff}.sc-toast{position:fixed;bottom:25px;right:25px;z-index:99999;max-width:340px;padding:15px 22px;border:1px solid #38bdf8;border-radius:15px;background:#0b2d51;color:white;box-shadow:0 15px 40px #0009;opacity:0;transform:translateY(20px);pointer-events:none;transition:all .25s}.sc-toast.show{opacity:1;transform:translateY(0)}.sc-toast-error{border-color:#fb7185}#dashboard-stats [draggable=true],#dashboard-grades [draggable=true]{outline:1px dashed #ffcf39;outline-offset:2px}.sc-no-motion *, .sc-no-motion *::before,.sc-no-motion *::after{animation:none!important;transition:none!important}#dashboard-scanner:fullscreen{background:#061326;padding:clamp(12px,2vw,28px);overflow:auto}#dashboard-scanner:fullscreen #reader{max-height:52vh;min-height:220px}#dashboard-scanner:fullscreen #student-result{padding-top:12px!important;padding-bottom:12px!important}#dashboard-scanner:fullscreen #student-result button{min-height:52px;font-size:1rem!important;position:relative;z-index:5}#dashboard-scanner:fullscreen #manual-id{min-width:0}#dashboard-scanner:fullscreen .grid:nth-child(2)>div{min-height:0}
 </style>
 
 <style id="sciencore-visual-refresh-33">
@@ -651,7 +651,10 @@ input,select,textarea,button{max-width:100%}
         }
         function formatMonthsForVoice(monthsArr, type = 'unpaid') {
             if (!monthsArr || monthsArr.length === 0) return '';
-            const names = monthsArr.map(monthNameForVoice);
+            const names = monthsArr.map(month => {
+                if (month && typeof month === 'object' && month.name) return String(month.name).replace(/^\d{4}\s*/, '');
+                return monthNameForVoice(month);
+            });
             let monthsText;
             if (names.length === 1) monthsText = `${names[0]} මාසයේ`;
             else if (names.length === 2) monthsText = `${names[0]} සහ ${names[1]} මාසවල`;
@@ -987,8 +990,7 @@ input,select,textarea,button{max-width:100%}
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-1">✅ Attendance Recorded Successfully</p>
                                 </div>
                             `;
-                            const paidSentence = paidPastMonths.length ? formatMonthsForVoice(paidPastMonths, "received") : "මෙතෙක් ගෙවූ මාසයක් සටහන් වී නැහැ";
-                            speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ${paidSentence}. සියලුම මාසවල ගාස්තු ගෙවා අවසන්.`;
+                            speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ගෙවීමට හිඟ මාස නැහැ.`;
                         } else {
                             const unpaidSentence = formatMonthsForVoice(unpaidPastMonths, "unpaid");
                             const singleFee = getClassFeeByGrade(foundStudent.grade);
@@ -1007,15 +1009,14 @@ input,select,textarea,button{max-width:100%}
                                     </div>
                                     
                                     <button onclick="instantMultiPayMonths('${studentKey}', '${foundStudent.name}', '${foundStudent.grade}', '${searchCode}')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-extrabold py-3 rounded-xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
-                                        💳 Mark Class Fee Payment (ගෙවීම් සටහන් කරන්න - රු. ${singleFee}/-)
+                                        💰 දැන් ගෙවීම සටහන් කරන්න · මාසික ගාස්තුව රු. ${singleFee}/-
                                     </button>
 
                                     ${waBtn}
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-1">✅ පැමිණීම සටහන් කරගන්නා ලදී</p>
                                 </div>
                             `;
-                            const paidSentence = paidPastMonths.length ? formatMonthsForVoice(paidPastMonths, "received") : "මෙතෙක් ගෙවූ මාසයක් සටහන් වී නැහැ";
-                            speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ${paidSentence}. ${unpaidSentence}.`;
+                            speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ${unpaidSentence}.`;
                         }
 
                         if (alreadyMarked) { scBeep('duplicate'); displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 Already marked today — පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml; }
@@ -1113,14 +1114,14 @@ input,select,textarea,button{max-width:100%}
                         }
 
                         // Voice Command formatting as requested
-                        const paidSentence = formatMonthsForVoice(paidMonthNames, "received");
-                        let fullVoiceMsg = `${studentName}. රුපියල් ${recordedAmount}. ${paidSentence}. `;
+                        const paidSentence = formatMonthsForVoice(paidMonthNames.map(name => ({name})), "received");
+                        let fullVoiceMsg = `${studentName}. රුපියල් ${recordedAmount} ක ගෙවීම සාර්ථකව සටහන් කළා. ${paidSentence}. `;
 
                         if (remainingUnpaidNames.length > 0) {
-                            const remainingSentence = formatMonthsForVoice(remainingUnpaidNames, "remaining");
-                            fullVoiceMsg += ` ${remainingSentence}.`;
+                            const remainingSentence = formatMonthsForVoice(remainingUnpaidNames.map(name => ({name})), "remaining");
+                            fullVoiceMsg += `${remainingSentence}.`;
                         } else {
-                            fullVoiceMsg += `ඒ අනුව සියලුම මාසවල පන්ති ගාස්තු ගෙවා අවසන්.`;
+                            fullVoiceMsg += `ගෙවීමට ඉතිරි මාස නැහැ. සියලුම ගාස්තු ගෙවා අවසන්.`;
                         }
 
                         alert(`✅ ${studentName} ගේ ${paidMonthNames.join(', ')} ගෙවීම් සාර්ථකව සටහන් විය!`);
