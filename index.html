@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sciencore Class Management System</title>
+    <title>Sciencore 2.3 | Management Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script type="module">
+        
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getDatabase, ref, set, get, update, remove, child, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
 
@@ -24,6 +25,7 @@
         const db = getDatabase(app);
 
         window.db = db;
+        window.currentUser = null;
         window.ref = ref;
         window.set = set;
         window.get = get;
@@ -45,11 +47,36 @@
             .bg-slate-800, .bg-slate-900 { background: white !important; border: 1px solid #ccc !important; color: black !important; }
             th, td { border: 1px solid #333 !important; padding: 6px !important; color: black !important; }
         }
+
+/* SCIENCORE 2.3 — Navy / Azure / Black / Yellow / White */
+:root {color-scheme:dark; --navy:#07152c;--navy2:#0b2144;--blue:#1b7bdb;--sky:#4dbbff;--yellow:#ffcf39;--edge:rgba(99,169,243,.23)}
+html{scroll-behavior:smooth} body{background:radial-gradient(ellipse 70% 35% at 10% 0%,rgba(26,112,212,.16),transparent),radial-gradient(ellipse 50% 25% at 90% 30%,rgba(21,96,192,.10),transparent),#050d1c!important;color:#f6faff}
+nav{background:rgba(5,15,33,.92)!important;border-color:var(--edge)!important;box-shadow:0 12px 45px rgba(0,0,0,.24)!important}
+nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,background .18s,border-color .18s,box-shadow .18s!important}nav button:hover{transform:translateY(-2px);border-color:rgba(255,207,57,.55);box-shadow:0 6px 18px rgba(10,72,160,.22)}
+#btn-dashboard{background:linear-gradient(115deg,#ffcf39,#f3ac19)!important;color:#07152c!important;font-weight:800}
+.sc-hero{position:relative;isolation:isolate;overflow:hidden;padding:clamp(22px,4vw,42px);border:1px solid rgba(82,165,255,.32);border-radius:24px;background:linear-gradient(112deg,#0c2a55 0%,#071a37 53%,#061226 100%);box-shadow:0 22px 55px rgba(0,0,0,.22);animation:scUp .55s both}
+.sc-hero-glow{position:absolute;right:-95px;top:-180px;width:480px;height:480px;background:radial-gradient(circle,rgba(31,139,255,.3),transparent 65%);animation:scGlow 7s ease-in-out infinite alternate;pointer-events:none}
+.sc-kicker{font-size:.68rem;letter-spacing:.17em;font-weight:900;color:#76c9ff}.sc-gradient-text{background:linear-gradient(100deg,#fff,#76caff,#ffdc60);color:transparent;background-clip:text;-webkit-background-clip:text}
+.sc-live,.sc-scanner-note{display:inline-flex;align-items:center;gap:9px;border:1px solid rgba(93,177,255,.25);background:rgba(11,34,71,.74);padding:11px 15px;border-radius:14px;color:#e0f1ff;font-size:.78rem;font-weight:800}.sc-live-dot{width:8px;height:8px;border-radius:50%;background:#48e7a6;box-shadow:0 0 0 5px rgba(72,231,166,.11);animation:scPulse 2s infinite}
+#dashboard-scanner>.grid:first-child>div{background:linear-gradient(125deg,rgba(13,46,91,.96),rgba(9,26,55,.98))!important;border-color:var(--edge)!important;border-radius:18px!important;box-shadow:0 10px 26px rgba(0,0,0,.16)!important}
+#dashboard-scanner>.grid:nth-child(2)>div{background:linear-gradient(150deg,#0b2349,#08172e)!important;border:1px solid rgba(88,165,251,.26)!important;border-radius:22px!important;box-shadow:0 15px 40px rgba(0,0,0,.19)!important}
+#dashboard-scanner h2{color:#fff!important;font-weight:850!important}
+#reader{border:1px dashed rgba(107,187,255,.44)!important;background:#040c1c!important;border-radius:16px!important;min-height:270px;overflow:hidden}#reader video{border-radius:12px;max-height:390px;object-fit:cover}#reader button{background:#ffcf39!important;color:#081a36!important;border:0!important;border-radius:10px!important;padding:8px 15px!important;font-weight:800!important}#reader a{color:#69c5ff!important}
+#manual-id{background:#07152c!important;border:1px solid rgba(103,180,255,.35)!important}#manual-id:focus{outline:2px solid #54baff!important;outline-offset:1px}#dashboard-scanner button[onclick^="verifyStudent"]{background:#ffcf39!important;color:#07152c!important}
+#current-time-display{color:#ffda58!important;font-size:clamp(1.25rem,2.3vw,1.85rem)!important;letter-spacing:.04em}#current-date-display{font-size:.95rem!important}
+.sc-stat,.sc-grade,.sc-section{background:linear-gradient(145deg,rgba(14,40,79,.98),rgba(7,23,47,.98));border:1px solid var(--edge);border-radius:20px;padding:20px;transition:transform .2s,box-shadow .2s,border-color .2s;animation:scUp .5s both}
+.sc-stat:hover,.sc-grade:hover{transform:translateY(-4px);border-color:rgba(255,207,57,.45);box-shadow:0 12px 30px rgba(2,16,38,.36)}.sc-stat-line{height:3px;border-radius:10px;background:linear-gradient(90deg,#ffcf39,#299ff7,transparent);margin-top:15px}.sc-section{padding:22px}.sc-refresh{border:1px solid rgba(91,180,255,.32);border-radius:12px;padding:9px 14px;background:#0c2b54;font-weight:700;color:#d9efff}.sc-refresh:hover{background:#14437d}.sc-footnote{color:#829fc4;font-size:.72rem;text-align:center;padding:12px}
+.panel{background:#0d2549!important;border-color:rgba(91,168,248,.24)!important}.field{background:#07152c!important;border-color:rgba(91,168,248,.32)!important}.action{background:#ffcf39!important;color:#06152d!important}
+.fade-in{animation:scUp .35s both}.card-hover:hover{box-shadow:0 12px 30px rgba(35,131,245,.15)!important}
+@keyframes scUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}@keyframes scGlow{from{transform:translate(0,0) scale(1)}to{transform:translate(-70px,70px) scale(1.25)}}@keyframes scPulse{50%{box-shadow:0 0 0 10px rgba(72,231,166,0)}}
+@media(max-width:640px){nav .max-w-7xl{gap:12px}nav button{font-size:.7rem!important;padding:7px 9px!important}#dashboard-scanner>.grid:nth-child(2){gap:15px}#dashboard-scanner>.grid:nth-child(2)>div{padding:16px!important}#reader{min-height:230px}.sc-stat,.sc-grade{padding:14px}.sc-live{width:100%;justify-content:center}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media print{.sc-hero,#dashboard-scanner,#tab-dashboard{display:none!important}}
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans selection:bg-amber-500 selection:text-slate-900">
 
-    <!-- Top Navigation Bar -->
+<!-- Top Navigation Bar -->
     <nav class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 p-3 sticky top-0 z-50 shadow-xl no-print">
         <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center gap-3">
@@ -57,13 +84,19 @@
                     <img src="logo.png" alt="Sciencore" class="object-cover w-full h-full" onerror="this.onerror=null; this.src='https://api.iconify.design/lucide:atom.svg?color=%23f59e0b';">
                 </div>
                 <div>
-                    <h1 class="text-lg md:text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-100 leading-tight">Sciencore</h1>
+                    <h1 class="text-lg md:text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-sky-200 via-white to-amber-300 leading-tight">Sciencore</h1>
                     <p class="text-[10px] text-slate-400 font-semibold tracking-widest">THE CORE OF SCIENCE</p>
                 </div>
             </div>
             <!-- Navigation Tabs -->
             <div class="flex flex-wrap gap-2">
-                <button onclick="switchTab('scanner')" id="btn-scanner" class="px-3 py-2 bg-amber-500 text-slate-900 font-extrabold rounded-xl shadow-md transition-all text-xs md:text-sm active:scale-95">📷 Scanner</button>
+                <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">🏠 Dashboard</button>
+                <button onclick="switchTab('birthdays')" id="btn-birthdays" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">🎂 Birthdays</button>
+                <button onclick="switchTab('messages')" id="btn-messages" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">📲 Messages</button>
+                <button onclick="switchTab('timetable')" id="btn-timetable" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">📅 Timetable</button>
+                <button onclick="switchTab('expenses')" id="btn-expenses" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">💸 Expenses</button>
+                <button onclick="switchTab('activity')" id="btn-activity" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">📜 Activity</button>
+                <button onclick="switchTab('settings')" id="btn-settings" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">⚙️ Settings</button>
                 <button onclick="switchTab('reports')" id="btn-reports" class="px-3 py-2 bg-slate-700/80 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-xs md:text-sm active:scale-95">📊 Reports</button>
                 <button onclick="switchTab('students')" id="btn-students" class="px-3 py-2 bg-slate-700/80 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-xs md:text-sm active:scale-95">📝 Register</button>
                 <button onclick="switchTab('income')" id="btn-income" class="px-3 py-2 bg-slate-700/80 text-slate-200 rounded-xl hover:bg-slate-600 transition-all text-xs md:text-sm active:scale-95">💰 Income</button>
@@ -73,8 +106,18 @@
     </nav>
 
     <main class="max-w-7xl mx-auto p-4 md:p-6">
+
+<section id="tab-dashboard" class="hidden space-y-7 fade-in">
+  <div class="sc-hero">
+    <div class="sc-hero-glow"></div>
+    <div class="relative z-10 flex flex-wrap items-center justify-between gap-4">
+      <div><span class="sc-kicker">✦ SCIENCORE CONTROL CENTER</span><h2 class="text-3xl md:text-4xl font-black mt-2">Welcome to <span class="sc-gradient-text">Sciencore.</span></h2><p class="text-slate-300 mt-2 text-sm">Fast attendance, clear insights. Everything in one place.</p></div>
+      <div class="sc-live"><span class="sc-live-dot"></span> SYSTEM LIVE <span class="opacity-60">•</span> <span id="hero-live-time">--:--:--</span></div>
+    </div>
+  </div>
+  <div class="flex flex-wrap items-center justify-between gap-3"><div><div class="sc-kicker">01 / QUICK ATTENDANCE</div><h3 class="text-xl md:text-2xl font-extrabold text-white mt-1">📷 Scan &amp; Check In</h3></div><div class="sc-scanner-note">⚡ QR scan or enter an ID below</div></div>
         <!-- TAB 1: SCANNER -->
-        <section id="tab-scanner" class="space-y-6 fade-in">
+        <div id="dashboard-scanner" class="space-y-6 fade-in">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-slate-800/80 border border-amber-500/30 p-4 rounded-2xl flex items-center gap-3 shadow-lg card-hover">
                     <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400 text-xl border border-amber-500/20">📅</div>
@@ -118,7 +161,20 @@
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+
+  <div class="flex flex-wrap items-center justify-between gap-3 pt-2"><div><div class="sc-kicker">02 / OVERVIEW</div><h3 class="text-xl md:text-2xl font-extrabold text-white mt-1">📊 At a Glance</h3></div><button onclick="loadDashboard()" class="sc-refresh">↻ Refresh overview</button></div>
+  <div id="dashboard-stats" class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4"></div>
+  <div class="sc-section"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">🎓 Students by Grade</h3><span class="text-xs text-slate-400">Live database summary</span></div><div id="dashboard-grades" class="grid grid-cols-2 md:grid-cols-5 gap-3"></div></div>
+  <div class="sc-footnote">🔒 Internal management workspace · Keep database permissions restricted</div>
+</section>
+<section id="tab-birthdays" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">🎂 Birthday Center</h2><p class="text-xs text-slate-400">Automatic SMS requires an external SMS provider and a scheduled backend. Here you can prepare SMS manually.</p><div id="birthday-list" class="space-y-3"></div></section>
+<section id="tab-messages" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">📲 Message Center</h2><select id="msg-grade" class="field"><option value="All">All Grades</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11 (O/L)</option></select><textarea id="msg-text" class="field w-full" rows="4" placeholder="Message for parents..."></textarea><button onclick="prepareMessages()" class="action">Prepare individual SMS links</button><div id="message-list" class="space-y-2"></div></section>
+<section id="tab-timetable" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">📅 Timetable / Class Events</h2><form onsubmit="addSchedule(event)" class="grid md:grid-cols-4 gap-3"><select id="schedule-grade" class="field"><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11 (O/L)</option></select><input id="schedule-date" type="date" required class="field"><input id="schedule-time" type="time" required class="field"><input id="schedule-note" placeholder="Class / extra / cancelled" required class="field"><button class="action">Add event</button></form><div id="schedule-list" class="space-y-2"></div></section>
+<section id="tab-expenses" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">💸 Expense Tracker</h2><form onsubmit="addExpense(event)" class="grid md:grid-cols-4 gap-3"><input id="expense-date" type="date" required class="field"><input id="expense-category" required placeholder="Printing / Rent / Other" class="field"><input id="expense-amount" required type="number" min="0.01" step="0.01" placeholder="Amount Rs." class="field"><button class="action">Save expense</button></form><p id="expense-total" class="font-bold text-emerald-400"></p><div id="expense-list" class="space-y-2"></div></section>
+<section id="tab-activity" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">📜 Staff Activity</h2><div id="activity-list" class="space-y-2"></div></section>
+<section id="tab-settings" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">⚙️ System Settings</h2><p class="text-xs text-slate-400">Only approved admin accounts should change settings. Configure database security rules before production use.</p><form onsubmit="saveSettings(event)" class="grid md:grid-cols-3 gap-3"><input id="fee-7" type="number" min="0" class="field" placeholder="Grade 7-9 fee"><input id="fee-10" type="number" min="0" class="field" placeholder="Grade 10-11 fee"><button class="action">Save fees</button></form><div class="flex flex-wrap gap-3"><button onclick="exportStudentsCSV()" class="action">Export students CSV</button><button onclick="exportBackup()" class="action">Download JSON backup</button><button onclick="exportAttendanceCSV()" class="action">Export attendance CSV</button></div><p class="text-xs text-amber-300">Backup export does not replace secure scheduled server backups. Restore should be handled by an administrator after validation.</p></section>
+<style>.field{background:#0f172a;border:1px solid #475569;border-radius:10px;padding:11px;color:white;min-width:0}.action{background:#f59e0b;color:#0f172a;font-weight:800;border-radius:10px;padding:11px 16px}.panel{background:#1e293b;border:1px solid #475569;border-radius:14px;padding:15px}</style>
 
         <!-- TAB 2: REPORTS & ATTENDANCE LOGS -->
         <section id="tab-reports" class="hidden space-y-6 fade-in">
@@ -230,17 +286,18 @@
                         </div>
                     </div>
 
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3"><div><label class="block text-sm mb-1">Birthday</label><input id="reg-birthday" type="date" class="field w-full"></div><div><label class="block text-sm mb-1">School</label><input id="reg-school" class="field w-full" placeholder="School"></div><div><label class="block text-sm mb-1">Student Mobile (optional)</label><input id="reg-student-phone" type="tel" class="field w-full" placeholder="07XXXXXXXX"></div><div><label class="block text-sm mb-1">Registration date</label><input id="reg-joined" type="date" class="field w-full"></div></div>
                     <!-- QR CODE METHOD SELECTION -->
                     <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
                         <label class="block text-sm font-bold text-amber-300">🪪 Student ID & QR Code Method (ක්‍රමය තෝරන්න)</label>
                         <div class="flex gap-4">
                             <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-200">
                                 <input type="radio" name="qr-method" value="auto" checked onchange="toggleQrInputMode()" class="accent-amber-500">
-                                ස්වයංක්‍රීයව අංකයක් ජනනය කරන්න (Auto)
+                                🆕 අලුත් QR Code එකක් ස්වයංක්‍රීයව හදන්න (Auto)
                             </label>
                             <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-200">
                                 <input type="radio" name="qr-method" value="manual" onchange="toggleQrInputMode()" class="accent-amber-500">
-                                මගේම QR / අංකයක් ඇතුළත් කරන්න (Manual)
+                                ♻️ කලින් හදාගත් QR Code එකක් සම්බන්ධ කරන්න (Existing QR)
                             </label>
                         </div>
 
@@ -249,7 +306,7 @@
                             <button type="button" onclick="autoGenerateStudentIdByGrade()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95">🔄 Refresh</button>
                         </div>
 
-                        <div id="manual-id-box" class="hidden mt-2">
+                        <div id="manual-id-box" class="hidden mt-2 space-y-3"><label class="block text-xs text-slate-300">Existing QR එකේ අංකය ටයිප් කරන්න හෝ QR image එක Upload කරන්න.</label><input type="file" id="existing-qr-file" accept="image/*" onchange="readExistingQRImage(event)" class="field w-full text-xs"><p id="existing-qr-feedback" class="text-xs text-amber-300"></p>
                             <input type="text" id="reg-custom-id" placeholder="කලින් තිබෙන QR කෝඩ් අංකය මෙහි ටයිප් කරන්න..." class="w-full bg-slate-950 border border-amber-500/60 font-mono text-amber-300 font-bold rounded-xl p-3 outline-none focus:border-amber-400">
                         </div>
                     </div>
@@ -383,7 +440,7 @@
                     <input type="text" id="edit-id" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white outline-none">
                 </div>
 
-                <div class="border-t border-slate-700 pt-3">
+                <div class="grid grid-cols-2 gap-3"><label>Birthday<input id="edit-birthday" type="date" class="field w-full"></label><label>School<input id="edit-school" class="field w-full"></label><label>Student mobile<input id="edit-student-phone" class="field w-full"></label></div><div class="border-t border-slate-700 pt-3">
                     <label class="block text-sm font-semibold text-amber-300 mb-2">All Months Fee Status (June - Dec 2026)</label>
                     <div id="modal-months-container" class="grid grid-cols-2 gap-2"></div>
                 </div>
@@ -414,7 +471,7 @@
     </div>
 
     <script>
-        const GEMINI_API_KEY = "AQ.Ab8RN6K90r4jvn3heJjzIBw8LW7fDkW2_7oeHpQg94p4rFoBBg";
+        const GEMINI_API_KEY = ""; // Never place a secret API key in browser code
 
         let html5QrCode = null;
         let lastScannedId = "";
@@ -422,7 +479,7 @@
         let allStudentsCache = [];
         let currentSelectedGradeFilter = 'All';
 
-        const allMonthsList = [
+        let allMonthsList = [
             { id: "2026-06", name: "ජූනි" },
             { id: "2026-07", name: "ජූලි" },
             { id: "2026-08", name: "අගෝස්තු" },
@@ -432,6 +489,9 @@
             { id: "2026-12", name: "දෙසැම්බර්" }
         ];
 
+        function localDateKey(d = new Date()) { const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
+        function monthsThroughCurrent() { const now=new Date(), arr=[]; for(let y=2026;y<=now.getFullYear();y++) for(let m=(y===2026?6:1);m<=12;m++){if(y===now.getFullYear()&&m>now.getMonth()+1) break;arr.push({id:`${y}-${String(m).padStart(2,'0')}`,name:`${y} ${new Date(y,m-1,1).toLocaleDateString('si-LK',{month:'long'})}`});}return arr; }
+        function refreshMonths(){const n=new Date();allMonthsList=monthsThroughCurrent(); if(n.getFullYear()===2026){for(let m=n.getMonth()+2;m<=12;m++)allMonthsList.push({id:`2026-${String(m).padStart(2,'0')}`,name:new Date(2026,m-1,1).toLocaleDateString('si-LK',{month:'long'})});}}
         // Accurate Sinhala Grammar Month Formatter for Voice Output
         function formatMonthsForVoice(monthsArr, type = "unpaid") {
             if (!monthsArr || monthsArr.length === 0) return "";
@@ -452,14 +512,14 @@
             } else if (type === "received") {
                 return `${monthsText} මුදල් ගෙවන ලදී`;
             } else if (type === "remaining") {
-                return `${monthsText} ඉතිරිව පවතී`;
+                return `${monthsText} මුදල් ගෙවීමට ඉතිරිව පවතී`;
             }
             return monthsText;
         }
 
         function getClassFeeByGrade(grade) {
-            if (grade.includes("10") || grade.includes("11")) return 1200;
-            return 1000;
+            if (grade.includes("10") || grade.includes("11")) return Number(window.sciencoreFees?.upper ?? 1200);
+            return Number(window.sciencoreFees?.lower ?? 1000);
         }
 
         function getTodaySecurityPin() {
@@ -488,7 +548,9 @@
                 const dateEl = document.getElementById('current-date-display');
                 const timeEl = document.getElementById('current-time-display');
                 if (dateEl) dateEl.innerText = dateStr;
-                if (timeEl) timeEl.innerText = now.toLocaleTimeString();
+                if (timeEl) timeEl.innerText = now.toLocaleTimeString('en-LK', {hour12:true});
+                const heroClock = document.getElementById('hero-live-time');
+                if (heroClock) heroClock.textContent = now.toLocaleTimeString('en-LK',{hour12:true});
             }
             updateClock();
             setInterval(updateClock, 1000);
@@ -554,7 +616,8 @@
         }
 
         function switchTab(tabName) {
-            ['scanner', 'reports', 'students', 'income', 'ai'].forEach(t => {
+            if (tabName === 'scanner') tabName = 'dashboard';
+            ['dashboard','birthdays','messages','timetable','expenses','activity','settings', 'reports', 'students', 'income', 'ai'].forEach(t => {
                 const tabEl = document.getElementById(`tab-${t}`);
                 const btnEl = document.getElementById(`btn-${t}`);
                 if (tabEl) tabEl.classList.add('hidden');
@@ -571,7 +634,13 @@
                 activeBtn.classList.add('bg-amber-500', 'text-slate-900', 'font-bold');
             }
 
-            if (tabName === 'scanner') {
+            if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'birthdays') loadBirthdays();
+            if (tabName === 'timetable') loadSchedules();
+            if (tabName === 'expenses') loadExpenses();
+            if (tabName === 'activity') loadActivities();
+            if (tabName === 'settings') loadSettings();
+            if (tabName === 'dashboard') {
                 initScanner();
                 loadTodayAttendanceLog();
             } else {
@@ -585,8 +654,12 @@
             }
         }
 
+        let scannerStarting = false;
         async function initScanner() {
             setTimeout(async () => {
+                if (scannerStarting || document.getElementById("tab-dashboard")?.classList.contains("hidden")) return;
+                scannerStarting = true;
+                try {
                 if (!html5QrCode) {
                     html5QrCode = new Html5Qrcode("reader");
                 }
@@ -613,6 +686,7 @@
                         }
                     }
                 }
+                } finally { scannerStarting = false; }
             }, 300);
         }
 
@@ -643,7 +717,7 @@
             verifyStudentByQR(qrCode.trim());
         }
 
-        async function verifyStudentByQR(qrCode) {
+        async function verifyStudentByQR(qrCode, silent = false) {
             const resultDiv = document.getElementById('student-result');
             if (!resultDiv) return;
             resultDiv.innerHTML = `<p class="text-amber-400 font-semibold">Searching database...</p>`;
@@ -661,7 +735,7 @@
                         const student = childSnapshot.val();
                         if (student.studentId) {
                             const dbStudentId = student.studentId.trim();
-                            if (dbStudentId === searchCode || searchCode.includes(dbStudentId) || dbStudentId.includes(searchCode)) {
+                            if (dbStudentId === searchCode) {
                                 foundStudent = student;
                                 studentKey = childSnapshot.key;
                             }
@@ -683,11 +757,12 @@
                             }
                         }
 
-                        const today = new Date().toISOString().split('T')[0];
+                        const today = localDateKey();
                         const attRef = window.ref(window.db, `attendance/${today}/${studentKey}`);
                         const attSnap = await window.get(attRef);
                         
-                        if (!attSnap.exists()) {
+                        const alreadyMarked = attSnap.exists();
+                        if (!alreadyMarked) {
                             await window.set(attRef, {
                                 name: foundStudent.name,
                                 grade: foundStudent.grade,
@@ -709,10 +784,10 @@
                                 <div class="text-left bg-slate-900 p-5 rounded-2xl border border-emerald-500 space-y-3 fade-in">
                                     <div class="flex justify-between items-start">
                                         <div>
-                                            <h3 class="text-xl font-bold text-white">${foundStudent.name}</h3>
-                                            <p class="text-sm text-slate-300">Grade: ${foundStudent.grade} | ID: ${foundStudent.studentId}</p>
+                                            <h3 class="text-xl font-bold text-white">${esc(foundStudent.name)}</h3>
+                                            <p class="text-sm text-slate-300">Grade: ${esc(foundStudent.grade)} | ID: ${esc(foundStudent.studentId)}</p>
                                         </div>
-                                        <span class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500 text-emerald-300 text-xs font-bold rounded-lg">${cardType} Card</span>
+                                        <span class="px-2.5 py-1 bg-emerald-500/20 border border-emerald-500 text-emerald-300 text-xs font-bold rounded-lg">${esc(cardType)} Card</span>
                                     </div>
                                     <div class="p-3 rounded-xl border bg-emerald-500/20 text-emerald-400 border-emerald-500 font-bold text-center">
                                         පැමිණීම සටහන් කරගන්නා ලදී!
@@ -730,10 +805,10 @@
                                 <div class="text-left bg-slate-900 p-5 rounded-2xl border border-rose-500 space-y-4 shadow-lg shadow-rose-950/40 fade-in">
                                     <div class="flex justify-between items-start">
                                         <div>
-                                            <h3 class="text-xl font-bold text-white">${foundStudent.name}</h3>
-                                            <p class="text-sm text-slate-300">Grade: ${foundStudent.grade} | ID: ${foundStudent.studentId}</p>
+                                            <h3 class="text-xl font-bold text-white">${esc(foundStudent.name)}</h3>
+                                            <p class="text-sm text-slate-300">Grade: ${esc(foundStudent.grade)} | ID: ${esc(foundStudent.studentId)}</p>
                                         </div>
-                                        <span class="px-2.5 py-1 bg-rose-500/20 border border-rose-500 text-rose-300 text-xs font-bold rounded-lg">${cardType} Card</span>
+                                        <span class="px-2.5 py-1 bg-rose-500/20 border border-rose-500 text-rose-300 text-xs font-bold rounded-lg">${esc(cardType)} Card</span>
                                     </div>
                                     <div class="p-3 rounded-xl border bg-rose-500/20 text-rose-400 border-rose-500 font-bold text-center">
                                         ⚠️ අනතුරු ඇඟවීමයි: ${unpaidSentence}!
@@ -750,14 +825,15 @@
                             speechMessage = `${foundStudent.name}. ${unpaidSentence}. පැමිණීම සටහන් කරගන්නා ලදී.`;
                         }
 
+                        if (alreadyMarked) displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 Already marked today — පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml;
                         resultDiv.innerHTML = displayHtml;
                         triggerVibration();
-                        speakText(speechMessage);
+                        if (!silent) speakText(speechMessage);
 
                     } else {
-                        resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ Student ID / QR Code '${searchCode}' not found!</p>`;
+                        resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ Student ID / QR Code '${esc(searchCode)}' not found!</p>`;
                         triggerVibration();
-                        speakText("මෙම අංකය සහිත ළමයෙක් හමු නොවීය.");
+                        if (!silent) speakText("මෙම අංකය සහිත ළමයෙක් හමු නොවීය.");
                     }
                 } else {
                     resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ No students registered yet!</p>`;
@@ -833,8 +909,8 @@
                         }
 
                         alert(`✅ ${studentName} ගේ ${paidMonthNames.join(', ')} ගෙවීම් සාර්ථකව සටහන් විය!`);
+                        await verifyStudentByQR(qrCode, true);
                         speakText(fullVoiceMsg);
-                        verifyStudentByQR(qrCode);
                     } else {
                         alert("⚠️ ගෙවීමට හිඟ මාස හමු නොවීය!");
                     }
@@ -848,6 +924,10 @@
 
         async function registerStudent(event) {
             event.preventDefault();
+            const submitBtn = event.submitter;
+            if (submitBtn?.disabled) return;
+            if (submitBtn) submitBtn.disabled = true;
+            try {
             const name = document.getElementById('reg-name').value.trim();
             const rawPhone = document.getElementById('reg-phone').value.trim();
             
@@ -858,6 +938,7 @@
 
             let studentId = "";
             if (qrMethod === 'auto') {
+                await autoGenerateStudentIdByGrade();
                 studentId = document.getElementById('reg-id').value.trim();
             } else {
                 studentId = document.getElementById('reg-custom-id').value.trim();
@@ -867,6 +948,7 @@
                 }
             }
 
+            if (!studentId || studentId.length > 300 || !name) { alert("Invalid student name or QR content."); return; }
             const grade = document.getElementById('reg-grade').value;
             const cardType = document.getElementById('reg-card-type').value;
             const initialFee = document.getElementById('reg-fee').value;
@@ -880,11 +962,18 @@
             });
 
             try {
+                const duplicateSnap=await window.get(window.ref(window.db,'students'));
+                let duplicate=false; duplicateSnap.forEach(row=>{if(String(row.val().studentId||'').trim()===studentId)duplicate=true;});
+                if(duplicate){alert('❌ මේ QR / Student ID එක දැනටමත් වෙනත් ළමයෙකුට භාවිත කරලා තියෙනවා.');return;}
                 const newStudentRef = window.push(window.ref(window.db, 'students'));
                 await window.set(newStudentRef, {
                     name: name,
                     phone: phone,
                     studentId: studentId,
+                    birthday: document.getElementById("reg-birthday").value || "",
+                    school: document.getElementById("reg-school").value.trim(),
+                    studentPhone: formatPhoneForWhatsApp(document.getElementById("reg-student-phone").value),
+                    joined: document.getElementById("reg-joined").value || localDateKey(),
                     grade: grade,
                     cardType: cardType,
                     fees: feesObj
@@ -899,10 +988,13 @@
                 document.getElementById('reg-form').reset();
                 autoGenerateStudentIdByGrade();
                 toggleQrInputMode();
+            loadSettings().catch(err => console.warn("Settings unavailable:",err)).finally(() => switchTab("dashboard"));
+                audit('Student registered: '+name);
             } catch (error) {
                 alert("Registration failed.");
                 console.error(error);
             }
+            } finally { if (submitBtn) submitBtn.disabled = false; }
         }
 
         function downloadQR(containerId, filenamePrefix) {
@@ -967,7 +1059,7 @@
         async function loadTodayAttendanceLog() {
             const tbody = document.getElementById('attendance-log-body');
             tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">Loading today's attendance...</td></tr>`;
-            const today = new Date().toISOString().split('T')[0];
+            const today = localDateKey();
             const filterGradeVal = document.getElementById('att-grade-filter') ? document.getElementById('att-grade-filter').value : 'All';
 
             try {
@@ -1195,6 +1287,8 @@
         async function openEditModal(key, name, studentId, grade, fees, phone, cardType) {
             document.getElementById('edit-modal').classList.remove('hidden');
             document.getElementById('edit-db-key').value = key;
+            const profileSnap=await window.get(window.ref(window.db,`students/${key}`));const profile=profileSnap.val()||{};
+            document.getElementById('edit-birthday').value=profile.birthday||'';document.getElementById('edit-school').value=profile.school||'';document.getElementById('edit-student-phone').value=profile.studentPhone||'';
             document.getElementById('edit-name').value = name;
             
             let rawPhone = phone || '';
@@ -1271,19 +1365,26 @@
             const name = document.getElementById('edit-name').value.trim();
             const rawPhone = document.getElementById('edit-phone').value.trim();
             const studentId = document.getElementById('edit-id').value.trim();
+            if (!studentId || studentId.length > 300 || !name) { alert("Invalid name or QR content."); return; }
             const grade = document.getElementById('edit-grade').value;
             const cardType = document.getElementById('edit-card-type').value;
 
             const phone = formatPhoneForWhatsApp(rawPhone);
-
+            const allSnap=await window.get(window.ref(window.db,'students'));let conflict=false;
+            allSnap.forEach(row=>{if(row.key!==key && String(row.val().studentId||'').trim()===studentId)conflict=true;});
+            if(conflict){alert('Duplicate QR / Student ID');return;}
             try {
                 await window.update(window.ref(window.db, `students/${key}`), {
                     name: name,
                     phone: phone,
                     studentId: studentId,
                     grade: grade,
-                    cardType: cardType
+                    cardType: cardType,
+                    birthday: document.getElementById('edit-birthday').value,
+                    school: document.getElementById('edit-school').value,
+                    studentPhone: formatPhoneForWhatsApp(document.getElementById('edit-student-phone').value)
                 });
+                audit('Student updated: '+name);
                 alert("Student profile updated successfully!");
                 closeEditModal();
                 loadReports();
@@ -1294,6 +1395,8 @@
 
         // GOOGLE GEMINI AI ASSISTANT INTEGRATION
         async function askGeminiAI() {
+            alert('AI feature needs a secure server-side proxy. Do not paste a Gemini API key into the HTML file.');return;
+
             const inputEl = document.getElementById('ai-input');
             const chatBox = document.getElementById('ai-chat-box');
             if (!inputEl || !chatBox) return;
@@ -1332,7 +1435,7 @@
                 You are Sciencore Class Management AI Assistant.
                 You help class teachers by analyzing class student and attendance data.
                 Always answer politely in Sinhala language unless asked in English.
-                Current Date: ${new Date().toISOString().split('T')[0]}.
+                Current Date: ${localDateKey()}.
                 
                 Database Context:
                 Students List: ${JSON.stringify(studentsData)}
@@ -1374,12 +1477,37 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        window.onload = () => { 
-            initScanner(); 
+        // SCIENCORE 2.0 management extensions
+        const esc = v => String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        const readPath = async path => (await window.get(window.ref(window.db,path))).val() || {};
+        const savePath = (path,value) => window.set(window.ref(window.db,path),value);
+        const allStudentRows = async () => Object.entries(await readPath('students')).map(([key,value])=>({key,...value}));
+        async function audit(action){try {await savePath('activity/'+window.push(window.ref(window.db,'activity')).key,{action,at:new Date().toISOString(),by:'Local operator'});}catch(e){console.warn('Activity log error',e);}}
+
+        async function readExistingQRImage(event){const file=event.target.files?.[0];if(!file)return;const info=document.getElementById('existing-qr-feedback');try{const temp=document.createElement('div');temp.id='qr-upload-temp';temp.style.display='none';document.body.appendChild(temp);const scanner=new Html5Qrcode('qr-upload-temp');const code=await scanner.scanFile(file,true);await scanner.clear();temp.remove();if(!code.trim() || code.length>300)throw Error("Invalid QR length");document.getElementById('reg-custom-id').value=code.trim();info.textContent='✅ Existing QR decoded: '+code;}catch(err){info.textContent='❌ QR image could not be decoded. Enter its exact content manually.';}}
+        async function loadDashboard(){const rows=await allStudentRows(),today=localDateKey(),attendance=await readPath('attendance/'+today),present=rows.filter(s=>Object.prototype.hasOwnProperty.call(attendance,s.key)).length,month=getCurrentMonthKey().key;const owed=rows.filter(s=>s.cardType!=='Free'&&s.fees?.[month]!=='Paid').length;const birthdays=rows.filter(s=>s.birthday?.slice(5)===today.slice(5)).length;const values=[['👥 Students',rows.length],['✅ Present today',present],['❌ Absent (registered)',Math.max(0,rows.length-present)],['🔴 Unpaid this month',owed],['🎂 Birthdays today',birthdays]];document.getElementById('dashboard-stats').innerHTML=values.map(([k,v])=>`<div class="sc-stat"><div class="text-xs text-slate-300 font-semibold">${k}</div><div class="text-3xl md:text-4xl font-black text-white mt-3">${v}</div><div class="sc-stat-line"></div></div>`).join('');const grades=['Grade 7','Grade 8','Grade 9','Grade 10','Grade 11 (O/L)'];document.getElementById('dashboard-grades').innerHTML=grades.map(g=>`<div class="sc-grade"><div class="text-sky-200 font-bold text-sm">${g}</div><div class="text-3xl font-black mt-2">${rows.filter(s=>s.grade===g).length}</div></div>`).join('');}
+        function smsLink(phone,message){const p=String(phone||'').replace(/\D/g,'');return 'sms:+'+encodeURIComponent(p)+'?body='+encodeURIComponent(message);}
+        async function loadBirthdays(){const rows=await allStudentRows(),today=localDateKey();const upcoming=rows.filter(s=>s.birthday).map(s=>{const [,,m,d]=s.birthday.match(/^(\d{4})-(\d{2})-(\d{2})$/)||[];if(!m||!d)return null;let date=new Date(Number(today.slice(0,4)),Number(m)-1,Number(d));if(date<new Date(today+'T00:00:00'))date.setFullYear(date.getFullYear()+1);return {...s,days:Math.round((date-new Date(today+'T00:00:00'))/86400000)};}).filter(Boolean).filter(s=>s.days<=30).sort((a,b)=>a.days-b.days);document.getElementById('birthday-list').innerHTML=upcoming.map(s=>{const msg=`Happy Birthday ${s.name}! Wishing you a wonderful year ahead. Best wishes, SCIENCORE - The Core of Science.`;const phone=s.studentPhone||s.phone;return `<div class="panel flex flex-wrap justify-between items-center gap-3"><div><b>${esc(s.name)}</b> · ${esc(s.grade)} <span class="text-amber-300">${s.days===0?'🎂 Today':`in ${s.days} days`}</span></div><a class="action" href="${smsLink(phone,msg)}">Open SMS app</a></div>`}).join('')||'<div class="panel">No birthdays in the next 30 days.</div>';}
+        async function prepareMessages(){const rows=await allStudentRows(),g=document.getElementById('msg-grade').value,msg=document.getElementById('msg-text').value.trim();if(!msg){alert('Enter message');return;}document.getElementById('message-list').innerHTML=rows.filter(s=>(g==='All'||s.grade===g)&&s.phone).map(s=>`<div class="panel flex justify-between gap-2"><span>${esc(s.name)} · ${esc(s.grade)}</span><a class="text-amber-400 underline" href="${smsLink(s.phone,msg)}">Open SMS</a></div>`).join('')||'No phone numbers available.';}
+        async function addSchedule(e){e.preventDefault();const data={grade:document.getElementById('schedule-grade').value,date:document.getElementById('schedule-date').value,time:document.getElementById('schedule-time').value,note:document.getElementById('schedule-note').value};await savePath('schedules/'+window.push(window.ref(window.db,'schedules')).key,data);await audit('Timetable event added');e.target.reset();loadSchedules();}
+        async function loadSchedules(){const rows=Object.entries(await readPath('schedules')).map(([key,v])=>({key,...v})).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));document.getElementById('schedule-list').innerHTML=rows.map(s=>`<div class="panel">${esc(s.date)} ${esc(s.time)} · ${esc(s.grade)} · ${esc(s.note)}</div>`).join('')||'No events yet.';}
+        async function addExpense(e){e.preventDefault();const data={date:document.getElementById('expense-date').value,category:document.getElementById('expense-category').value,amount:Number(document.getElementById('expense-amount').value),by:'Local operator'};if(!(data.amount>0))return;await savePath('expenses/'+window.push(window.ref(window.db,'expenses')).key,data);await audit('Expense added: Rs '+data.amount);e.target.reset();document.getElementById('expense-date').value=localDateKey();loadExpenses();}
+        async function loadExpenses(){const rows=Object.values(await readPath('expenses'));const month=localDateKey().slice(0,7);const filtered=rows.filter(s=>s.date?.startsWith(month));document.getElementById('expense-total').textContent='This month expenses: Rs. '+filtered.reduce((a,b)=>a+Number(b.amount||0),0).toLocaleString();document.getElementById('expense-list').innerHTML=filtered.map(s=>`<div class="panel">${esc(s.date)} · ${esc(s.category)} · Rs. ${Number(s.amount).toLocaleString()}</div>`).join('')||'No expenses this month.';}
+        async function loadActivities(){const rows=Object.values(await readPath('activity')).sort((a,b)=>(b.at||'').localeCompare(a.at||'')).slice(0,100);document.getElementById('activity-list').innerHTML=rows.map(s=>`<div class="panel text-sm">${esc(s.at)} · ${esc(s.by)} · ${esc(s.action)}</div>`).join('')||'No activities yet.';}
+        async function loadSettings(){const fees=await readPath('settings/fees');window.sciencoreFees={lower:Number(fees.lower??1000),upper:Number(fees.upper??1200)};document.getElementById('fee-7').value=window.sciencoreFees.lower;document.getElementById('fee-10').value=window.sciencoreFees.upper;}
+        async function saveSettings(e){e.preventDefault();const fees={lower:Number(document.getElementById('fee-7').value),upper:Number(document.getElementById('fee-10').value)};await savePath('settings/fees',fees);window.sciencoreFees=fees;await audit('Fees settings updated');alert('Settings saved');}
+        function downloadText(name,text,type){const blob=new Blob([text],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),3000);}
+        const csv=v=>{let value=String(v??'');if(/^[\s]*[=+@-]/.test(value))value="'"+value;return '"'+value.replace(/"/g,'""')+'"';};
+        async function exportStudentsCSV(){const rows=await allStudentRows(),cols=['name','studentId','grade','phone','studentPhone','birthday','school','cardType','joined'];downloadText('sciencore_students.csv','\ufeff'+[cols.join(','),...rows.map(r=>cols.map(k=>csv(r[k])).join(','))].join('\r\n'),'text/csv;charset=utf-8');}
+        async function exportAttendanceCSV(){const attendance=await readPath('attendance');const rows=[];for(const [date,group] of Object.entries(attendance))for(const [id,r] of Object.entries(group))rows.push([date,id,r.name,r.grade,r.time]);downloadText('sciencore_attendance.csv','\ufeff'+[['date','studentKey','name','grade','time'].join(','),...rows.map(r=>r.map(csv).join(','))].join('\r\n'),'text/csv;charset=utf-8');}
+        async function exportBackup(){const paths=['students','attendance','schedules','expenses','activity','settings','payments'];const backup={exportedAt:new Date().toISOString(),data:{}};for(const path of paths)backup.data[path]=await readPath(path);downloadText('sciencore_backup_'+localDateKey()+'.json',JSON.stringify(backup,null,2),'application/json');await audit('Backup exported');}
+
+        window.onload = () => {
+            refreshMonths(); document.getElementById("reg-joined").value=localDateKey();document.getElementById("expense-date").value=localDateKey();document.getElementById("schedule-date").value=localDateKey(); 
+            // No management-team login screen. Database permissions must be configured separately.
             startLiveClock();
-            autoGenerateStudentIdByGrade();
-            loadTodayAttendanceLog();
             toggleQrInputMode();
+            loadSettings().catch(err => console.warn("Settings unavailable:",err)).finally(() => switchTab("dashboard"));
         };
     </script>
 </body>
