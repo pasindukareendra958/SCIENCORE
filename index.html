@@ -189,6 +189,15 @@ input,select,textarea,button{max-width:100%}
 @media(max-width:520px){body>main{padding:14px 10px!important}.sc-hero{padding:20px 17px!important}.sc-section{padding:15px!important}#dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important}#dashboard-grades{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}#dashboard-scanner>.grid:nth-child(2){grid-template-columns:minmax(0,1fr)!important}#dashboard-scanner>.grid:first-child{grid-template-columns:minmax(0,1fr)!important}}
 </style>
 
+<style id="sciencore-v41-scan-workflow-fix">
+#dashboard-scanner:fullscreen{display:flex!important;flex-direction:column!important;gap:16px!important;overflow-y:auto!important;background:#061326!important}
+#dashboard-scanner:fullscreen #reader{width:100%!important;max-height:48vh!important;min-height:220px!important;margin-inline:auto!important}
+#dashboard-scanner:fullscreen #student-result{flex:0 0 auto!important;min-height:80px!important;max-height:none!important;overflow:visible!important}
+#dashboard-scanner:fullscreen #student-result h3{font-size:clamp(1.2rem,2.3vw,1.8rem)!important}
+#dashboard-scanner:fullscreen #student-result button{min-height:54px!important;font-size:1rem!important}
+#dashboard-scanner:fullscreen .grid{gap:12px!important}
+@media(max-width:700px){#dashboard-scanner:fullscreen{padding:12px!important}#dashboard-scanner:fullscreen #reader{max-height:38vh!important;min-height:180px!important}}
+</style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans selection:bg-amber-500 selection:text-slate-900">
 
@@ -1321,22 +1330,7 @@ body>main{margin-left:226px!important;max-width:none!important;width:calc(100% -
             <tr><td>Grade</td><td>${safe(record.grade)}</td></tr><tr><td>Paid Month(s)</td><td>${monthText}</td></tr>
             <tr class="total"><td>Amount Received</td><td>Rs. ${Number(record.amount).toLocaleString('en-LK',{minimumFractionDigits:2})}</td></tr>
             </table><p class="foot">Thank you • SCIENCORE</p><button onclick="window.print()" style="padding:12px 25px;background:#eab308;border:0;border-radius:9px;cursor:pointer">Print / Save PDF</button>
-<style id="sciencore-v41-scan-workflow-fix">
-#dashboard-scanner:fullscreen{display:flex!important;flex-direction:column!important;gap:16px!important;overflow-y:auto!important;background:#061326!important}
-#dashboard-scanner:fullscreen #reader{width:100%!important;max-height:48vh!important;min-height:220px!important;margin-inline:auto!important}
-#dashboard-scanner:fullscreen #student-result{flex:0 0 auto!important;min-height:80px!important;max-height:none!important;overflow:visible!important}
-#dashboard-scanner:fullscreen #student-result h3{font-size:clamp(1.2rem,2.3vw,1.8rem)!important}
-#dashboard-scanner:fullscreen #student-result button{min-height:54px!important;font-size:1rem!important}
-#dashboard-scanner:fullscreen .grid{gap:12px!important}
-@media(max-width:700px){#dashboard-scanner:fullscreen{padding:12px!important}#dashboard-scanner:fullscreen #reader{max-height:38vh!important;min-height:180px!important}}
-</style>
-<script id="sciencore-v41-explicit-next-scan">
-// Keep each student's result visible until the operator chooses payment or next QR.
-window.addEventListener('DOMContentLoaded',()=>{
-  const box=document.getElementById('student-result');
-  if(box && !box.textContent.trim()) box.innerHTML='<div class="text-center py-5 text-slate-300"><p class="text-lg font-bold">QR එක Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත කැමරාවට පෙන්වන්න.</p></div>';
-});
-</script>
+
 
 </body></html>`;
         }
@@ -1858,22 +1852,7 @@ window.addEventListener('DOMContentLoaded',()=>{
             const w = window.open('', '_blank', 'width=850,height=700');
             if (!w) { scToast('Allow pop-ups for printing', false); return; }
             w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SCIENCORE Print</title><style>body{font:16px Arial,sans-serif;color:#112244;padding:25px}h1{color:#143a80}.qr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.qr-card{border:1px solid #bbb;text-align:center;padding:12px;break-inside:avoid}.qr-card canvas{max-width:100%}@media print{@page{size:A4;margin:12mm}}</style></head><body>${body}
-<style id="sciencore-v41-scan-workflow-fix">
-#dashboard-scanner:fullscreen{display:flex!important;flex-direction:column!important;gap:16px!important;overflow-y:auto!important;background:#061326!important}
-#dashboard-scanner:fullscreen #reader{width:100%!important;max-height:48vh!important;min-height:220px!important;margin-inline:auto!important}
-#dashboard-scanner:fullscreen #student-result{flex:0 0 auto!important;min-height:80px!important;max-height:none!important;overflow:visible!important}
-#dashboard-scanner:fullscreen #student-result h3{font-size:clamp(1.2rem,2.3vw,1.8rem)!important}
-#dashboard-scanner:fullscreen #student-result button{min-height:54px!important;font-size:1rem!important}
-#dashboard-scanner:fullscreen .grid{gap:12px!important}
-@media(max-width:700px){#dashboard-scanner:fullscreen{padding:12px!important}#dashboard-scanner:fullscreen #reader{max-height:38vh!important;min-height:180px!important}}
-</style>
-<script id="sciencore-v41-explicit-next-scan">
-// Keep each student's result visible until the operator chooses payment or next QR.
-window.addEventListener('DOMContentLoaded',()=>{
-  const box=document.getElementById('student-result');
-  if(box && !box.textContent.trim()) box.innerHTML='<div class="text-center py-5 text-slate-300"><p class="text-lg font-bold">QR එක Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත කැමරාවට පෙන්වන්න.</p></div>';
-});
-</script>
+
 
 </body></html>`);
             w.document.close();
@@ -1977,23 +1956,15 @@ window.addEventListener('load', function () {
 });
 </script>
 
-<style id="sciencore-v41-scan-workflow-fix">
-#dashboard-scanner:fullscreen{display:flex!important;flex-direction:column!important;gap:16px!important;overflow-y:auto!important;background:#061326!important}
-#dashboard-scanner:fullscreen #reader{width:100%!important;max-height:48vh!important;min-height:220px!important;margin-inline:auto!important}
-#dashboard-scanner:fullscreen #student-result{flex:0 0 auto!important;min-height:80px!important;max-height:none!important;overflow:visible!important}
-#dashboard-scanner:fullscreen #student-result h3{font-size:clamp(1.2rem,2.3vw,1.8rem)!important}
-#dashboard-scanner:fullscreen #student-result button{min-height:54px!important;font-size:1rem!important}
-#dashboard-scanner:fullscreen .grid{gap:12px!important}
-@media(max-width:700px){#dashboard-scanner:fullscreen{padding:12px!important}#dashboard-scanner:fullscreen #reader{max-height:38vh!important;min-height:180px!important}}
-</style>
+
+
 <script id="sciencore-v41-explicit-next-scan">
-// Keep each student's result visible until the operator chooses payment or next QR.
+// Keep the initial scanner instructions visible; the scan result remains until an operator action.
 window.addEventListener('DOMContentLoaded',()=>{
   const box=document.getElementById('student-result');
   if(box && !box.textContent.trim()) box.innerHTML='<div class="text-center py-5 text-slate-300"><p class="text-lg font-bold">QR එක Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත කැමරාවට පෙන්වන්න.</p></div>';
 });
 </script>
-
 </body>
 </html>
 <style id="sciencore-v40-fullscreen-fixes">
