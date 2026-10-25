@@ -212,7 +212,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm mb-1 text-slate-300">Grade</label>
-                            <select id="reg-grade" onchange="autoGenerateStudentIdByGrade()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
+                            <select id="reg-grade" onchange="onGradeChangeSelection()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
                                 <option value="Grade 7">Grade 7 (O/L 2030)</option>
                                 <option value="Grade 8">Grade 8 (O/L 2029)</option>
                                 <option value="Grade 9">Grade 9 (O/L 2028)</option>
@@ -229,13 +229,31 @@
                             </select>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-sm mb-1 text-slate-300">Student ID (Auto-Generated Year Code)</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="reg-id" required readonly class="flex-1 bg-slate-900/80 border border-amber-500/40 font-mono text-amber-300 font-bold rounded-xl p-3 outline-none">
-                            <button type="button" onclick="autoGenerateStudentIdByGrade()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95">🔄 Refresh ID</button>
+
+                    <!-- QR CODE METHOD SELECTION -->
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <label class="block text-sm font-bold text-amber-300">🪪 Student ID & QR Code Method (ක්‍රමය තෝරන්න)</label>
+                        <div class="flex gap-4">
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-200">
+                                <input type="radio" name="qr-method" value="auto" checked onchange="toggleQrInputMode()" class="accent-amber-500">
+                                ස්වයංක්‍රීයව අංකයක් ජනනය කරන්න (Auto)
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm text-slate-200">
+                                <input type="radio" name="qr-method" value="manual" onchange="toggleQrInputMode()" class="accent-amber-500">
+                                මගේම QR / අංකයක් ඇතුළත් කරන්න (Manual)
+                            </label>
+                        </div>
+
+                        <div id="auto-id-box" class="flex gap-2 mt-2">
+                            <input type="text" id="reg-id" required readonly class="flex-1 bg-slate-950 border border-amber-500/40 font-mono text-amber-300 font-bold rounded-xl p-3 outline-none">
+                            <button type="button" onclick="autoGenerateStudentIdByGrade()" class="bg-slate-700 hover:bg-slate-600 text-amber-300 px-4 py-3 rounded-xl text-sm font-semibold transition-all active:scale-95">🔄 Refresh</button>
+                        </div>
+
+                        <div id="manual-id-box" class="hidden mt-2">
+                            <input type="text" id="reg-custom-id" placeholder="කලින් තිබෙන QR කෝඩ් අංකය මෙහි ටයිප් කරන්න..." class="w-full bg-slate-950 border border-amber-500/60 font-mono text-amber-300 font-bold rounded-xl p-3 outline-none focus:border-amber-400">
                         </div>
                     </div>
+
                     <div>
                         <label class="block text-sm mb-1 text-slate-300">Current Month Fee Status</label>
                         <select id="reg-fee" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white outline-none">
@@ -504,6 +522,27 @@
             const nextNum = String(maxSeq + 1).padStart(4, '0');
             const regIdEl = document.getElementById('reg-id');
             if (regIdEl) regIdEl.value = `${yearPrefix}${nextNum}`;
+        }
+
+        function onGradeChangeSelection() {
+            autoGenerateStudentIdByGrade();
+        }
+
+        function toggleQrInputMode() {
+            const radios = document.getElementsByName('qr-method');
+            let selectedVal = "auto";
+            for (let r of radios) {
+                if (r.checked) { selectedVal = r.value; break; }
+            }
+            const autoBox = document.getElementById('auto-id-box');
+            const manualBox = document.getElementById('manual-id-box');
+            if (selectedVal === 'auto') {
+                autoBox.classList.remove('hidden');
+                manualBox.classList.add('hidden');
+            } else {
+                autoBox.classList.add('hidden');
+                manualBox.classList.remove('hidden');
+            }
         }
 
         function getCurrentMonthKey() {
@@ -782,7 +821,7 @@
                             remainingUnpaidNames.push(unpaidMonths[i].name);
                         }
 
-                        // Voice Command formatting
+                        // Voice Command formatting as requested
                         const paidSentence = formatMonthsForVoice(paidMonthNames, "received");
                         let fullVoiceMsg = `${studentName}. ${paidSentence}. `;
 
@@ -811,7 +850,23 @@
             event.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
             const rawPhone = document.getElementById('reg-phone').value.trim();
-            const studentId = document.getElementById('reg-id').value.trim();
+            
+            // Check QR Method
+            const radios = document.getElementsByName('qr-method');
+            let qrMethod = "auto";
+            for (let r of radios) { if (r.checked) { qrMethod = r.value; break; } }
+
+            let studentId = "";
+            if (qrMethod === 'auto') {
+                studentId = document.getElementById('reg-id').value.trim();
+            } else {
+                studentId = document.getElementById('reg-custom-id').value.trim();
+                if (!studentId) {
+                    alert("❌ කරුණාකර අභිරුචි QR / ID අංකයක් ඇතුළත් කරන්න!");
+                    return;
+                }
+            }
+
             const grade = document.getElementById('reg-grade').value;
             const cardType = document.getElementById('reg-card-type').value;
             const initialFee = document.getElementById('reg-fee').value;
@@ -843,6 +898,7 @@
 
                 document.getElementById('reg-form').reset();
                 autoGenerateStudentIdByGrade();
+                toggleQrInputMode();
             } catch (error) {
                 alert("Registration failed.");
                 console.error(error);
@@ -1323,6 +1379,7 @@
             startLiveClock();
             autoGenerateStudentIdByGrade();
             loadTodayAttendanceLog();
+            toggleQrInputMode();
         };
     </script>
 </body>
