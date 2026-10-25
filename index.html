@@ -264,7 +264,7 @@ input,select,textarea,button{max-width:100%}
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-slate-800/90 p-6 rounded-2xl border border-slate-700 shadow-xl">
-                    <h2 class="text-lg font-semibold mb-4 text-amber-300 flex items-center gap-2">📷 Attendance QR Scanner</h2>
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-4"><h2 class="text-lg font-semibold text-amber-300 flex items-center gap-2">📷 Attendance QR Scanner</h2><button type="button" onclick="toggleScannerFullscreen()" class="ops-btn" style="background:#ffcf39;color:#07152c">⛶ Full Screen</button></div>
                     <div id="reader" class="w-full bg-slate-900 rounded-xl overflow-hidden border border-slate-700 shadow-inner min-h-[280px]"></div>
                     <div class="mt-4 flex gap-2">
                         <input type="text" id="manual-id" placeholder="Enter Student ID / QR Code..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white focus:border-amber-400 outline-none transition-all">
@@ -640,29 +640,39 @@ input,select,textarea,button{max-width:100%}
             '07':'ජූලි','08':'අගෝස්තු','09':'සැප්තැම්බර්','10':'ඔක්තෝබර්','11':'නොවැම්බර්','12':'දෙසැම්බර්'
         };
         function monthNameForVoice(month) {
-            if (month && typeof month === 'object' && month.id) {
-                const key = String(month.id).slice(-2);
-                return SI_MONTH_NAMES[key] || String(month.name || month.id);
-            }
-            const text = String(month || '');
-            const match = text.match(/(?:^|[-\s])(\d{2})(?:$|\s)/);
-            if (match && SI_MONTH_NAMES[match[1]]) return SI_MONTH_NAMES[match[1]];
-            return text.replace(/^\d{4}\s*/, '');
+            const map = {'01':'ජනවාරි','02':'පෙබරවාරි','03':'මාර්තු','04':'අප්‍රේල්','05':'මැයි','06':'ජූනි','07':'ජූලි','08':'අගෝස්තු','09':'සැප්තැම්බර්','10':'ඔක්තෝබර්','11':'නොවැම්බර්','12':'දෙසැම්බර්'};
+            const en = {january:'ජනවාරි',february:'පෙබරවාරි',march:'මාර්තු',april:'අප්‍රේල්',may:'මැයි',june:'ජූනි',july:'ජූලි',august:'අගෝස්තු',september:'සැප්තැම්බර්',october:'ඔක්තෝබර්',november:'නොවැම්බර්',december:'දෙසැම්බර්',jan:'ජනවාරි',feb:'පෙබරවාරි',mar:'මාර්තු',apr:'අප්‍රේල්',jun:'ජූනි',jul:'ජූලි',aug:'අගෝස්තු',sep:'සැප්තැම්බර්',oct:'ඔක්තෝබර්',nov:'නොවැම්බර්',dec:'දෙසැම්බර්'};
+            let text = month && typeof month === 'object' ? String(month.id || month.name || '') : String(month || '');
+            const idMatch = text.match(/(?:^|[-/\s])(\d{2})(?:$|[-/\s])/);
+            if (idMatch && map[idMatch[1]]) return map[idMatch[1]];
+            const clean = text.replace(/^\d{4}\s*/, '').trim();
+            const key = clean.toLowerCase().replace(/[^a-z]/g, '');
+            if (en[key]) return en[key];
+            for (const [word, si] of Object.entries(en)) if (clean.toLowerCase().includes(word)) return si;
+            return clean;
         }
         function formatMonthsForVoice(monthsArr, type = 'unpaid') {
-            if (!monthsArr || monthsArr.length === 0) return '';
-            const names = monthsArr.map(month => {
-                if (month && typeof month === 'object' && month.name) return String(month.name).replace(/^\d{4}\s*/, '');
-                return monthNameForVoice(month);
-            });
-            let monthsText;
-            if (names.length === 1) monthsText = `${names[0]} මාසයේ`;
-            else if (names.length === 2) monthsText = `${names[0]} සහ ${names[1]} මාසවල`;
-            else monthsText = `${names.slice(0, -1).join(', ')} සහ ${names[names.length - 1]} මාසවල`;
-            if (type === 'unpaid') return `${monthsText} සඳහා ගාස්තු ගෙවා නැහැ`;
-            if (type === 'received') return `${monthsText} සඳහා ගාස්තු ගෙවා තිබෙනවා`;
-            if (type === 'remaining') return `${monthsText} සඳහා ගාස්තු ගෙවීමට ඉතිරිව තිබෙනවා`;
+            if (!monthsArr || !monthsArr.length) return '';
+            const names = monthsArr.map(monthNameForVoice).filter(Boolean);
+            if (!names.length) return '';
+            const monthsText = names.length === 1 ? `${names[0]} මාසයේ` : names.length === 2 ? `${names[0]} සහ ${names[1]} මාසවල` : `${names.slice(0,-1).join(', ')} සහ ${names[names.length-1]} මාසවල`;
+            if (type === 'unpaid') return `${monthsText} ගාස්තු ගෙවා නැහැ`;
+            if (type === 'received') return `${monthsText} ගාස්තුව ගෙවා ඇත`;
+            if (type === 'remaining') return `${monthsText} ගාස්තු ගෙවීමට ඉතිරිව ඇත`;
             return monthsText;
+        }
+        function instantMultiPayActiveStudent() {
+            const st = window.scLastVerifiedStudent;
+            if (!st) return scToast('මුලින් QR එක Scan කරන්න', false);
+            return instantMultiPayMonths(st.key, st.name, st.grade, st.qr);
+        }
+        function closeScanResultForNext() {
+            const box = document.getElementById('student-result');
+            if (box) box.innerHTML = '<div class="text-center py-10 text-slate-300"><p class="text-lg font-bold">ඊළඟ QR කේතය Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත Scanner එකට පෙන්වන්න.</p></div>';
+            const manual = document.getElementById('manual-id');
+            if (manual) { manual.value = ''; manual.focus({preventScroll:true}); }
+            if (window.scScanResetTimer) clearTimeout(window.scScanResetTimer);
+            if (typeof scToast === 'function') scToast('ඊළඟ QR එක Scan කරන්න');
         }
 
         function getClassFeeByGrade(grade) {
@@ -1019,7 +1029,9 @@ input,select,textarea,button{max-width:100%}
                             speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ${unpaidSentence}.`;
                         }
 
-                        if (alreadyMarked) { scBeep('duplicate'); displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 Already marked today — පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml; }
+                        if (alreadyMarked) { scBeep('duplicate'); displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 අද පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml; }
+                        window.scLastVerifiedStudent = { key: studentKey, name: foundStudent.name, grade: foundStudent.grade, qr: searchCode };
+                        displayHtml += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"><button type="button" onclick="instantMultiPayActiveStudent()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-4 rounded-xl">💰 මුදල් ගෙවීම සටහන් කරන්න</button><button type="button" onclick="closeScanResultForNext()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-3 px-4 rounded-xl">✕ වසන්න / ඊළඟ QR එක</button></div>`;
                         resultDiv.innerHTML = displayHtml;
                         triggerVibration();
                         if (!silent) speakText(speechMessage);
@@ -1114,7 +1126,7 @@ input,select,textarea,button{max-width:100%}
                         }
 
                         // Voice Command formatting as requested
-                        const paidSentence = formatMonthsForVoice(paidMonthNames.map(name => ({name})), "received");
+                        const paidSentence = formatMonthsForVoice((receipt.monthKeys || []).map(id => ({id})), "received");
                         let fullVoiceMsg = `${studentName}. රුපියල් ${recordedAmount} ක ගෙවීම සාර්ථකව සටහන් කළා. ${paidSentence}. `;
 
                         if (remainingUnpaidNames.length > 0) {
@@ -1879,7 +1891,8 @@ body>main{margin-left:226px!important;max-width:none!important;width:calc(100% -
         async function loadOperationsPayments(){const rows=Object.entries(await readPath('payments')).map(([key,r])=>({key,...r})).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))).slice(0,20);document.getElementById('ops-payments').innerHTML=rows.map(p=>`<div class="ops-row"><b>${esc(p.studentName)}</b> · Rs ${Number(p.amount||0).toLocaleString()} <span class="ops-muted">${esc(p.receiptNo)} ${p.voided?' · REVERSED':''}</span>${p.voided?'':`<button class="ops-mini" onclick="reversePayment('${p.key}')">Reverse</button>`}</div>`).join('')||'<p class="ops-muted">No payments recorded.</p>';}
         async function reversePayment(key,fromUndo=false){try{const snap=await window.get(window.ref(window.db,'payments/'+key));if(!snap.exists()||snap.val().voided){scToast('Payment already reversed or missing',false);return false;}const p=snap.val();if(!fromUndo&&!confirm(`Reverse receipt ${p.receiptNo} for Rs ${p.amount}? This changes fee status and keeps the audit trail.`))return false;const reason=prompt('Reason for reversal (required):');if(!reason?.trim())return false;const studentSnap=await window.get(window.ref(window.db,'students/'+p.studentKey));if(!studentSnap.exists()){scToast('Student record missing — manual review required',false);return false;}const student=studentSnap.val();const allPayments=Object.values(await readPath('payments'));const updates={};for(const m of p.monthKeys||[]){const coveredByOtherLiveReceipt=allPayments.some(other=>!other.voided&&other.receiptNo!==p.receiptNo&&other.studentKey===p.studentKey&&(other.monthKeys||[]).includes(m));if(student.fees?.[m]==='Paid'&&!coveredByOtherLiveReceipt)updates[`students/${p.studentKey}/fees/${m}`]='Unpaid';}updates[`payments/${key}/voided`]=true;updates[`payments/${key}/voidReason`]=reason.trim();updates[`payments/${key}/voidedAt`]=new Date().toISOString();await window.update(window.ref(window.db),updates);await audit('Reversed receipt '+p.receiptNo+': '+reason);scToast('Payment reversed; verify fee status if another receipt covers the same month');loadOperationsPayments();return true;}catch(e){console.error(e);scToast('Payment reversal failed',false);return false;}}
         function updateOpsHealth(){const el=document.getElementById('ops-health');if(!el)return;el.textContent=`${navigator.onLine?'🟢 Online':'🔴 Offline'} · ${navigator.mediaDevices?.getUserMedia?'🟢 Camera supported':'🟠 Camera unavailable'} · ${window.db?'🟢 Firebase SDK loaded':'🔴 Firebase unavailable'} · ${JSON.parse(localStorage.getItem('sciencore-offline-attendance')||'[]').length} offline queued · SMS gateway not configured`;}
-        function toggleScannerFullscreen(){switchTab('dashboard');const e=document.getElementById('dashboard-scanner');if(!document.fullscreenElement)e.requestFullscreen?.().catch(()=>scToast('Fullscreen not supported',false));else document.exitFullscreen?.();}
+        function toggleScannerFullscreen(){switchTab('dashboard');const e=document.getElementById('dashboard-scanner');if(!e)return;if(!document.fullscreenElement){if(e.requestFullscreen)e.requestFullscreen().catch(()=>scToast('Full-screen mode is not supported in this browser',false));else scToast('මෙම Browser එකේ Full Screen පහසුකම නොමැත',false);}else document.exitFullscreen?.();}
+        document.addEventListener('fullscreenchange',()=>{const root=document.getElementById('dashboard-scanner');if(root&&document.fullscreenElement===root){root.style.minHeight='100vh';root.style.overflowY='auto';root.style.width='100%';}else if(root){root.style.minHeight='';root.style.overflowY='';root.style.width='';}});
         document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;if(e.key==='F2'){e.preventDefault();switchTab('operations');document.getElementById('ops-search').focus();}if(e.key==='F3'){e.preventDefault();switchTab('dashboard');document.getElementById('manual-id').focus();}if(e.key==='F4'){e.preventDefault();switchTab('students');}if(e.key==='Escape'&&document.fullscreenElement)document.exitFullscreen?.();});
         window.addEventListener('online',()=>{updateOpsHealth();syncOfflineQueue().catch(console.warn);});window.addEventListener('offline',updateOpsHealth);
 
@@ -1929,3 +1942,10 @@ window.addEventListener('load', function () {
 </script>
 </body>
 </html>
+<style id="sciencore-v40-fullscreen-fixes">
+#dashboard-scanner:fullscreen{box-sizing:border-box;width:100vw!important;min-height:100vh!important;padding:clamp(12px,2vw,28px)!important;overflow:auto!important;background:#061326!important}
+#dashboard-scanner:fullscreen #student-result{max-height:none!important;overflow:visible!important}
+#dashboard-scanner:fullscreen #student-result button{min-height:50px;white-space:normal;overflow-wrap:anywhere}
+#dashboard-scanner:fullscreen #reader{min-height:240px;max-height:42vh}
+@media(max-width:700px){#dashboard-scanner:fullscreen>.grid:nth-child(2){grid-template-columns:minmax(0,1fr)!important}#dashboard-scanner:fullscreen #reader{max-height:35vh}}
+</style>
