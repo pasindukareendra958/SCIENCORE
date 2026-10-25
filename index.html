@@ -655,10 +655,10 @@ input,select,textarea,button{max-width:100%}
             if (!monthsArr || !monthsArr.length) return '';
             const names = monthsArr.map(monthNameForVoice).filter(Boolean);
             if (!names.length) return '';
-            const monthsText = names.length === 1 ? `${names[0]} මාසයේ` : names.length === 2 ? `${names[0]} සහ ${names[1]} මාසවල` : `${names.slice(0,-1).join(', ')} සහ ${names[names.length-1]} මාසවල`;
-            if (type === 'unpaid') return `${monthsText} ගාස්තු ගෙවා නැහැ`;
-            if (type === 'received') return `${monthsText} ගාස්තුව ගෙවා ඇත`;
-            if (type === 'remaining') return `${monthsText} ගාස්තු ගෙවීමට ඉතිරිව ඇත`;
+            const monthsText = names.length === 1 ? `${names[0]} මාසයේ` : `${names.slice(0,-1).join(', ')} සහ ${names[names.length-1]} මාසවල`;
+            if (type === 'unpaid') return names.length === 1 ? `${monthsText} ගාස්තුව ගෙවා නැහැ` : `${monthsText} ගාස්තු ගෙවා නැහැ`;
+            if (type === 'received') return `${monthsText} ගාස්තුව ගෙවා තිබෙනවා`;
+            if (type === 'remaining') return names.length === 1 ? `${monthsText} ගාස්තුව ගෙවීමට ඉතිරිව තිබෙනවා` : `${monthsText} ගාස්තු ගෙවීමට ඉතිරිව තිබෙනවා`;
             return monthsText;
         }
         function instantMultiPayActiveStudent() {
@@ -1320,7 +1320,25 @@ body>main{margin-left:226px!important;max-width:none!important;width:calc(100% -
             <tr><td>Student Name</td><td>${safe(record.studentName)}</td></tr><tr><td>Student ID</td><td>${safe(record.studentId)}</td></tr>
             <tr><td>Grade</td><td>${safe(record.grade)}</td></tr><tr><td>Paid Month(s)</td><td>${monthText}</td></tr>
             <tr class="total"><td>Amount Received</td><td>Rs. ${Number(record.amount).toLocaleString('en-LK',{minimumFractionDigits:2})}</td></tr>
-            </table><p class="foot">Thank you • SCIENCORE</p><button onclick="window.print()" style="padding:12px 25px;background:#eab308;border:0;border-radius:9px;cursor:pointer">Print / Save PDF</button></body></html>`;
+            </table><p class="foot">Thank you • SCIENCORE</p><button onclick="window.print()" style="padding:12px 25px;background:#eab308;border:0;border-radius:9px;cursor:pointer">Print / Save PDF</button>
+<style id="sciencore-v41-scan-workflow-fix">
+#dashboard-scanner:fullscreen{display:flex!important;flex-direction:column!important;gap:16px!important;overflow-y:auto!important;background:#061326!important}
+#dashboard-scanner:fullscreen #reader{width:100%!important;max-height:48vh!important;min-height:220px!important;margin-inline:auto!important}
+#dashboard-scanner:fullscreen #student-result{flex:0 0 auto!important;min-height:80px!important;max-height:none!important;overflow:visible!important}
+#dashboard-scanner:fullscreen #student-result h3{font-size:clamp(1.2rem,2.3vw,1.8rem)!important}
+#dashboard-scanner:fullscreen #student-result button{min-height:54px!important;font-size:1rem!important}
+#dashboard-scanner:fullscreen .grid{gap:12px!important}
+@media(max-width:700px){#dashboard-scanner:fullscreen{padding:12px!important}#dashboard-scanner:fullscreen #reader{max-height:38vh!important;min-height:180px!important}}
+</style>
+<script id="sciencore-v41-explicit-next-scan">
+// Keep each student's result visible until the operator chooses payment or next QR.
+window.addEventListener('DOMContentLoaded',()=>{
+  const box=document.getElementById('student-result');
+  if(box && !box.textContent.trim()) box.innerHTML='<div class="text-center py-5 text-slate-300"><p class="text-lg font-bold">QR එක Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත කැමරාවට පෙන්වන්න.</p></div>';
+});
+</script>
+
+</body></html>`;
         }
         function showPaymentReceipt(record) {
             const html = receiptHTML(record);
@@ -1811,7 +1829,7 @@ body>main{margin-left:226px!important;max-width:none!important;width:calc(100% -
         const scDefaultPrefs={voice:true,beep:true,motion:true,name:true,rate:1,volume:1,reset:4,qrSize:1};
         let scPrefs={...scDefaultPrefs,...safeLocalJSON('sciencore-ops-prefs',{})}; scPrefs.reset=Math.max(0,Math.min(60,Number(scPrefs.reset)||0)); scPrefs.volume=Math.max(0,Math.min(1,Number(scPrefs.volume??1))); scPrefs.qrSize=[0.75,1,1.5,2].includes(Number(scPrefs.qrSize))?Number(scPrefs.qrSize):1;
         let scActiveSession=null,scImportRows=[],scScanResetTimer=null;
-        function scheduleScanResultReset(){clearTimeout(scScanResetTimer);const delay=Math.max(0,Math.min(60,Number(scPrefs.reset)||0));if(!delay)return;scScanResetTimer=setTimeout(()=>{const box=document.getElementById("student-result");if(box)box.innerHTML="<p class=\"text-slate-400\">Ready for the next QR scan</p>";},delay*1000);}
+        function scheduleScanResultReset(){ clearTimeout(scScanResetTimer); /* Do not auto-hide student/payment choices: wait for an explicit user action. */ }
         function scToast(message,ok=true){let el=document.getElementById('sc-toast');if(!el){el=document.createElement('div');el.id='sc-toast';document.body.appendChild(el);}el.textContent=message;el.className='sc-toast '+(ok?'':'sc-toast-error');el.classList.add('show');clearTimeout(window.scToastTimer);window.scToastTimer=setTimeout(()=>el.classList.remove('show'),3200);}
         function scBeep(kind=true){if(!scPrefs.beep)return;try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const tones=kind==='duplicate'?[[420,.08],[300,.08]]:kind==='error'||kind===false?[[220,.18]]:kind==='payment'?[[660,.09],[880,.12]]:[[880,.1]];let offset=0;for(const [frequency,duration] of tones){const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.value=frequency;gain.gain.value=.035;osc.connect(gain);gain.connect(ctx.destination);osc.start(ctx.currentTime+offset);osc.stop(ctx.currentTime+offset+duration);offset+=duration+.035;}setTimeout(()=>ctx.close(),Math.ceil((offset+.2)*1000));}catch(e){}}
         function testScannerSounds(){const was=scPrefs.beep;scPrefs.beep=true;scBeep(true);setTimeout(()=>scBeep('duplicate'),250);setTimeout(()=>scBeep('error'),500);setTimeout(()=>{scPrefs.beep=was;},800);}
@@ -1839,7 +1857,25 @@ body>main{margin-left:226px!important;max-width:none!important;width:calc(100% -
         function scPrint(body){
             const w = window.open('', '_blank', 'width=850,height=700');
             if (!w) { scToast('Allow pop-ups for printing', false); return; }
-            w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SCIENCORE Print</title><style>body{font:16px Arial,sans-serif;color:#112244;padding:25px}h1{color:#143a80}.qr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.qr-card{border:1px solid #bbb;text-align:center;padding:12px;break-inside:avoid}.qr-card canvas{max-width:100%}@media print{@page{size:A4;margin:12mm}}</style></head><body>${body}</body></html>`);
+            w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SCIENCORE Print</title><style>body{font:16px Arial,sans-serif;color:#112244;padding:25px}h1{color:#143a80}.qr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.qr-card{border:1px solid #bbb;text-align:center;padding:12px;break-inside:avoid}.qr-card canvas{max-width:100%}@media print{@page{size:A4;margin:12mm}}</style></head><body>${body}
+<style id="sciencore-v41-scan-workflow-fix">
+#dashboard-scanner:fullscreen{display:flex!important;flex-direction:column!important;gap:16px!important;overflow-y:auto!important;background:#061326!important}
+#dashboard-scanner:fullscreen #reader{width:100%!important;max-height:48vh!important;min-height:220px!important;margin-inline:auto!important}
+#dashboard-scanner:fullscreen #student-result{flex:0 0 auto!important;min-height:80px!important;max-height:none!important;overflow:visible!important}
+#dashboard-scanner:fullscreen #student-result h3{font-size:clamp(1.2rem,2.3vw,1.8rem)!important}
+#dashboard-scanner:fullscreen #student-result button{min-height:54px!important;font-size:1rem!important}
+#dashboard-scanner:fullscreen .grid{gap:12px!important}
+@media(max-width:700px){#dashboard-scanner:fullscreen{padding:12px!important}#dashboard-scanner:fullscreen #reader{max-height:38vh!important;min-height:180px!important}}
+</style>
+<script id="sciencore-v41-explicit-next-scan">
+// Keep each student's result visible until the operator chooses payment or next QR.
+window.addEventListener('DOMContentLoaded',()=>{
+  const box=document.getElementById('student-result');
+  if(box && !box.textContent.trim()) box.innerHTML='<div class="text-center py-5 text-slate-300"><p class="text-lg font-bold">QR එක Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත කැමරාවට පෙන්වන්න.</p></div>';
+});
+</script>
+
+</body></html>`);
             w.document.close();
             if (!body.includes('qr-grid')) setTimeout(() => { w.focus(); w.print(); }, 650);
             return w;
@@ -1940,6 +1976,24 @@ window.addEventListener('load', function () {
   }, 250);
 });
 </script>
+
+<style id="sciencore-v41-scan-workflow-fix">
+#dashboard-scanner:fullscreen{display:flex!important;flex-direction:column!important;gap:16px!important;overflow-y:auto!important;background:#061326!important}
+#dashboard-scanner:fullscreen #reader{width:100%!important;max-height:48vh!important;min-height:220px!important;margin-inline:auto!important}
+#dashboard-scanner:fullscreen #student-result{flex:0 0 auto!important;min-height:80px!important;max-height:none!important;overflow:visible!important}
+#dashboard-scanner:fullscreen #student-result h3{font-size:clamp(1.2rem,2.3vw,1.8rem)!important}
+#dashboard-scanner:fullscreen #student-result button{min-height:54px!important;font-size:1rem!important}
+#dashboard-scanner:fullscreen .grid{gap:12px!important}
+@media(max-width:700px){#dashboard-scanner:fullscreen{padding:12px!important}#dashboard-scanner:fullscreen #reader{max-height:38vh!important;min-height:180px!important}}
+</style>
+<script id="sciencore-v41-explicit-next-scan">
+// Keep each student's result visible until the operator chooses payment or next QR.
+window.addEventListener('DOMContentLoaded',()=>{
+  const box=document.getElementById('student-result');
+  if(box && !box.textContent.trim()) box.innerHTML='<div class="text-center py-5 text-slate-300"><p class="text-lg font-bold">QR එක Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත කැමරාවට පෙන්වන්න.</p></div>';
+});
+</script>
+
 </body>
 </html>
 <style id="sciencore-v40-fullscreen-fixes">
