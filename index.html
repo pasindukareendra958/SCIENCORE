@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sciencore 2.3 | Management Dashboard</title>
+    <title>SCIENCORE 3.8 | Class Management System</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <script type="module">
@@ -73,6 +73,122 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 @media print{.sc-hero,#dashboard-scanner,#tab-dashboard{display:none!important}}
     </style>
+<style id="sciencore-v3-style">
+.ops-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:16px}.ops-card{background:linear-gradient(145deg,#0e2343,#091425);border:1px solid #254a75;border-radius:22px;padding:20px;box-shadow:0 12px 32px #0004;transition:transform .22s,border-color .22s}.ops-card:hover{transform:translateY(-3px);border-color:#38bdf8}.ops-card h3{font-size:1.12rem;font-weight:850;color:#fff;margin-bottom:12px}.ops-muted{font-size:.78rem;color:#a6b8d1;margin:6px 0}.ops-scroll{max-height:260px;overflow:auto;margin-top:12px}.ops-row{padding:10px 0;border-bottom:1px solid #294461;font-size:.84rem;overflow-wrap:anywhere}.ops-btn,.ops-mini{background:#164b77;color:#e7f7ff;padding:9px 13px;border-radius:11px;font-weight:700;font-size:.8rem;display:inline-block}.ops-mini{margin:5px 0 0 8px;background:#234363}.ops-btn:hover,.ops-mini:hover{background:#226fa4}.ops-label{display:block;font-size:.76rem;color:#b4c8e4;margin:12px 0 5px}.ops-check{display:block;margin:9px 0;color:#dbeafe;font-size:.86rem}.ops-status{margin-top:12px;padding:12px;border:1px solid #30537a;background:#0a1b33;border-radius:12px;font-size:.82rem;color:#a8ddff}.sc-toast{position:fixed;bottom:25px;right:25px;z-index:99999;max-width:340px;padding:15px 22px;border:1px solid #38bdf8;border-radius:15px;background:#0b2d51;color:white;box-shadow:0 15px 40px #0009;opacity:0;transform:translateY(20px);pointer-events:none;transition:all .25s}.sc-toast.show{opacity:1;transform:translateY(0)}.sc-toast-error{border-color:#fb7185}#dashboard-stats [draggable=true],#dashboard-grades [draggable=true]{outline:1px dashed #ffcf39;outline-offset:2px}.sc-no-motion *, .sc-no-motion *::before,.sc-no-motion *::after{animation:none!important;transition:none!important}#dashboard-scanner:fullscreen{background:#061326;padding:28px;overflow:auto}#dashboard-scanner:fullscreen #reader{max-height:60vh}
+</style>
+
+<style id="sciencore-visual-refresh-33">
+/* SCIENCORE 3.3 — visual refresh only; existing HTML IDs and JS workflows preserved */
+:root{--sc-bg:#07111f;--sc-side:#0b1728;--sc-panel:#101f33;--sc-line:rgba(148,174,207,.17);--sc-blue:#54b7ff;--sc-gold:#ffd166;--sc-green:#47d7ac}
+html{scroll-behavior:smooth}body{background:radial-gradient(ellipse at 75% -15%,rgba(39,119,207,.20),transparent 42%),linear-gradient(145deg,#07111f,#09172a 58%,#07111d)!important;letter-spacing:.005em}
+/* Desktop navigation becomes a clear left control rail */
+@media(min-width:1024px){
+ body>nav{position:fixed!important;left:0;top:0;bottom:0;width:248px;overflow-y:auto;padding:22px 14px!important;border-right:1px solid rgba(107,160,221,.2)!important;border-bottom:0!important;background:linear-gradient(180deg,#0b192c 0%,#081321 100%)!important;backdrop-filter:blur(20px);z-index:100;box-shadow:12px 0 35px #0002!important}
+ body>nav>.max-w-7xl{width:100%;max-width:none;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:25px}
+ body>nav>.max-w-7xl>div:first-child{padding:6px 8px 22px;border-bottom:1px solid var(--sc-line)}
+ body>nav>.max-w-7xl>div:first-child>div:first-child{width:48px;height:48px;border-radius:15px!important;box-shadow:0 8px 25px #0004}
+ body>nav>.max-w-7xl>div:nth-child(2){display:flex;flex-direction:column;flex-wrap:nowrap;gap:7px;width:100%}
+ body>nav button{width:100%;text-align:left;padding:12px 13px!important;border-radius:12px!important;font-size:.82rem!important;font-weight:700;transform:none!important;box-shadow:none!important;border-color:transparent!important;background:transparent!important;color:#a9bad0!important;display:flex;align-items:center;gap:8px}
+ body>nav button:hover{background:rgba(72,139,214,.13)!important;color:#fff!important;border-color:rgba(99,177,255,.2)!important}
+ body>nav #btn-dashboard{background:linear-gradient(110deg,#ffd166,#ffb84d)!important;color:#172235!important;box-shadow:0 8px 20px rgba(255,177,64,.14)!important}
+ body>main{margin-left:248px!important;max-width:none!important;padding:30px clamp(22px,3vw,48px)!important}
+}
+/* Header and sections */
+.sc-hero{border-radius:26px!important;border:1px solid rgba(92,166,244,.28)!important;background:linear-gradient(120deg,#102f55 0%,#10213b 52%,#111b30 100%)!important;box-shadow:0 22px 55px rgba(0,0,0,.20)!important;padding:clamp(25px,4vw,44px)!important}
+.sc-hero h2{letter-spacing:-.035em;line-height:1.12}
+.sc-kicker{font-size:.66rem!important;letter-spacing:.19em!important;color:#7fd0ff!important}
+.sc-live{border-radius:999px!important;background:rgba(6,19,35,.65)!important;padding:10px 14px!important}
+.sc-section,.sc-stat,.sc-grade,.ops-card{border-radius:20px!important;border-color:var(--sc-line)!important;background:linear-gradient(145deg,rgba(18,34,55,.96),rgba(12,25,43,.98))!important;box-shadow:0 12px 32px rgba(0,0,0,.12)!important}
+.sc-stat,.sc-grade{padding:22px!important}.sc-stat:hover,.sc-grade:hover{transform:translateY(-3px);border-color:rgba(255,209,102,.42)!important;box-shadow:0 16px 35px #0003!important}
+.sc-stat>div:first-child{color:#a9bfd8!important;font-size:.76rem!important;letter-spacing:.025em}
+.sc-stat>div:nth-child(2){font-size:clamp(2rem,3vw,2.7rem)!important;letter-spacing:-.04em}
+.sc-stat-line{height:4px!important;background:linear-gradient(90deg,#ffd166,#4dbbff,rgba(77,187,255,0))!important}
+.sc-grade{position:relative;overflow:hidden}.sc-grade:after{content:"";position:absolute;width:100px;height:100px;border-radius:50%;right:-42px;top:-42px;background:rgba(58,157,255,.07);pointer-events:none}
+.sc-refresh,.ops-btn,.ops-mini{border-radius:11px!important;transition:transform .18s,filter .18s!important}.sc-refresh:hover,.ops-btn:hover,.ops-mini:hover{filter:brightness(1.12);transform:translateY(-1px)}
+#dashboard-scanner>.grid:first-child>div{border-radius:18px!important;background:linear-gradient(145deg,#112945,#0e2036)!important;border:1px solid var(--sc-line)!important}
+#dashboard-scanner>.grid:nth-child(2)>div{border-radius:23px!important;background:linear-gradient(145deg,#12253d,#0d1c30)!important;border:1px solid rgba(121,166,217,.18)!important;box-shadow:0 18px 42px #0002!important;padding:clamp(17px,2vw,28px)!important}
+#dashboard-scanner h2{letter-spacing:-.015em}
+#reader{border-radius:18px!important;background:linear-gradient(145deg,#06101d,#0a1a2c)!important;border-color:rgba(84,183,255,.38)!important}
+#manual-id{border-radius:12px!important;padding:13px 15px!important}
+button{cursor:pointer}input,select,textarea{border-radius:11px!important}
+.field{border-radius:11px!important}.panel{border-radius:17px!important}
+.ops-card{padding:23px!important}.ops-card h3{letter-spacing:-.01em}.ops-status{border-radius:13px!important}
+.sc-toast{border-radius:15px!important;backdrop-filter:blur(12px)}
+/* Cleaner spacing for all existing modules */
+#tab-dashboard,#tab-operations,#tab-birthdays,#tab-messages,#tab-timetable,#tab-expenses,#tab-activity,#tab-settings,#tab-reports,#tab-students,#tab-income,#tab-ai{scroll-margin-top:20px}
+@media(max-width:1023px){body>nav{position:sticky!important;top:0;left:auto;bottom:auto;width:auto;z-index:100;padding:12px!important}body>nav>.max-w-7xl{max-width:100%;gap:14px}body>nav>.max-w-7xl>div:nth-child(2){justify-content:flex-start}body>main{margin-left:auto!important;padding:18px!important}}
+@media(max-width:640px){body>nav button{font-size:.72rem!important;padding:9px 10px!important;border-radius:10px!important}body>main{padding:12px!important}.sc-hero{padding:23px!important;border-radius:20px!important}.sc-live{width:auto!important}.sc-section{padding:17px!important}.sc-stat,.sc-grade{padding:15px!important}#dashboard-scanner>.grid:nth-child(2)>div{padding:16px!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+
+<style id="sciencore-dashboard-reference-redesign">
+:root{--ui-bg:#07111f;--ui-panel:rgba(18,31,49,.86);--ui-line:rgba(148,177,211,.19);--ui-blue:#22c5f5;--ui-purple:#9a63ff;--ui-muted:#9fb1c7;--ui-white:#f3f7fc}
+html{background:var(--ui-bg)} body{background:radial-gradient(ellipse at 68% 12%,rgba(39,104,157,.20),transparent 36%),radial-gradient(ellipse at 18% 70%,rgba(115,55,180,.12),transparent 30%),linear-gradient(135deg,#050b14,#0b1726 60%,#07111d)!important;color:var(--ui-white)!important}
+body>nav{position:fixed!important;left:0;top:0;bottom:0;width:226px;overflow-y:auto;padding:22px 14px!important;background:rgba(7,15,27,.91)!important;backdrop-filter:blur(22px)!important;border-right:1px solid var(--ui-line)!important;border-bottom:0!important;box-shadow:10px 0 36px #0002!important}
+body>nav>div{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:26px!important;width:100%!important}
+body>nav>div>div:first-child{padding:0 7px 18px;border-bottom:1px solid var(--ui-line)}
+body>nav>div>div:nth-child(2){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;width:100%}
+body>nav button{width:100%;text-align:left;justify-content:flex-start;border:1px solid transparent!important;background:transparent!important;color:#9cacc0!important;border-radius:11px!important;padding:11px 12px!important;font-size:12px!important;transition:background .2s,border-color .2s,transform .2s!important}
+body>nav button:hover{background:rgba(55,91,129,.25)!important;color:#fff!important;transform:translateX(2px)}
+body>nav #btn-dashboard,body>nav #btn-operations{background:linear-gradient(100deg,rgba(31,190,242,.22),rgba(111,84,224,.13))!important;border-color:rgba(59,195,246,.23)!important;color:#e9faff!important;box-shadow:inset 3px 0 #2ac7f5!important}
+body>main{margin-left:226px!important;max-width:none!important;width:calc(100% - 226px)!important;padding:28px clamp(18px,3vw,42px)!important}
+#tab-dashboard{gap:22px!important;max-width:1500px;margin:0 auto}
+.sc-hero{position:relative;overflow:hidden;border:1px solid var(--ui-line)!important;border-radius:20px!important;background:linear-gradient(115deg,rgba(23,53,81,.91),rgba(18,28,47,.93) 58%,rgba(39,29,70,.88))!important;box-shadow:0 18px 48px rgba(0,0,0,.24)!important;padding:clamp(23px,3vw,36px)!important}
+.sc-hero:after{content:"";position:absolute;width:300px;height:300px;right:-80px;top:-145px;border-radius:50%;background:radial-gradient(circle,rgba(39,196,246,.18),transparent 68%);pointer-events:none}
+.sc-kicker{color:#67d9ff!important;letter-spacing:.14em!important;font-size:10px!important;font-weight:800!important}
+.sc-gradient-text{background:linear-gradient(90deg,#f4faff,#6ad8ff,#ad88ff)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+.sc-live{background:rgba(3,17,31,.5)!important;border:1px solid rgba(83,198,245,.22)!important;border-radius:999px!important;padding:9px 13px!important;color:#d6eaff!important;font-size:11px!important}
+.sc-live-dot{background:#2fe0ad!important;box-shadow:0 0 12px #2fe0ad!important}
+#dashboard-scanner>.grid:first-child>div{background:linear-gradient(145deg,rgba(21,43,65,.92),rgba(12,25,41,.95))!important;border:1px solid var(--ui-line)!important;border-radius:16px!important;box-shadow:0 12px 28px #0002!important;transition:transform .2s,border-color .2s!important}
+#dashboard-scanner>.grid:first-child>div:hover{transform:translateY(-3px);border-color:rgba(48,195,246,.42)!important}
+#dashboard-scanner>.grid:nth-child(2)>div,.sc-section,#dashboard-stats>div,#dashboard-grades>div{background:linear-gradient(145deg,rgba(20,36,56,.94),rgba(12,23,38,.96))!important;border:1px solid var(--ui-line)!important;border-radius:17px!important;box-shadow:0 12px 32px rgba(0,0,0,.17)!important}
+#dashboard-scanner h2{color:#d7f5ff!important;font-weight:800!important}
+#dashboard-stats>div,#dashboard-grades>div{padding:16px!important;transition:transform .2s,border-color .2s!important}
+#dashboard-stats>div:hover,#dashboard-grades>div:hover{transform:translateY(-3px);border-color:rgba(65,196,246,.4)!important}
+.sc-section{padding:21px!important}
+.sc-refresh{background:rgba(43,142,197,.15)!important;border:1px solid rgba(76,183,235,.28)!important;color:#bcecff!important;border-radius:10px!important;padding:8px 12px!important}
+#dashboard-scanner .text-amber-300,#dashboard-scanner .text-amber-400{color:#73dfff!important}
+#dashboard-scanner .bg-amber-500{background:#39c9f4!important;color:#061321!important}
+#dashboard-scanner .border-amber-500\/30,#dashboard-scanner .border-amber-500\/20{border-color:rgba(59,195,246,.25)!important}
+#manual-id{background:#071421!important;border:1px solid rgba(76,184,235,.3)!important}#manual-id:focus{outline:2px solid #35c7f6!important}
+#dashboard-scanner button[onclick^="verifyStudent"]{background:linear-gradient(100deg,#2cc8f3,#69a7ff)!important;color:#071321!important}
+.ops-card{background:linear-gradient(145deg,rgba(20,36,56,.96),rgba(10,21,36,.98))!important;border-color:var(--ui-line)!important}
+.sc-toast{background:#12263b!important;border-color:#3ac7f4!important}
+@media(max-width:800px){body>nav{position:sticky!important;top:0!important;bottom:auto!important;width:100%!important;height:auto!important;max-height:none!important;padding:12px!important;border-right:0!important;border-bottom:1px solid var(--ui-line)!important;z-index:100!important}body>nav>div{gap:12px!important}body>nav>div>div:first-child{padding:0 3px 10px}body>nav>div>div:nth-child(2){flex-direction:row!important;flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:3px}body>nav button{width:auto!important;white-space:nowrap!important;flex:0 0 auto!important;padding:9px 11px!important}body>main{margin-left:0!important;width:100%!important;padding:16px 12px!important}#tab-dashboard{gap:16px!important}.sc-hero{padding:22px!important}}
+@media(max-width:480px){body>nav>div>div:first-child img{width:38px!important;height:38px!important}body>nav>div>div:first-child{border-bottom:0!important}#dashboard-scanner>.grid:nth-child(2)>div{padding:14px!important}.sc-section{padding:15px!important}}
+@media(prefers-reduced-motion:reduce){body>nav button,#dashboard-stats>div,#dashboard-grades>div{transition:none!important}}
+</style>
+
+
+<style id="sciencore-layout-overlap-fix">
+/* Layout repair: restore breathing room and prevent dashboard elements from crowding */
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{min-width:320px;overflow-x:hidden;line-height:1.5}
+body>nav{width:236px!important;padding:22px 14px!important}
+body>nav>.max-w-7xl{width:100%!important;max-width:none!important;margin:0!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;justify-content:flex-start!important;gap:24px!important}
+body>nav>.max-w-7xl>div:first-child{display:flex!important;align-items:center!important;gap:12px!important;min-width:0;padding:0 5px 18px!important;border-bottom:1px solid var(--ui-line)!important}
+body>nav>.max-w-7xl>div:nth-child(2){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important;width:100%!important;min-width:0}
+body>nav button{display:flex!important;align-items:center!important;gap:10px!important;min-height:42px!important;width:100%!important;white-space:normal!important;line-height:1.35!important;margin:0!important;padding:11px 12px!important}
+body>main{display:block!important;margin:0 0 0 236px!important;width:calc(100% - 236px)!important;max-width:none!important;min-width:0!important;padding:30px clamp(18px,3vw,42px)!important}
+#tab-dashboard{display:flex;flex-direction:column;gap:22px!important;width:100%;min-width:0}
+#tab-dashboard.hidden{display:none!important}
+#tab-dashboard>*{min-width:0;max-width:100%}
+.sc-hero{margin:0 0 2px!important;min-width:0}
+#dashboard-scanner{display:flex;flex-direction:column;gap:22px!important;min-width:0}
+#dashboard-scanner>.grid{width:100%;min-width:0;gap:16px!important}
+#dashboard-scanner>.grid>*{min-width:0;overflow-wrap:anywhere}
+#dashboard-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:15px!important;margin:0!important}
+#dashboard-grades{gap:14px!important}
+.sc-section{margin:0!important;min-width:0;overflow:hidden}
+#dashboard-recent-activity{display:flex;flex-direction:column;gap:9px!important}
+#dashboard-scanner h2,#tab-dashboard h2,#tab-dashboard h3{overflow-wrap:anywhere}
+input,select,textarea,button{max-width:100%}
+@media(max-width:800px){body>nav{position:sticky!important;inset:auto!important;width:100%!important;max-height:none!important;padding:12px!important}body>nav>.max-w-7xl{gap:12px!important}body>nav>.max-w-7xl>div:first-child{padding:0 3px 10px!important;border-bottom:0!important}body>nav>.max-w-7xl>div:nth-child(2){flex-direction:row!important;flex-wrap:nowrap!important;overflow-x:auto!important;gap:8px!important;padding:2px 0 7px!important}body>nav button{width:auto!important;flex:0 0 auto!important;white-space:nowrap!important;min-height:38px!important;padding:9px 11px!important}body>main{margin:0!important;width:100%!important;padding:20px 14px!important}#tab-dashboard{gap:18px!important}#dashboard-scanner{gap:18px!important}#dashboard-scanner>.grid{gap:12px!important}}
+@media(max-width:520px){body>main{padding:14px 10px!important}.sc-hero{padding:20px 17px!important}.sc-section{padding:15px!important}#dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px!important}#dashboard-grades{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}#dashboard-scanner>.grid:nth-child(2){grid-template-columns:minmax(0,1fr)!important}#dashboard-scanner>.grid:first-child{grid-template-columns:minmax(0,1fr)!important}}
+</style>
+
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans selection:bg-amber-500 selection:text-slate-900">
 
@@ -91,6 +207,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
             <!-- Navigation Tabs -->
             <div class="flex flex-wrap gap-2">
                 <button onclick="switchTab('dashboard')" id="btn-dashboard" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">🏠 Dashboard</button>
+                <button onclick="switchTab('operations')" id="btn-operations" class="px-3 py-2 bg-sky-700 text-white rounded-xl text-xs">⚡ Operations</button>
                 <button onclick="switchTab('birthdays')" id="btn-birthdays" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">🎂 Birthdays</button>
                 <button onclick="switchTab('messages')" id="btn-messages" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">📲 Messages</button>
                 <button onclick="switchTab('timetable')" id="btn-timetable" class="px-3 py-2 bg-slate-700 text-white rounded-xl text-xs">📅 Timetable</button>
@@ -115,7 +232,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
       <div class="sc-live"><span class="sc-live-dot"></span> SYSTEM LIVE <span class="opacity-60">•</span> <span id="hero-live-time">--:--:--</span></div>
     </div>
   </div>
-  <div class="flex flex-wrap items-center justify-between gap-3"><div><div class="sc-kicker">01 / QUICK ATTENDANCE</div><h3 class="text-xl md:text-2xl font-extrabold text-white mt-1">📷 Scan &amp; Check In</h3></div><div class="sc-scanner-note">⚡ QR scan or enter an ID below</div></div>
+  <div class="flex flex-wrap items-center justify-between gap-3"><div><div class="sc-kicker">01 / QUICK ATTENDANCE</div><h3 class="text-xl md:text-2xl font-extrabold text-white mt-1">📷 Scan &amp; Check In</h3></div><div class="sc-scanner-note">⚡ QR scan or enter an ID below · <button onclick="switchTab('operations')" class="underline text-yellow-300">Class controls</button></div></div>
         <!-- TAB 1: SCANNER -->
         <div id="dashboard-scanner" class="space-y-6 fade-in">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -166,7 +283,31 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
   <div class="flex flex-wrap items-center justify-between gap-3 pt-2"><div><div class="sc-kicker">02 / OVERVIEW</div><h3 class="text-xl md:text-2xl font-extrabold text-white mt-1">📊 At a Glance</h3></div><button onclick="loadDashboard()" class="sc-refresh">↻ Refresh overview</button></div>
   <div id="dashboard-stats" class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4"></div>
   <div class="sc-section"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">🎓 Students by Grade</h3><span class="text-xs text-slate-400">Live database summary</span></div><div id="dashboard-grades" class="grid grid-cols-2 md:grid-cols-5 gap-3"></div></div>
-  <div class="sc-footnote">🔒 Internal management workspace · Keep database permissions restricted</div>
+  <div class="sc-section"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg">📜 Recent Activity</h3><button class="sc-refresh" onclick="switchTab('activity')">View all activity</button></div><div id="dashboard-recent-activity" class="space-y-2"><p class="text-sm text-slate-400">Loading recent activity…</p></div></div>
+  <div class="sc-footnote">⚠️ No login screen. Hosting a page publicly does not protect student data; secure Firebase rules are essential.</div>
+</section>
+
+<section id="tab-operations" class="hidden space-y-5 fade-in">
+ <div class="sc-hero"><div class="relative z-10"><span class="sc-kicker">SCIENCORE 3.8 · OPERATIONS</span><h2 class="text-3xl font-black mt-2">⚡ Smart Class Control</h2><p class="text-slate-300 mt-2">Class sessions · payments · QR printing · daily reports</p></div></div>
+ <div class="ops-grid">
+  <div class="ops-card"><h3>🎓 Class Session</h3><p class="ops-muted">Choose a grade and start the session before scanning.</p><select id="ops-grade" class="field w-full"><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11 (O/L)</option></select><div class="flex gap-2 mt-3"><button class="action" onclick="startClassSession()">▶ Start Class</button><button class="ops-btn" onclick="endClassSession()">■ End & Report</button></div><div id="ops-session" class="ops-status">No active session</div></div>
+  <div class="ops-card"><h3>🔎 Instant Student Search</h3><input id="ops-search" class="field w-full" placeholder="Name / Student ID / phone" oninput="searchOperations()"><div id="ops-results" class="ops-scroll"></div></div>
+  <div class="ops-card"><h3>💰 Cash Drawer</h3><div class="ops-muted">Count physical cash against recorded cash payments.</div><label class="ops-label">Opening cash (Rs.)</label><input id="ops-opening" class="field w-full" type="number" min="0" value="0"><button class="action mt-2" onclick="openCashDrawer()">Open drawer</button><label class="ops-label">Actual closing cash (Rs.)</label><input id="ops-actual" class="field w-full" type="number" min="0" placeholder="Enter amount counted"><button class="ops-btn mt-2" onclick="closeCashDrawer()">Close & reconcile</button><div id="ops-cash-result" class="ops-status"></div></div>
+  <div class="ops-card"><h3>📊 Daily / Monthly Reports</h3><div class="flex flex-wrap gap-2"><button class="action" onclick="downloadDailyReport()">↓ Daily CSV</button><button class="ops-btn" onclick="downloadMonthlyReport()">↓ Monthly CSV</button><button class="ops-btn" onclick="printDailyReport()">🖨 Print day</button></div><div id="ops-report-summary" class="ops-status"></div></div>
+  <div class="ops-card"><h3>🖨 Bulk QR / Student ID Printing</h3><p class="ops-muted">Choose QR-only, mini card, or full ID card. Existing QR payloads are respected.</p><select id="ops-print-grade" class="field w-full"><option value="All">All grades</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11 (O/L)</option></select><label class="ops-label">Print layout</label><select id="ops-print-layout" class="field w-full"><option value="qr">QR + Student ID</option><option value="mini">Mini Student Card</option><option value="full">Full Student ID Card</option></select><div class="flex flex-wrap gap-2 mt-3"><button class="action" onclick="bulkPrintQR()">🖨 Print Cards</button><button class="ops-btn" onclick="exportStudentsTemplate()">↓ Import template</button></div><label class="ops-label">Download one student card as PNG</label><input id="ops-png-student-id" class="field w-full" placeholder="Student ID"><button class="ops-btn mt-2" onclick="downloadStudentCardPNG()">⬇ Download ID Card PNG</button><p class="ops-muted">Uses the selected layout above and the student's current QR payload.</p></div>
+  <div class="ops-card"><h3>📥 Bulk Student Import</h3><p class="ops-muted">CSV columns: name,studentId,grade,phone,cardType,birthday,school. Preview and confirm before saving.</p><input type="file" id="ops-csv" accept=".csv,text/csv" class="field w-full" onchange="previewStudentCSV(event)"><div id="ops-import-preview" class="ops-scroll"></div><button id="ops-import-confirm" class="action hidden mt-2" onclick="confirmStudentCSV()">Import valid students</button></div>
+  <div class="ops-card"><h3>📆 Payment Promises</h3><p class="ops-muted">Follow up when a parent promises to pay later.</p><input id="ops-promise-id" class="field w-full" placeholder="Student ID"><input id="ops-promise-date" class="field w-full mt-2" type="date"><input id="ops-promise-amount" class="field w-full mt-2" type="number" min="1" placeholder="Amount Rs"><button class="action mt-2" onclick="addPaymentPromise()">Save reminder</button><div id="ops-promises" class="ops-scroll"></div></div><div class="ops-card"><h3>🔔 Alerts & Follow-ups</h3><button class="ops-btn" onclick="loadOperationsAlerts()">↻ Refresh alerts</button><div id="ops-alerts" class="ops-scroll"></div></div>
+  <div class="ops-card"><h3>🧾 Payment History & Corrections</h3><p class="ops-muted">Reversals preserve audit history; never silently delete receipts.</p><button class="ops-btn" onclick="loadOperationsPayments()">↻ Load recent payments</button><div id="ops-payments" class="ops-scroll"></div></div>
+  <div class="ops-card"><h3>↩️ Undo Last Action</h3><p class="ops-muted">Undo only the latest attendance mark or reverse the latest payment with a required reason. A local action record is kept on this browser.</p><div id="ops-undo-summary" class="ops-status">No recent reversible action recorded on this device.</div><button class="action mt-2" onclick="undoLastAction()">↩ Undo last attendance / payment</button></div>
+  <div class="ops-card"><h3>🔧 Device & Voice Settings</h3><label class="ops-check"><input type="checkbox" id="ops-voice" onchange="saveOpsPrefs()"> Voice announcements</label><label class="ops-check"><input type="checkbox" id="ops-beep" onchange="saveOpsPrefs()"> Scan sound</label><label class="ops-check"><input type="checkbox" id="ops-motion" onchange="saveOpsPrefs()"> Animations</label><label class="ops-check"><input type="checkbox" id="ops-name" onchange="saveOpsPrefs()"> Read student name</label><label class="ops-label">Voice speed</label><input type="range" min="0.7" max="1.4" step="0.1" id="ops-rate" onchange="saveOpsPrefs()"><label class="ops-label">Voice volume</label><input type="range" min="0" max="1" step="0.1" id="ops-volume" onchange="saveOpsPrefs()"><label class="ops-label">Auto reset scanner result (seconds; default 4, 0 = off)</label><input class="field w-full" id="ops-reset" type="number" min="0" max="60" onchange="saveOpsPrefs()"><label class="ops-label">Downloaded QR PNG size</label><select class="field w-full" id="ops-qr-size" onchange="saveOpsPrefs()"><option value="0.75">Small</option><option value="1">Standard</option><option value="1.5">Large</option><option value="2">Print quality / Extra large</option></select><button class="ops-btn mt-3" onclick="toggleScannerFullscreen()">⛶ Full-screen scanner</button><button class="ops-btn mt-2" onclick="testScannerSounds()">🔊 Test scan sounds</button><button class="ops-btn mt-2" onclick="testSinhalaVoice()">🗣 Test Sinhala voice</button><div id="ops-health" class="ops-status"></div></div>
+  <div class="ops-card"><h3>⏰ Late Attendance & Absence Warnings</h3><p class="ops-muted">Set the usual start time and grace period. Late status is recorded on future scans.</p><label class="ops-label">Usual class start</label><input id="ops-start-time" type="time" value="08:00" class="field w-full"><label class="ops-label">Grace period (minutes)</label><input id="ops-grace" type="number" min="0" max="180" value="10" class="field w-full"><button class="action mt-3" onclick="saveAttendanceRules()">Save attendance rules</button><button class="ops-btn mt-2" onclick="renderLateAttendance()">Show today's late students</button><button class="ops-btn mt-2" onclick="renderAbsenceWarnings()">Check repeated absences</button><div id="ops-attendance-insights" class="ops-scroll"></div></div>
+  <div class="ops-card"><h3>♻️ QR Replacement & Print History</h3><p class="ops-muted">Replaces the QR payload while keeping the Student ID and historical records. Old QR cards stop matching after replacement.</p><input id="ops-qr-student-id" class="field w-full" placeholder="Student ID to replace QR"><button class="action mt-2" onclick="replaceStudentQR()">Generate replacement QR</button><button class="ops-btn mt-2" onclick="showQRPrintHistory()">View QR print history</button><div id="ops-qr-result" class="ops-status"></div></div>
+  <div class="ops-card"><h3>🛡️ Duplicate Student Check</h3><p class="ops-muted">Finds matching IDs and possible same-name/phone records. Similar names are warnings, not automatic deletions.</p><button class="action" onclick="runDuplicateAudit()">Scan student records</button><div id="ops-duplicate-results" class="ops-scroll"></div></div>
+  <div class="ops-card"><h3>💛 Custom Student Discount</h3><p class="ops-muted">Set a per-month discount amount and reason. The discounted monthly fee is shown before payment.</p><input id="ops-discount-id" class="field w-full" placeholder="Student ID"><input id="ops-discount-amount" class="field w-full mt-2" type="number" min="0" step="0.01" placeholder="Discount per month (Rs.)"><input id="ops-discount-reason" class="field w-full mt-2" placeholder="Reason (optional)"><button class="action mt-2" onclick="saveStudentDiscount()">Save discount</button><div id="ops-discount-result" class="ops-status"></div></div>
+  <div class="ops-card"><h3>🧰 Dashboard & Quick Controls</h3><p class="ops-muted">Reorder dashboard summary cards, open the scanner quickly, and review keyboard shortcuts.</p><button class="action" onclick="toggleDashboardArrange()">↕ Toggle dashboard arrange mode</button><button class="ops-btn mt-2" onclick="switchTab('dashboard');document.getElementById('manual-id').focus()">F3 · Focus scanner input</button><button class="ops-btn mt-2" onclick="switchTab('operations');document.getElementById('ops-search').focus()">F2 · Student search</button><div class="ops-status">Shortcuts: F2 Search · F3 Scanner · F4 Registration · Esc Exit fullscreen. Drag summary cards when arrange mode is enabled.</div></div>
+  <div class="ops-card"><h3>📴 Connectivity & Offline Queue</h3><p class="ops-muted">Shows connection status and queued attendance items on this device. Sync requires the same student record to remain valid.</p><button class="action" onclick="showOfflineQueue()">View offline queue</button><button class="ops-btn mt-2" onclick="syncOfflineQueue()">Sync queued attendance</button><div id="ops-offline-status" class="ops-status"></div></div>
+
+ </div>
 </section>
 <section id="tab-birthdays" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">🎂 Birthday Center</h2><p class="text-xs text-slate-400">Automatic SMS requires an external SMS provider and a scheduled backend. Here you can prepare SMS manually.</p><div id="birthday-list" class="space-y-3"></div></section>
 <section id="tab-messages" class="hidden space-y-4"><h2 class="text-xl text-amber-300 font-bold">📲 Message Center</h2><select id="msg-grade" class="field"><option value="All">All Grades</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11 (O/L)</option></select><textarea id="msg-text" class="field w-full" rows="4" placeholder="Message for parents..."></textarea><button onclick="prepareMessages()" class="action">Prepare individual SMS links</button><div id="message-list" class="space-y-2"></div></section>
@@ -476,6 +617,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
         let html5QrCode = null;
         let lastScannedId = "";
         let lastScanTime = 0;
+        let lastDuplicateBeepAt = 0;
         let allStudentsCache = [];
         let currentSelectedGradeFilter = 'All';
 
@@ -492,28 +634,31 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
         function localDateKey(d = new Date()) { const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${day}`; }
         function monthsThroughCurrent() { const now=new Date(), arr=[]; for(let y=2026;y<=now.getFullYear();y++) for(let m=(y===2026?6:1);m<=12;m++){if(y===now.getFullYear()&&m>now.getMonth()+1) break;arr.push({id:`${y}-${String(m).padStart(2,'0')}`,name:`${y} ${new Date(y,m-1,1).toLocaleDateString('si-LK',{month:'long'})}`});}return arr; }
         function refreshMonths(){const n=new Date();allMonthsList=monthsThroughCurrent(); if(n.getFullYear()===2026){for(let m=n.getMonth()+2;m<=12;m++)allMonthsList.push({id:`2026-${String(m).padStart(2,'0')}`,name:new Date(2026,m-1,1).toLocaleDateString('si-LK',{month:'long'})});}}
-        // Accurate Sinhala Grammar Month Formatter for Voice Output
-        function formatMonthsForVoice(monthsArr, type = "unpaid") {
-            if (!monthsArr || monthsArr.length === 0) return "";
-            
-            let monthsText = "";
-            if (monthsArr.length === 1) {
-                monthsText = `${monthsArr[0]} මාසයේ`;
-            } else if (monthsArr.length === 2) {
-                monthsText = `${monthsArr[0]} සහ ${monthsArr[1]} මාසවල`;
-            } else {
-                const last = monthsArr[monthsArr.length - 1];
-                const rest = monthsArr.slice(0, monthsArr.length - 1).join(', ');
-                monthsText = `${rest} සහ ${last} මාසවල`;
+        // Sinhala month names for clear spoken announcements
+        const SI_MONTH_NAMES = {
+            '01':'ජනවාරි','02':'පෙබරවාරි','03':'මාර්තු','04':'අප්‍රේල්','05':'මැයි','06':'ජූනි',
+            '07':'ජූලි','08':'අගෝස්තු','09':'සැප්තැම්බර්','10':'ඔක්තෝබර්','11':'නොවැම්බර්','12':'දෙසැම්බර්'
+        };
+        function monthNameForVoice(month) {
+            if (month && typeof month === 'object' && month.id) {
+                const key = String(month.id).slice(-2);
+                return SI_MONTH_NAMES[key] || String(month.name || month.id);
             }
-
-            if (type === "unpaid") {
-                return `${monthsText} මුදල් ගෙවා නැත`;
-            } else if (type === "received") {
-                return `${monthsText} මුදල් ගෙවන ලදී`;
-            } else if (type === "remaining") {
-                return `${monthsText} මුදල් ගෙවීමට ඉතිරිව පවතී`;
-            }
+            const text = String(month || '');
+            const match = text.match(/(?:^|[-\s])(\d{2})(?:$|\s)/);
+            if (match && SI_MONTH_NAMES[match[1]]) return SI_MONTH_NAMES[match[1]];
+            return text.replace(/^\d{4}\s*/, '');
+        }
+        function formatMonthsForVoice(monthsArr, type = 'unpaid') {
+            if (!monthsArr || monthsArr.length === 0) return '';
+            const names = monthsArr.map(monthNameForVoice);
+            let monthsText;
+            if (names.length === 1) monthsText = `${names[0]} මාසයේ`;
+            else if (names.length === 2) monthsText = `${names[0]} සහ ${names[1]} මාසවල`;
+            else monthsText = `${names.slice(0, -1).join(', ')} සහ ${names[names.length - 1]} මාසවල`;
+            if (type === 'unpaid') return `${monthsText} සඳහා ගාස්තු ගෙවා නැහැ`;
+            if (type === 'received') return `${monthsText} සඳහා ගාස්තු ගෙවා තිබෙනවා`;
+            if (type === 'remaining') return `${monthsText} සඳහා ගාස්තු ගෙවීමට ඉතිරිව තිබෙනවා`;
             return monthsText;
         }
 
@@ -617,7 +762,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
 
         function switchTab(tabName) {
             if (tabName === 'scanner') tabName = 'dashboard';
-            ['dashboard','birthdays','messages','timetable','expenses','activity','settings', 'reports', 'students', 'income', 'ai'].forEach(t => {
+            ['dashboard','operations','birthdays','messages','timetable','expenses','activity','settings', 'reports', 'students', 'income', 'ai'].forEach(t => {
                 const tabEl = document.getElementById(`tab-${t}`);
                 const btnEl = document.getElementById(`btn-${t}`);
                 if (tabEl) tabEl.classList.add('hidden');
@@ -635,6 +780,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
             }
 
             if (tabName === 'dashboard') loadDashboard();
+            if (tabName === 'operations') loadOperations();
             if (tabName === 'birthdays') loadBirthdays();
             if (tabName === 'timetable') loadSchedules();
             if (tabName === 'expenses') loadExpenses();
@@ -671,10 +817,13 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                             (decodedText) => {
                                 const cleanCode = decodedText ? decodedText.trim() : "";
                                 const now = Date.now();
-                                if (cleanCode === lastScannedId && now - lastScanTime < 4000) return;
+                                if (cleanCode === lastScannedId && now - lastScanTime < 4000) {
+                                    if (now - lastDuplicateBeepAt > 1600) { scBeep('duplicate'); lastDuplicateBeepAt = now; }
+                                    return;
+                                }
                                 lastScannedId = cleanCode;
                                 lastScanTime = now;
-                                verifyStudentByQR(cleanCode);
+                                Promise.resolve(verifyStudentByQR(cleanCode)).finally(() => scheduleScanResultReset());
                             },
                             (error) => {}
                         );
@@ -697,12 +846,37 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
         }
 
         function speakText(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
+            if (scPrefs.voice === false) return;
+            if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+                if (typeof scToast === 'function') scToast('මෙම බ්‍රවුසරයේ හඬ පහසුකම නොමැත');
+                return;
+            }
+            if (!scPrefs.name && text.includes('. ')) text = text.slice(text.indexOf('. ') + 2);
+            const synth = window.speechSynthesis;
+            const speakWithAvailableVoices = () => {
+                const voices = synth.getVoices ? synth.getVoices() : [];
+                const sinhalaVoice = voices.find(v => /^si([-_]|$)/i.test(v.lang)) || voices.find(v => /sinhala/i.test(v.name));
+                if (!sinhalaVoice) {
+                    const health = document.getElementById('ops-health');
+                    if (health) health.textContent = 'සිංහල හඬක් මෙම පරිගණකයේ/Chrome හි නොමැත. Windows Settings → Time & language → Language & region තුළ Sinhala language සහ Speech/voice support තිබේද බලන්න. පසුව Chrome නැවත විවෘත කරන්න.';
+                    if (typeof scToast === 'function') scToast('සිංහල හඬක් හමු නොවීය — English හඬෙන් කියවීම නතර කළා');
+                    return;
+                }
+                synth.cancel();
                 const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'si-LK';
-                utterance.rate = 0.9;
-                window.speechSynthesis.speak(utterance);
+                utterance.voice = sinhalaVoice;
+                utterance.lang = sinhalaVoice.lang || 'si-LK';
+                utterance.rate = Math.max(0.5, Math.min(2, Number(scPrefs.rate) || 0.9));
+                utterance.volume = Math.max(0, Math.min(1, Number(scPrefs.volume ?? 1)));
+                synth.speak(utterance);
+            };
+            // Chrome may load its voice list asynchronously.
+            if (synth.getVoices().length) speakWithAvailableVoices();
+            else {
+                let finished = false;
+                const onVoices = () => { if (finished) return; finished = true; synth.removeEventListener?.('voiceschanged', onVoices); speakWithAvailableVoices(); };
+                synth.addEventListener?.('voiceschanged', onVoices);
+                setTimeout(() => { if (!finished) { finished = true; synth.removeEventListener?.('voiceschanged', onVoices); speakWithAvailableVoices(); } }, 1200);
             }
         }
 
@@ -711,6 +885,8 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                 navigator.vibrate([200, 100, 200]);
             }
         }
+
+        function studentQrPayload(student) { return String(student?.qrCodeValue || student?.studentId || '').trim(); }
 
         async function verifyStudent(qrCode) {
             if (!qrCode) return;
@@ -722,6 +898,13 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
             if (!resultDiv) return;
             resultDiv.innerHTML = `<p class="text-amber-400 font-semibold">Searching database...</p>`;
             const searchCode = qrCode ? qrCode.trim() : "";
+            if(!navigator.onLine){
+                const cached=await allStudentRows();const student=cached.find(st=>studentQrPayload(st)===searchCode);
+                if(!student){resultDiv.innerHTML='<div class="ops-status">🔴 Offline: this QR is not in the saved device cache. Reconnect and try again.</div>';return;}
+                const now=new Date(),rules=JSON.parse(localStorage.getItem('sciencore-attendance-rules')||'{"startTime":"08:00","grace":10}'),[sh,sm]=String(rules.startTime||'08:00').split(':').map(Number),late=now.getHours()*60+now.getMinutes()>(Number(sh||0)*60+Number(sm||0)+Number(rules.grace||0));
+                const q=JSON.parse(localStorage.getItem('sciencore-offline-attendance')||'[]');if(!q.some(x=>x.studentId===student.studentId&&x.date===localDateKey())){q.push({studentId:student.studentId,date:localDateKey(),time:now.toLocaleTimeString(),isoAt:now.toISOString(),late});localStorage.setItem('sciencore-offline-attendance',JSON.stringify(q));}
+                resultDiv.innerHTML=`<div class="ops-status"><b>📴 OFFLINE ATTENDANCE QUEUED</b><br>${esc(student.name)} · ${esc(student.grade)}<br>Student ID: ${esc(student.studentId)}<br>${late?'🟠 Late arrival':'🟢 On time'}<br>⚠️ Not yet synced to Firebase.</div>`;scBeep(true);if(!silent)speakText(`${student.name}. Offline attendance queued. Not yet synced.`);showOfflineQueue();return;
+            }
 
             try {
                 const dbRef = window.ref(window.db, 'students');
@@ -734,7 +917,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                     snapshot.forEach((childSnapshot) => {
                         const student = childSnapshot.val();
                         if (student.studentId) {
-                            const dbStudentId = student.studentId.trim();
+                            const dbStudentId = studentQrPayload(student);
                             if (dbStudentId === searchCode) {
                                 foundStudent = student;
                                 studentKey = childSnapshot.key;
@@ -743,16 +926,20 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                     });
 
                     if (foundStudent) {
+                        if (window.scActiveSession?.grade && window.scActiveSession.grade !== foundStudent.grade) {
+                            const ok=confirm(`⚠️ Wrong class!\nCurrent: ${window.scActiveSession.grade}\nStudent: ${foundStudent.grade}\nAllow attendance anyway?`);
+                            if(!ok){resultDiv.innerHTML='<div class="ops-status">⛔ Wrong grade — attendance not recorded.</div>';scBeep(false);return;}
+                        }
                         const fees = foundStudent.fees || {};
                         const cardType = foundStudent.cardType || "Full";
                         const currentMonth = getCurrentMonthKey();
                         
                         let unpaidPastMonths = [];
+                        let paidPastMonths = [];
                         if (cardType !== "Free") {
                             for (let m of allMonthsList) {
-                                if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
-                                    unpaidPastMonths.push(m.name);
-                                }
+                                if (fees[m.id] === 'Unpaid' || !fees[m.id]) unpaidPastMonths.push(m);
+                                else if (fees[m.id] === 'Paid') paidPastMonths.push(m);
                                 if (m.id === currentMonth.key) break;
                             }
                         }
@@ -762,16 +949,20 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                         const attSnap = await window.get(attRef);
                         
                         const alreadyMarked = attSnap.exists();
+                        if (alreadyMarked) scBeep('duplicate');
                         if (!alreadyMarked) {
-                            await window.set(attRef, {
-                                name: foundStudent.name,
-                                grade: foundStudent.grade,
-                                time: new Date().toLocaleTimeString()
-                            });
+                            const now=new Date();const rules=JSON.parse(localStorage.getItem('sciencore-attendance-rules')||'{"startTime":"08:00","grace":10}');const [sh,sm]=String(rules.startTime||'08:00').split(':').map(Number);const late=now.getHours()*60+now.getMinutes()>(Number(sh||0)*60+Number(sm||0)+Number(rules.grace||0));
+                            const attendanceRecord={name:foundStudent.name,grade:foundStudent.grade,time:now.toLocaleTimeString(),isoAt:now.toISOString(),late,attendanceStatus:late?'Late':'On time'};
+                            await window.set(attRef, attendanceRecord);
+                            recordUndoAction({type:'attendance',path:`attendance/${today}/${studentKey}`,date:today,studentKey,studentId:foundStudent.studentId,studentName:foundStudent.name,expectedIsoAt:attendanceRecord.isoAt});
                         }
 
                         loadTodayAttendanceLog();
-
+                        scBeep(true);
+                        scheduleScanResultReset();
+                        if (!alreadyMarked) {
+                          try { await audit(`Attendance: ${foundStudent.name} (${foundStudent.grade})`); } catch(e){}
+                        }
                         let displayHtml = "";
                         let speechMessage = "";
 
@@ -796,7 +987,8 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-1">✅ Attendance Recorded Successfully</p>
                                 </div>
                             `;
-                            speechMessage = `${foundStudent.name}. පැමිණීම සටහන් කරගන්නා ලදී.`;
+                            const paidSentence = paidPastMonths.length ? formatMonthsForVoice(paidPastMonths, "received") : "මෙතෙක් ගෙවූ මාසයක් සටහන් වී නැහැ";
+                            speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ${paidSentence}. සියලුම මාසවල ගාස්තු ගෙවා අවසන්.`;
                         } else {
                             const unpaidSentence = formatMonthsForVoice(unpaidPastMonths, "unpaid");
                             const singleFee = getClassFeeByGrade(foundStudent.grade);
@@ -822,17 +1014,18 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                                     <p class="text-xs text-emerald-400 font-semibold text-center mt-1">✅ පැමිණීම සටහන් කරගන්නා ලදී</p>
                                 </div>
                             `;
-                            speechMessage = `${foundStudent.name}. ${unpaidSentence}. පැමිණීම සටහන් කරගන්නා ලදී.`;
+                            const paidSentence = paidPastMonths.length ? formatMonthsForVoice(paidPastMonths, "received") : "මෙතෙක් ගෙවූ මාසයක් සටහන් වී නැහැ";
+                            speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ${paidSentence}. ${unpaidSentence}.`;
                         }
 
-                        if (alreadyMarked) displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 Already marked today — පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml;
+                        if (alreadyMarked) { scBeep('duplicate'); displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 Already marked today — පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml; }
                         resultDiv.innerHTML = displayHtml;
                         triggerVibration();
                         if (!silent) speakText(speechMessage);
 
                     } else {
-                        resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ Student ID / QR Code '${esc(searchCode)}' not found!</p>`;
-                        triggerVibration();
+                        resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ Student ID / QR Code '${esc(searchCode)}' not found!</p>`; scBeep('error'); scToast('Student / QR not found',false);
+                        scBeep('error'); triggerVibration();
                         if (!silent) speakText("මෙම අංකය සහිත ළමයෙක් හමු නොවීය.");
                     }
                 } else {
@@ -846,9 +1039,12 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
 
         async function instantMultiPayMonths(studentKey, studentName, grade, qrCode) {
             const requiredPin = getTodaySecurityPin();
-            const monthlyFee = getClassFeeByGrade(grade);
+            const initialStudentSnap = await window.get(window.ref(window.db, `students/${studentKey}`));
+            if (!initialStudentSnap.exists()) return scToast('Student record not found', false);
+            const initialStudentData = initialStudentSnap.val();
+            const monthlyFee = Math.max(0, getClassFeeByGrade(grade) - Number(initialStudentData.discountAmount || 0));
 
-            const inputAmountStr = prompt(`💳 ${studentName} (${grade})\nඑක් මාසයක ගාස්තුව: රු. ${monthlyFee}/-\nගෙවන මුදල ඇතුළත් කරන්න (මාස කිහිපයකට නම් එකතුව ඇතුළත් කරන්න):`, monthlyFee);
+            const inputAmountStr = prompt(`💳 ${studentName} (${grade})\nමාසික ගාස්තුව: රු. ${monthlyFee}/-\nගෙවන මුදල ඇතුළත් කරන්න (මාස කිහිපයකට නම් එකතුව ඇතුළත් කරන්න):`, monthlyFee);
             if (inputAmountStr === null) return;
 
             const paidAmount = parseFloat(inputAmountStr);
@@ -861,6 +1057,8 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
             if (enteredPin === null) return;
 
             if (enteredPin.trim() === requiredPin) {
+                const paymentMethod = (prompt('ගෙවීම් ක්‍රමය ඇතුළත් කරන්න: Cash / Bank Transfer / Online', 'Cash') || 'Cash').trim();
+                if (!['Cash','Bank Transfer','Online'].includes(paymentMethod)) { alert('ගෙවීම් ක්‍රමය Cash, Bank Transfer හෝ Online විය යුතුයි.'); return; }
                 try {
                     const snap = await window.get(window.child(window.ref(window.db), `students/${studentKey}`));
                     if (!snap.exists()) return;
@@ -877,7 +1075,10 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                     }
 
                     let monthsToPayCount = Math.floor(paidAmount / monthlyFee);
-                    if (monthsToPayCount <= 0) monthsToPayCount = 1;
+                    if (monthsToPayCount <= 0 || paidAmount % monthlyFee !== 0) {
+                        alert('⚠️ මේ ක්‍රමය සම්පූර්ණ මාසික ගාස්තු සඳහා පමණයි. කරුණාකර මාසික ගාස්තුවේ නිවැරදි ගුණාකාරයක් ඇතුළත් කරන්න.');
+                        return;
+                    }
 
                     let paidMonthNames = [];
                     let updates = {};
@@ -888,8 +1089,22 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                         paidMonthNames.push(targetMonth.name);
                     }
 
+                    if (monthsToPayCount > unpaidMonths.length) { alert('⚠️ ඇතුළත් කළ මුදලට සරිලන නොගෙවූ මාස ප්‍රමාණයක් නොමැත.'); return; }
                     if (Object.keys(updates).length > 0) {
+                        const receiptRef = window.push(window.ref(window.db, 'payments'));
+                        const recordedAmount = paidMonthNames.length * monthlyFee;
+                        const receipt = {
+                            receiptNo: `SC-${localDateKey().replace(/-/g,'')}-${receiptRef.key.slice(-7).toUpperCase()}`,
+                            studentKey, studentName, studentId: studentData.studentId || qrCode,
+                            grade, months: paidMonthNames, monthKeys: unpaidMonths.slice(0,paidMonthNames.length).map(m=>m.id),
+                            amount: recordedAmount, enteredAmount: paidAmount, method: paymentMethod,
+                            date: new Date().toLocaleString('en-GB', {timeZone:'Asia/Colombo'}),
+                            createdAt: new Date().toISOString()
+                        };
+                        updates[`payments/${receiptRef.key}`] = receipt;
                         await window.update(window.ref(window.db), updates);
+                        recordUndoAction({type:'payment',paymentKey:receiptRef.key,receiptNo:receipt.receiptNo,studentKey,studentId:receipt.studentId,studentName,monthKeys:receipt.monthKeys,amount:receipt.amount});
+                        scBeep('payment');
 
                         // Calculate remaining unpaid months after payment
                         let remainingUnpaidNames = [];
@@ -899,11 +1114,11 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
 
                         // Voice Command formatting as requested
                         const paidSentence = formatMonthsForVoice(paidMonthNames, "received");
-                        let fullVoiceMsg = `${studentName}. ${paidSentence}. `;
+                        let fullVoiceMsg = `${studentName}. රුපියල් ${recordedAmount}. ${paidSentence}. `;
 
                         if (remainingUnpaidNames.length > 0) {
                             const remainingSentence = formatMonthsForVoice(remainingUnpaidNames, "remaining");
-                            fullVoiceMsg += `තවදුරටත් ${remainingSentence}.`;
+                            fullVoiceMsg += ` ${remainingSentence}.`;
                         } else {
                             fullVoiceMsg += `ඒ අනුව සියලුම මාසවල පන්ති ගාස්තු ගෙවා අවසන්.`;
                         }
@@ -911,6 +1126,7 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                         alert(`✅ ${studentName} ගේ ${paidMonthNames.join(', ')} ගෙවීම් සාර්ථකව සටහන් විය!`);
                         await verifyStudentByQR(qrCode, true);
                         speakText(fullVoiceMsg);
+                        showPaymentReceipt(receipt);
                     } else {
                         alert("⚠️ ගෙවීමට හිඟ මාස හමු නොවීය!");
                     }
@@ -970,6 +1186,8 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                     name: name,
                     phone: phone,
                     studentId: studentId,
+                    qrCodeValue: studentId,
+                    qrVersion: 1,
                     birthday: document.getElementById("reg-birthday").value || "",
                     school: document.getElementById("reg-school").value.trim(),
                     studentPhone: formatPhoneForWhatsApp(document.getElementById("reg-student-phone").value),
@@ -980,6 +1198,9 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
                 });
 
                 const qrContainer = document.getElementById('new-qr-container');
+                qrContainer.dataset.studentId = studentId;
+                qrContainer.dataset.qrPayload = studentId;
+                qrContainer.dataset.studentName = name;
                 qrContainer.innerHTML = "";
                 new QRCode(qrContainer, { text: studentId, width: 160, height: 160, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
                 document.getElementById('new-qr-text').innerText = `Name: ${name} | ID: ${studentId} | ${grade}`;
@@ -997,43 +1218,108 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
             } finally { if (submitBtn) submitBtn.disabled = false; }
         }
 
+        // Printable PNG includes the EXACT QR payload and a human-readable student ID below.
+        // The quiet zone is preserved to keep the QR readable by scanners.
         function downloadQR(containerId, filenamePrefix) {
             const container = document.getElementById(containerId);
+            if (!container) return;
             const canvas = container.querySelector('canvas');
             const img = container.querySelector('img');
+            const studentId = container.dataset.studentId || '';
+            const qrPayload = container.dataset.qrPayload || studentId;
+            if (!studentId || !qrPayload) { alert('Student ID එක හමු නොවීය. නැවත QR එක Generate කරන්න.'); return; }
+            const render = (source) => {
+                const scale = Math.max(0.75, Math.min(2, Number(scPrefs.qrSize || 1)));
+                const size = Math.round(680 * scale), margin = Math.round(85 * scale);
+                const output = document.createElement('canvas');
+                output.width = Math.round(850 * scale);
+                output.height = Math.round(1030 * scale);
+                const ctx = output.getContext('2d');
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, output.width, output.height);
+                ctx.fillStyle = '#0b2147'; ctx.textAlign = 'center';
+                ctx.font = `bold ${Math.round(38*scale)}px Arial, sans-serif`; ctx.fillText('SCIENCORE', Math.round(425*scale), Math.round(65*scale));
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(source, margin, Math.round(100*scale), size, size);
+                ctx.imageSmoothingEnabled = true;
+                ctx.fillStyle = '#111827';
+                ctx.font = `bold ${Math.round(32*scale)}px Arial, sans-serif`; ctx.fillText('STUDENT ID', Math.round(425*scale), Math.round(850*scale));
+                const fontSize = (studentId.length > 32 ? 23 : studentId.length > 20 ? 29 : 44) * scale;
+                ctx.font = `bold ${Math.round(fontSize)}px Arial, sans-serif`;
+                const shownId = studentId.length > 64 ? studentId.slice(0, 61) + '...' : studentId;
+                ctx.fillText(shownId, Math.round(425*scale), Math.round(920*scale), Math.round(790*scale));
+                const link = document.createElement('a');
+                link.href = output.toDataURL('image/png');
+                link.download = `SCIENCORE_QR_${studentId.replace(/[^a-z0-9_-]/gi,'_').slice(0,45)}.png`;
+                document.body.appendChild(link); link.click(); link.remove();
+            };
+            if (canvas) render(canvas);
+            else if (img) { if (img.complete && img.naturalWidth) render(img); else img.addEventListener('load', () => render(img), {once:true}); }
+            else alert('QR Code එක තවම සකස් වෙමින් පවතී. නැවත උත්සාහ කරන්න.');
+        }
 
-            let sourceCanvas = canvas;
-            if (!sourceCanvas && img) {
-                sourceCanvas = document.createElement('canvas');
-                sourceCanvas.width = img.naturalWidth || 160;
-                sourceCanvas.height = img.naturalHeight || 160;
-                const ctx = sourceCanvas.getContext('2d');
-                ctx.fillStyle = "#FFFFFF";
-                ctx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
-                ctx.drawImage(img, 0, 0);
+        // Receipt: saved payment record and a printable receipt (Print -> Save as PDF).
+        function receiptHTML(record) {
+            const safe = v => esc(String(v ?? ''));
+            const monthText = (record.months || []).map(m => safe(m)).join(', ');
+            return `<!doctype html><html><head><meta charset="utf-8"><title>Receipt ${safe(record.receiptNo)}</title>
+            <style>body{font:16px Arial,sans-serif;color:#0c2347;margin:30px auto;max-width:650px}header{text-align:center;border-bottom:3px solid #eab308;padding:20px}h1{margin:0}table{width:100%;border-collapse:collapse;margin-top:25px}td{padding:12px;border-bottom:1px solid #ddd}td:first-child{font-weight:bold;width:38%}.total{font-size:23px;font-weight:bold;background:#eff6ff}.foot{text-align:center;margin-top:40px;color:#64748b}@media print{button{display:none}}</style>
+<style id="sciencore-dashboard-reference-redesign">
+:root{--ui-bg:#07111f;--ui-panel:rgba(18,31,49,.86);--ui-line:rgba(148,177,211,.19);--ui-blue:#22c5f5;--ui-purple:#9a63ff;--ui-muted:#9fb1c7;--ui-white:#f3f7fc}
+html{background:var(--ui-bg)} body{background:radial-gradient(ellipse at 68% 12%,rgba(39,104,157,.20),transparent 36%),radial-gradient(ellipse at 18% 70%,rgba(115,55,180,.12),transparent 30%),linear-gradient(135deg,#050b14,#0b1726 60%,#07111d)!important;color:var(--ui-white)!important}
+body>nav{position:fixed!important;left:0;top:0;bottom:0;width:226px;overflow-y:auto;padding:22px 14px!important;background:rgba(7,15,27,.91)!important;backdrop-filter:blur(22px)!important;border-right:1px solid var(--ui-line)!important;border-bottom:0!important;box-shadow:10px 0 36px #0002!important}
+body>nav>div{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:26px!important;width:100%!important}
+body>nav>div>div:first-child{padding:0 7px 18px;border-bottom:1px solid var(--ui-line)}
+body>nav>div>div:nth-child(2){display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:7px!important;width:100%}
+body>nav button{width:100%;text-align:left;justify-content:flex-start;border:1px solid transparent!important;background:transparent!important;color:#9cacc0!important;border-radius:11px!important;padding:11px 12px!important;font-size:12px!important;transition:background .2s,border-color .2s,transform .2s!important}
+body>nav button:hover{background:rgba(55,91,129,.25)!important;color:#fff!important;transform:translateX(2px)}
+body>nav #btn-dashboard,body>nav #btn-operations{background:linear-gradient(100deg,rgba(31,190,242,.22),rgba(111,84,224,.13))!important;border-color:rgba(59,195,246,.23)!important;color:#e9faff!important;box-shadow:inset 3px 0 #2ac7f5!important}
+body>main{margin-left:226px!important;max-width:none!important;width:calc(100% - 226px)!important;padding:28px clamp(18px,3vw,42px)!important}
+#tab-dashboard{gap:22px!important;max-width:1500px;margin:0 auto}
+.sc-hero{position:relative;overflow:hidden;border:1px solid var(--ui-line)!important;border-radius:20px!important;background:linear-gradient(115deg,rgba(23,53,81,.91),rgba(18,28,47,.93) 58%,rgba(39,29,70,.88))!important;box-shadow:0 18px 48px rgba(0,0,0,.24)!important;padding:clamp(23px,3vw,36px)!important}
+.sc-hero:after{content:"";position:absolute;width:300px;height:300px;right:-80px;top:-145px;border-radius:50%;background:radial-gradient(circle,rgba(39,196,246,.18),transparent 68%);pointer-events:none}
+.sc-kicker{color:#67d9ff!important;letter-spacing:.14em!important;font-size:10px!important;font-weight:800!important}
+.sc-gradient-text{background:linear-gradient(90deg,#f4faff,#6ad8ff,#ad88ff)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important}
+.sc-live{background:rgba(3,17,31,.5)!important;border:1px solid rgba(83,198,245,.22)!important;border-radius:999px!important;padding:9px 13px!important;color:#d6eaff!important;font-size:11px!important}
+.sc-live-dot{background:#2fe0ad!important;box-shadow:0 0 12px #2fe0ad!important}
+#dashboard-scanner>.grid:first-child>div{background:linear-gradient(145deg,rgba(21,43,65,.92),rgba(12,25,41,.95))!important;border:1px solid var(--ui-line)!important;border-radius:16px!important;box-shadow:0 12px 28px #0002!important;transition:transform .2s,border-color .2s!important}
+#dashboard-scanner>.grid:first-child>div:hover{transform:translateY(-3px);border-color:rgba(48,195,246,.42)!important}
+#dashboard-scanner>.grid:nth-child(2)>div,.sc-section,#dashboard-stats>div,#dashboard-grades>div{background:linear-gradient(145deg,rgba(20,36,56,.94),rgba(12,23,38,.96))!important;border:1px solid var(--ui-line)!important;border-radius:17px!important;box-shadow:0 12px 32px rgba(0,0,0,.17)!important}
+#dashboard-scanner h2{color:#d7f5ff!important;font-weight:800!important}
+#dashboard-stats>div,#dashboard-grades>div{padding:16px!important;transition:transform .2s,border-color .2s!important}
+#dashboard-stats>div:hover,#dashboard-grades>div:hover{transform:translateY(-3px);border-color:rgba(65,196,246,.4)!important}
+.sc-section{padding:21px!important}
+.sc-refresh{background:rgba(43,142,197,.15)!important;border:1px solid rgba(76,183,235,.28)!important;color:#bcecff!important;border-radius:10px!important;padding:8px 12px!important}
+#dashboard-scanner .text-amber-300,#dashboard-scanner .text-amber-400{color:#73dfff!important}
+#dashboard-scanner .bg-amber-500{background:#39c9f4!important;color:#061321!important}
+#dashboard-scanner .border-amber-500\/30,#dashboard-scanner .border-amber-500\/20{border-color:rgba(59,195,246,.25)!important}
+#manual-id{background:#071421!important;border:1px solid rgba(76,184,235,.3)!important}#manual-id:focus{outline:2px solid #35c7f6!important}
+#dashboard-scanner button[onclick^="verifyStudent"]{background:linear-gradient(100deg,#2cc8f3,#69a7ff)!important;color:#071321!important}
+.ops-card{background:linear-gradient(145deg,rgba(20,36,56,.96),rgba(10,21,36,.98))!important;border-color:var(--ui-line)!important}
+.sc-toast{background:#12263b!important;border-color:#3ac7f4!important}
+@media(max-width:800px){body>nav{position:sticky!important;top:0!important;bottom:auto!important;width:100%!important;height:auto!important;max-height:none!important;padding:12px!important;border-right:0!important;border-bottom:1px solid var(--ui-line)!important;z-index:100!important}body>nav>div{gap:12px!important}body>nav>div>div:first-child{padding:0 3px 10px}body>nav>div>div:nth-child(2){flex-direction:row!important;flex-wrap:nowrap!important;overflow-x:auto!important;padding-bottom:3px}body>nav button{width:auto!important;white-space:nowrap!important;flex:0 0 auto!important;padding:9px 11px!important}body>main{margin-left:0!important;width:100%!important;padding:16px 12px!important}#tab-dashboard{gap:16px!important}.sc-hero{padding:22px!important}}
+@media(max-width:480px){body>nav>div>div:first-child img{width:38px!important;height:38px!important}body>nav>div>div:first-child{border-bottom:0!important}#dashboard-scanner>.grid:nth-child(2)>div{padding:14px!important}.sc-section{padding:15px!important}}
+@media(prefers-reduced-motion:reduce){body>nav button,#dashboard-stats>div,#dashboard-grades>div{transition:none!important}}
+</style>
+
+</head><body>
+            <header><h1>SCIENCORE</h1><p>CLASS FEE PAYMENT RECEIPT</p></header><table>
+            <tr><td>Receipt No.</td><td>${safe(record.receiptNo)}</td></tr><tr><td>Date / Time</td><td>${safe(record.date)}</td></tr>
+            <tr><td>Student Name</td><td>${safe(record.studentName)}</td></tr><tr><td>Student ID</td><td>${safe(record.studentId)}</td></tr>
+            <tr><td>Grade</td><td>${safe(record.grade)}</td></tr><tr><td>Paid Month(s)</td><td>${monthText}</td></tr>
+            <tr class="total"><td>Amount Received</td><td>Rs. ${Number(record.amount).toLocaleString('en-LK',{minimumFractionDigits:2})}</td></tr>
+            </table><p class="foot">Thank you • SCIENCORE</p><button onclick="window.print()" style="padding:12px 25px;background:#eab308;border:0;border-radius:9px;cursor:pointer">Print / Save PDF</button></body></html>`;
+        }
+        function showPaymentReceipt(record) {
+            const html = receiptHTML(record);
+            const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const win = window.open(url, '_blank');
+            if (!win) {
+                const a = document.createElement('a'); a.href=url; a.download=`Receipt_${record.receiptNo}.html`;
+                document.body.appendChild(a); a.click(); a.remove();
+                alert('Receipt එක Download වුණා. එය Open කර Print / Save PDF කරන්න.');
             }
-
-            if (sourceCanvas) {
-                const padding = 20;
-                const paddedCanvas = document.createElement('canvas');
-                paddedCanvas.width = sourceCanvas.width + (padding * 2);
-                paddedCanvas.height = sourceCanvas.height + (padding * 2);
-                const pCtx = paddedCanvas.getContext('2d');
-
-                pCtx.fillStyle = "#FFFFFF";
-                pCtx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
-                pCtx.drawImage(sourceCanvas, padding, padding);
-
-                const imageSrc = paddedCanvas.toDataURL("image/png");
-                const a = document.createElement('a');
-                a.href = imageSrc;
-                a.download = `${filenamePrefix}_${Date.now()}.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            } else {
-                alert("QR Code image is still generating, please click again.");
-            }
+            setTimeout(()=>URL.revokeObjectURL(url), 60000);
         }
 
         async function loadReports() {
@@ -1300,8 +1586,11 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
             document.getElementById('edit-card-type').value = cardType || 'Full';
 
             const modalQrContainer = document.getElementById('modal-qr-container');
+            modalQrContainer.dataset.studentId = studentId;
+            modalQrContainer.dataset.qrPayload = studentQrPayload(profile) || studentId;
+            modalQrContainer.dataset.studentName = name;
             modalQrContainer.innerHTML = "";
-            new QRCode(modalQrContainer, { text: studentId, width: 150, height: 150, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
+            new QRCode(modalQrContainer, { text: studentQrPayload(profile) || studentId, width: 150, height: 150, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
 
             const monthsContainer = document.getElementById('modal-months-container');
             monthsContainer.innerHTML = "";
@@ -1481,11 +1770,12 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
         const esc = v => String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         const readPath = async path => (await window.get(window.ref(window.db,path))).val() || {};
         const savePath = (path,value) => window.set(window.ref(window.db,path),value);
-        const allStudentRows = async () => Object.entries(await readPath('students')).map(([key,value])=>({key,...value}));
+        const allStudentRows = async () => { if(!navigator.onLine){try{return JSON.parse(localStorage.getItem('sciencore-student-cache')||'[]');}catch(e){return [];}} const rows=Object.entries(await readPath('students')).map(([key,value])=>({key,...value})); try{localStorage.setItem('sciencore-student-cache',JSON.stringify(rows));}catch(e){} return rows; };
         async function audit(action){try {await savePath('activity/'+window.push(window.ref(window.db,'activity')).key,{action,at:new Date().toISOString(),by:'Local operator'});}catch(e){console.warn('Activity log error',e);}}
 
         async function readExistingQRImage(event){const file=event.target.files?.[0];if(!file)return;const info=document.getElementById('existing-qr-feedback');try{const temp=document.createElement('div');temp.id='qr-upload-temp';temp.style.display='none';document.body.appendChild(temp);const scanner=new Html5Qrcode('qr-upload-temp');const code=await scanner.scanFile(file,true);await scanner.clear();temp.remove();if(!code.trim() || code.length>300)throw Error("Invalid QR length");document.getElementById('reg-custom-id').value=code.trim();info.textContent='✅ Existing QR decoded: '+code;}catch(err){info.textContent='❌ QR image could not be decoded. Enter its exact content manually.';}}
-        async function loadDashboard(){const rows=await allStudentRows(),today=localDateKey(),attendance=await readPath('attendance/'+today),present=rows.filter(s=>Object.prototype.hasOwnProperty.call(attendance,s.key)).length,month=getCurrentMonthKey().key;const owed=rows.filter(s=>s.cardType!=='Free'&&s.fees?.[month]!=='Paid').length;const birthdays=rows.filter(s=>s.birthday?.slice(5)===today.slice(5)).length;const values=[['👥 Students',rows.length],['✅ Present today',present],['❌ Absent (registered)',Math.max(0,rows.length-present)],['🔴 Unpaid this month',owed],['🎂 Birthdays today',birthdays]];document.getElementById('dashboard-stats').innerHTML=values.map(([k,v])=>`<div class="sc-stat"><div class="text-xs text-slate-300 font-semibold">${k}</div><div class="text-3xl md:text-4xl font-black text-white mt-3">${v}</div><div class="sc-stat-line"></div></div>`).join('');const grades=['Grade 7','Grade 8','Grade 9','Grade 10','Grade 11 (O/L)'];document.getElementById('dashboard-grades').innerHTML=grades.map(g=>`<div class="sc-grade"><div class="text-sky-200 font-bold text-sm">${g}</div><div class="text-3xl font-black mt-2">${rows.filter(s=>s.grade===g).length}</div></div>`).join('');}
+        async function loadDashboard(){const rows=await allStudentRows(),today=localDateKey(),attendance=await readPath('attendance/'+today),present=rows.filter(s=>Object.prototype.hasOwnProperty.call(attendance,s.key)).length,month=getCurrentMonthKey().key;const owed=rows.filter(s=>s.cardType!=='Free'&&s.fees?.[month]!=='Paid').length;const birthdays=rows.filter(s=>s.birthday?.slice(5)===today.slice(5)).length;const values=[['👥 Students',rows.length],['✅ Present today',present],['❌ Absent (registered)',Math.max(0,rows.length-present)],['🔴 Unpaid this month',owed],['🎂 Birthdays today',birthdays]];document.getElementById('dashboard-stats').innerHTML=values.map(([k,v])=>`<div class="sc-stat"><div class="text-xs text-slate-300 font-semibold">${k}</div><div class="text-3xl md:text-4xl font-black text-white mt-3">${v}</div><div class="sc-stat-line"></div></div>`).join('');const grades=['Grade 7','Grade 8','Grade 9','Grade 10','Grade 11 (O/L)'];document.getElementById('dashboard-grades').innerHTML=grades.map(g=>`<div class="sc-grade"><div class="text-sky-200 font-bold text-sm">${g}</div><div class="text-3xl font-black mt-2">${rows.filter(s=>s.grade===g).length}</div></div>`).join('');applyDashboardWidgetOrder();setDashboardArrangeState();loadDashboardRecentActivity().catch(console.warn);}
+        async function loadDashboardRecentActivity(){const rows=Object.values(await readPath('activity')).sort((a,b)=>String(b.at||'').localeCompare(String(a.at||''))).slice(0,5);const el=document.getElementById('dashboard-recent-activity');if(el)el.innerHTML=rows.map(r=>`<div class="ops-row"><b>${esc(r.action||'Activity')}</b><div class="ops-muted">${esc(r.at||'')} · ${esc(r.by||'')}</div></div>`).join('')||'<p class="text-sm text-slate-400">No activity recorded yet.</p>';}
         function smsLink(phone,message){const p=String(phone||'').replace(/\D/g,'');return 'sms:+'+encodeURIComponent(p)+'?body='+encodeURIComponent(message);}
         async function loadBirthdays(){const rows=await allStudentRows(),today=localDateKey();const upcoming=rows.filter(s=>s.birthday).map(s=>{const [,,m,d]=s.birthday.match(/^(\d{4})-(\d{2})-(\d{2})$/)||[];if(!m||!d)return null;let date=new Date(Number(today.slice(0,4)),Number(m)-1,Number(d));if(date<new Date(today+'T00:00:00'))date.setFullYear(date.getFullYear()+1);return {...s,days:Math.round((date-new Date(today+'T00:00:00'))/86400000)};}).filter(Boolean).filter(s=>s.days<=30).sort((a,b)=>a.days-b.days);document.getElementById('birthday-list').innerHTML=upcoming.map(s=>{const msg=`Happy Birthday ${s.name}! Wishing you a wonderful year ahead. Best wishes, SCIENCORE - The Core of Science.`;const phone=s.studentPhone||s.phone;return `<div class="panel flex flex-wrap justify-between items-center gap-3"><div><b>${esc(s.name)}</b> · ${esc(s.grade)} <span class="text-amber-300">${s.days===0?'🎂 Today':`in ${s.days} days`}</span></div><a class="action" href="${smsLink(phone,msg)}">Open SMS app</a></div>`}).join('')||'<div class="panel">No birthdays in the next 30 days.</div>';}
         async function prepareMessages(){const rows=await allStudentRows(),g=document.getElementById('msg-grade').value,msg=document.getElementById('msg-text').value.trim();if(!msg){alert('Enter message');return;}document.getElementById('message-list').innerHTML=rows.filter(s=>(g==='All'||s.grade===g)&&s.phone).map(s=>`<div class="panel flex justify-between gap-2"><span>${esc(s.name)} · ${esc(s.grade)}</span><a class="text-amber-400 underline" href="${smsLink(s.phone,msg)}">Open SMS</a></div>`).join('')||'No phone numbers available.';}
@@ -1500,7 +1790,114 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
         const csv=v=>{let value=String(v??'');if(/^[\s]*[=+@-]/.test(value))value="'"+value;return '"'+value.replace(/"/g,'""')+'"';};
         async function exportStudentsCSV(){const rows=await allStudentRows(),cols=['name','studentId','grade','phone','studentPhone','birthday','school','cardType','joined'];downloadText('sciencore_students.csv','\ufeff'+[cols.join(','),...rows.map(r=>cols.map(k=>csv(r[k])).join(','))].join('\r\n'),'text/csv;charset=utf-8');}
         async function exportAttendanceCSV(){const attendance=await readPath('attendance');const rows=[];for(const [date,group] of Object.entries(attendance))for(const [id,r] of Object.entries(group))rows.push([date,id,r.name,r.grade,r.time]);downloadText('sciencore_attendance.csv','\ufeff'+[['date','studentKey','name','grade','time'].join(','),...rows.map(r=>r.map(csv).join(','))].join('\r\n'),'text/csv;charset=utf-8');}
-        async function exportBackup(){const paths=['students','attendance','schedules','expenses','activity','settings','payments'];const backup={exportedAt:new Date().toISOString(),data:{}};for(const path of paths)backup.data[path]=await readPath(path);downloadText('sciencore_backup_'+localDateKey()+'.json',JSON.stringify(backup,null,2),'application/json');await audit('Backup exported');}
+        async function exportBackup(){const paths=['students','attendance','schedules','expenses','activity','settings','payments','classSessions','cashClosings','paymentPromises','qrPrintHistory'];const backup={exportedAt:new Date().toISOString(),data:{}};for(const path of paths)backup.data[path]=await readPath(path);downloadText('sciencore_backup_'+localDateKey()+'.json',JSON.stringify(backup,null,2),'application/json');await audit('Backup exported');}
+
+
+        // SCIENCORE 3.4: scanner feedback, PNG ID-card export, and reliability improvements.
+        function safeLocalJSON(key,fallback){try{const v=JSON.parse(localStorage.getItem(key)||'null');return v&&typeof v==='object'?v:fallback;}catch(e){return fallback;}}
+        const scDefaultPrefs={voice:true,beep:true,motion:true,name:true,rate:1,volume:1,reset:4,qrSize:1};
+        let scPrefs={...scDefaultPrefs,...safeLocalJSON('sciencore-ops-prefs',{})}; scPrefs.reset=Math.max(0,Math.min(60,Number(scPrefs.reset)||0)); scPrefs.volume=Math.max(0,Math.min(1,Number(scPrefs.volume??1))); scPrefs.qrSize=[0.75,1,1.5,2].includes(Number(scPrefs.qrSize))?Number(scPrefs.qrSize):1;
+        let scActiveSession=null,scImportRows=[],scScanResetTimer=null;
+        function scheduleScanResultReset(){clearTimeout(scScanResetTimer);const delay=Math.max(0,Math.min(60,Number(scPrefs.reset)||0));if(!delay)return;scScanResetTimer=setTimeout(()=>{const box=document.getElementById("student-result");if(box)box.innerHTML="<p class=\"text-slate-400\">Ready for the next QR scan</p>";},delay*1000);}
+        function scToast(message,ok=true){let el=document.getElementById('sc-toast');if(!el){el=document.createElement('div');el.id='sc-toast';document.body.appendChild(el);}el.textContent=message;el.className='sc-toast '+(ok?'':'sc-toast-error');el.classList.add('show');clearTimeout(window.scToastTimer);window.scToastTimer=setTimeout(()=>el.classList.remove('show'),3200);}
+        function scBeep(kind=true){if(!scPrefs.beep)return;try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const tones=kind==='duplicate'?[[420,.08],[300,.08]]:kind==='error'||kind===false?[[220,.18]]:kind==='payment'?[[660,.09],[880,.12]]:[[880,.1]];let offset=0;for(const [frequency,duration] of tones){const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.value=frequency;gain.gain.value=.035;osc.connect(gain);gain.connect(ctx.destination);osc.start(ctx.currentTime+offset);osc.stop(ctx.currentTime+offset+duration);offset+=duration+.035;}setTimeout(()=>ctx.close(),Math.ceil((offset+.2)*1000));}catch(e){}}
+        function testScannerSounds(){const was=scPrefs.beep;scPrefs.beep=true;scBeep(true);setTimeout(()=>scBeep('duplicate'),250);setTimeout(()=>scBeep('error'),500);setTimeout(()=>{scPrefs.beep=was;},800);}
+        function testSinhalaVoice(){speakText('මෙය SCIENCORE සිංහල හඬ පරීක්ෂාවකි. ඔක්තෝබර් මාසය සඳහා මුදල් ගෙවා නැත.');}
+        function saveOpsPrefs(){scPrefs={...scDefaultPrefs,...scPrefs,voice:document.getElementById('ops-voice').checked,beep:document.getElementById('ops-beep').checked,motion:document.getElementById('ops-motion').checked,name:document.getElementById('ops-name').checked,rate:Number(document.getElementById('ops-rate').value),volume:Number(document.getElementById('ops-volume').value),reset:Math.max(0,Math.min(60,Number(document.getElementById('ops-reset').value)||0)),qrSize:Number(document.getElementById('ops-qr-size').value)||1};localStorage.setItem('sciencore-ops-prefs',JSON.stringify(scPrefs));document.documentElement.classList.toggle('sc-no-motion',!scPrefs.motion);scToast('Preferences saved');}
+        function renderOpsPrefs(){for(const [key,id] of [['voice','ops-voice'],['beep','ops-beep'],['motion','ops-motion'],['name','ops-name']])document.getElementById(id).checked=!!scPrefs[key];document.getElementById('ops-rate').value=scPrefs.rate;document.getElementById('ops-volume').value=scPrefs.volume??1;document.getElementById('ops-reset').value=scPrefs.reset;document.getElementById('ops-qr-size').value=String(scPrefs.qrSize||1);const rules=safeLocalJSON('sciencore-attendance-rules',{startTime:'08:00',grace:10});document.getElementById('ops-start-time').value=rules.startTime||'08:00';document.getElementById('ops-grace').value=rules.grace??10;document.documentElement.classList.toggle('sc-no-motion',!scPrefs.motion);}
+        function getUndoActions(){return safeLocalJSON('sciencore-undo-actions',[]).filter(a=>a&&typeof a==='object');}
+        function recordUndoAction(action){const actions=getUndoActions();actions.push({...action,recordedAt:new Date().toISOString()});localStorage.setItem('sciencore-undo-actions',JSON.stringify(actions.slice(-20)));renderUndoSummary();}
+        function renderUndoSummary(){const el=document.getElementById('ops-undo-summary');if(!el)return;const a=getUndoActions().slice(-1)[0];el.textContent=!a?'No recent reversible action recorded on this device.':a.type==='attendance'?`Latest action: attendance for ${a.studentName||a.studentId||'student'} on ${a.date}. Undo is available only if the record has not changed.`:`Latest action: payment ${a.receiptNo||a.paymentKey||''} for ${a.studentName||'student'}. Undo will reverse the receipt and restore its months to unpaid only when safe.`;}
+        async function undoLastAction(){const actions=getUndoActions(),a=actions[actions.length-1];if(!a)return scToast('No reversible action recorded on this browser',false);if(a.type==='attendance'){if(!confirm(`Undo attendance for ${a.studentName||a.studentId} on ${a.date}?`))return;try{const r=window.ref(window.db,a.path),snap=await window.get(r);if(!snap.exists())return scToast('Attendance record is already missing',false);const val=snap.val();if(a.expectedIsoAt&&val.isoAt!==a.expectedIsoAt)return scToast('Attendance changed since this action; not undone',false);await window.remove(r);actions.pop();localStorage.setItem('sciencore-undo-actions',JSON.stringify(actions));await audit('Undo attendance: '+(a.studentId||a.studentName));loadTodayAttendanceLog();renderUndoSummary();scToast('Last attendance action undone');}catch(e){console.error(e);scToast('Could not undo attendance',false);}return;}if(a.type==='payment'&&a.paymentKey){const ok=await reversePayment(a.paymentKey,true);if(ok){const now=getUndoActions();if(now.length&&now[now.length-1].paymentKey===a.paymentKey)now.pop();localStorage.setItem('sciencore-undo-actions',JSON.stringify(now));renderUndoSummary();}return;}scToast('This action cannot be safely undone from here',false);}
+        async function loadOperations(){renderOpsPrefs();renderUndoSummary();scActiveSession=JSON.parse(sessionStorage.getItem('sciencore-class-session')||'null');renderClassSession();updateOpsHealth();await Promise.allSettled([loadOperationsAlerts(),loadOperationsPayments(),loadPaymentPromises(),updateOpsReport()]);}
+        function renderClassSession(){const e=document.getElementById('ops-session');if(e)e.textContent=scActiveSession?`🟢 ${scActiveSession.grade} · started ${new Date(scActiveSession.startedAt).toLocaleTimeString()}`:'No active session';}
+        async function startClassSession(){if(scActiveSession&&!confirm('End the previous session and start a new one?'))return;scActiveSession={grade:document.getElementById('ops-grade').value,startedAt:new Date().toISOString(),date:localDateKey()};sessionStorage.setItem('sciencore-class-session',JSON.stringify(scActiveSession));await audit('Class session started: '+scActiveSession.grade);renderClassSession();scToast('Class started');switchTab('dashboard');}
+        async function endClassSession(){if(!scActiveSession)return scToast('No active class',false);const s=scActiveSession;const attend=await readPath('attendance/'+s.date);const count=Object.values(attend).filter(a=>a.grade===s.grade).length;await savePath('classSessions/'+window.push(window.ref(window.db,'classSessions')).key,{...s,endedAt:new Date().toISOString(),attendanceCount:count});await audit('Class session ended: '+s.grade);scActiveSession=null;sessionStorage.removeItem('sciencore-class-session');renderClassSession();scToast(`${s.grade}: ${count} attendance entries today`);}
+        async function searchOperations(){const query=document.getElementById('ops-search').value.trim().toLowerCase(),target=document.getElementById('ops-results');if(query.length<2){target.innerHTML='';return;}const rows=await allStudentRows();target.innerHTML=rows.filter(r=>[r.name,r.studentId,r.phone,r.studentPhone].some(x=>String(x||'').toLowerCase().includes(query))).slice(0,15).map(r=>`<div class="ops-row"><b>${esc(r.name)}</b><div class="ops-muted">${esc(r.grade)} · ${esc(r.studentId)} · ${esc(r.cardType||'Full')}</div><button class="ops-mini" onclick="opsScan('${encodeURIComponent(r.studentId)}')">View / Scan</button><button class="ops-mini" onclick="editOpsStudent('${encodeURIComponent(r.key)}')">Status / Notes</button></div>`).join('')||'<p class="ops-muted">No matching students</p>';}
+        async function opsScan(id){const sid=decodeURIComponent(id);const student=(await allStudentRows()).find(r=>String(r.studentId)===sid);switchTab('dashboard');verifyStudent(student?studentQrPayload(student):sid);}
+        async function editOpsStudent(encodedKey){const key=decodeURIComponent(encodedKey),snap=await window.get(window.ref(window.db,'students/'+key));if(!snap.exists())return;const student=snap.val();const status=prompt('Student status: Active / Temporarily Inactive / Left Class',student.status||'Active');if(status===null)return;if(!['Active','Temporarily Inactive','Left Class'].includes(status))return scToast('Invalid status',false);const note=prompt('Private note (leave blank to keep existing)',student.privateNote||'');if(note===null)return;const updates={status,privateNote:note.slice(0,500)};await window.update(window.ref(window.db,'students/'+key),updates);await audit('Student status/notes updated: '+student.name);scToast('Student profile updated');searchOperations();}
+        function openCashDrawer(){const amount=Number(document.getElementById('ops-opening').value);if(!Number.isFinite(amount)||amount<0)return scToast('Invalid opening amount',false);localStorage.setItem('sciencore-cash-drawer',JSON.stringify({date:localDateKey(),opening:amount,openedAt:new Date().toISOString()}));scToast('Cash drawer opened');}
+        async function closeCashDrawer(){const drawer=JSON.parse(localStorage.getItem('sciencore-cash-drawer')||'null');if(!drawer||drawer.date!==localDateKey())return scToast('Open today’s drawer first',false);const actual=Number(document.getElementById('ops-actual').value);if(!Number.isFinite(actual)||actual<0||!document.getElementById('ops-actual').value)return scToast('Enter counted cash',false);const payments=Object.values(await readPath('payments')).filter(p=>String(p.createdAt||'').slice(0,10)===localDateKey()&&!p.voided&&(!p.method||p.method==='Cash'));const collected=payments.reduce((n,p)=>n+Number(p.amount||0),0),expected=drawer.opening+collected,difference=actual-expected;const record={...drawer,closedAt:new Date().toISOString(),cashCollected:collected,expected,actual,difference};await savePath('cashClosings/'+localDateKey(),record);await audit('Cash drawer closed; difference Rs '+difference);document.getElementById('ops-cash-result').textContent=`Expected Rs ${expected.toLocaleString()} · Actual Rs ${actual.toLocaleString()} · Difference Rs ${difference.toLocaleString()}`;localStorage.removeItem('sciencore-cash-drawer');scToast('Cash closing saved');}
+        async function scDayData(){const date=localDateKey(),month=date.slice(0,7),students=await allStudentRows(),attendance=await readPath('attendance/'+date),payments=Object.values(await readPath('payments')).filter(p=>!p.voided),expenses=Object.values(await readPath('expenses'));return{date,month,students,attendance,payments,expenses};}
+        async function updateOpsReport(){const d=await scDayData();const today=d.payments.filter(p=>String(p.createdAt||'').slice(0,10)===d.date);const todayIncome=today.reduce((a,p)=>a+Number(p.amount||0),0);document.getElementById('ops-report-summary').textContent=`${d.date} · ${Object.keys(d.attendance).length} attendance · ${today.length} payments · Rs ${todayIncome.toLocaleString()} received`;}
+        async function downloadDailyReport(){const d=await scDayData();const pay=d.payments.filter(p=>String(p.createdAt||'').slice(0,10)===d.date);const lines=[['Date','Student','Grade','Attendance Time','Payment Rs','Receipt'].join(',')];for(const [key,a] of Object.entries(d.attendance)){const matching=pay.filter(p=>p.studentKey===key);lines.push([d.date,a.name,a.grade,a.time,matching.reduce((n,p)=>n+Number(p.amount||0),0),matching.map(p=>p.receiptNo).join(';')].map(csv).join(','));}downloadText('sciencore_daily_'+d.date+'.csv','﻿'+lines.join('\r\n'),'text/csv;charset=utf-8');scToast('Daily report downloaded');}
+        async function downloadMonthlyReport(){const d=await scDayData(),pay=d.payments.filter(p=>String(p.createdAt||'').slice(0,7)===d.month),exp=d.expenses.filter(x=>String(x.date||'').slice(0,7)===d.month);const income=pay.reduce((a,p)=>a+Number(p.amount||0),0),cost=exp.reduce((a,p)=>a+Number(p.amount||0),0);downloadText('sciencore_month_'+d.month+'.csv','﻿'+[['Metric','Amount'],['Month',d.month],['Income',income],['Expenses',cost],['Net profit',income-cost],['Payments',pay.length]].map(r=>r.map(csv).join(',')).join('\r\n'),'text/csv;charset=utf-8');scToast('Monthly report downloaded');}
+        async function printDailyReport(){const d=await scDayData(),pay=d.payments.filter(p=>String(p.createdAt||'').slice(0,10)===d.date),total=pay.reduce((a,p)=>a+Number(p.amount||0),0);scPrint(`<h1>SCIENCORE · Daily Summary</h1><p>${esc(d.date)}</p><h2>Attendance: ${Object.keys(d.attendance).length}</h2><h2>Payments: ${pay.length}</h2><h2>Received: Rs ${total.toLocaleString()}</h2>`);}
+        function scPrint(body){
+            const w = window.open('', '_blank', 'width=850,height=700');
+            if (!w) { scToast('Allow pop-ups for printing', false); return; }
+            w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>SCIENCORE Print</title><style>body{font:16px Arial,sans-serif;color:#112244;padding:25px}h1{color:#143a80}.qr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.qr-card{border:1px solid #bbb;text-align:center;padding:12px;break-inside:avoid}.qr-card canvas{max-width:100%}@media print{@page{size:A4;margin:12mm}}</style></head><body>${body}</body></html>`);
+            w.document.close();
+            if (!body.includes('qr-grid')) setTimeout(() => { w.focus(); w.print(); }, 650);
+            return w;
+        }
+        async function downloadStudentCardPNG(){
+            const input=document.getElementById('ops-png-student-id');
+            const id=String(input?.value||'').trim();
+            if(!id)return scToast('Enter a Student ID first',false);
+            const student=(await allStudentRows()).find(r=>String(r.studentId)===id);
+            if(!student)return scToast('Student not found',false);
+            if(typeof QRCode==='undefined')return scToast('QR library unavailable. Check internet connection.',false);
+            const layout=document.getElementById('ops-print-layout')?.value||'qr';
+            const holder=document.createElement('div');holder.style.cssText='position:fixed;left:-10000px;top:0;width:220px;height:220px;background:#fff';document.body.appendChild(holder);
+            try{
+                new QRCode(holder,{text:studentQrPayload(student),width:180,height:180,correctLevel:QRCode.CorrectLevel.M});
+                await new Promise(resolve=>setTimeout(resolve,180));
+                const source=holder.querySelector('canvas')||holder.querySelector('img');
+                if(!source)throw new Error('QR image was not generated');
+                if(source.tagName==='IMG'&&!source.complete)await new Promise((resolve,reject)=>{source.onload=resolve;source.onerror=reject;});
+                const full=layout==='full',mini=layout==='mini';
+                const width=full?720:mini?520:600,height=full?1040:mini?700:760;
+                const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+                const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);
+                ctx.fillStyle='#0b2147';ctx.fillRect(0,0,width,Math.round(height*.13));
+                ctx.fillStyle='#ffcf39';ctx.textAlign='center';ctx.font=`bold ${full?42:mini?30:34}px Arial,sans-serif`;ctx.fillText('SCIENCORE',width/2,height*.085);
+                const qrSize=full?400:mini?260:330;const qrX=(width-qrSize)/2;const qrY=full?190:mini?150:160;
+                ctx.imageSmoothingEnabled=false;ctx.drawImage(source,qrX,qrY,qrSize,qrSize);ctx.imageSmoothingEnabled=true;
+                const name=String(student.name||'Student');const grade=String(student.grade||'');
+                ctx.fillStyle='#0f172a';ctx.textAlign='center';ctx.font=`bold ${full?38:mini?28:30}px Arial,sans-serif`;ctx.fillText(name.slice(0,42),width/2,qrY+qrSize+(full?70:mini?48:58));
+                ctx.fillStyle='#334155';ctx.font=`${full?30:mini?23:24}px Arial,sans-serif`;ctx.fillText(grade,width/2,qrY+qrSize+(full?115:mini?84:98));
+                ctx.fillStyle='#0b2147';ctx.font=`bold ${full?30:mini?22:25}px Arial,sans-serif`;ctx.fillText('STUDENT ID',width/2,height-(full?115:mini?90:100));
+                ctx.fillStyle='#111827';ctx.font=`bold ${full?34:mini?24:28}px Arial,sans-serif`;ctx.fillText(id.slice(0,50),width/2,height-(full?65:mini?50:55));
+                if(full){ctx.strokeStyle='#143a80';ctx.lineWidth=8;ctx.strokeRect(8,8,width-16,height-16);}
+                const a=document.createElement('a');a.download=`SCIENCORE_${layout.toUpperCase()}_${id.replace(/[^a-z0-9_-]/gi,'_').slice(0,40)}.png`;a.href=canvas.toDataURL('image/png');a.click();
+                try{await savePath('qrPrintHistory/'+window.push(window.ref(window.db,'qrPrintHistory')).key,{studentKey:student.key,studentId:student.studentId,studentName:student.name,qrPayload:studentQrPayload(student),printedAt:new Date().toISOString(),kind:layout+' PNG download'});await audit('Student card PNG downloaded: '+student.studentId);}catch(e){console.warn('PNG print history unavailable',e);}
+                scToast('Student ID PNG downloaded');
+            }catch(e){console.error(e);scToast('Could not create PNG card',false);}finally{holder.remove();}
+        }
+
+        async function bulkPrintQR(){const grade=document.getElementById('ops-print-grade').value,layout=document.getElementById('ops-print-layout')?.value||'qr',rows=(await allStudentRows()).filter(r=>(grade==='All'||r.grade===grade)&&r.studentId);if(!rows.length)return scToast('No students to print',false);if(rows.length>150&&!confirm('Print '+rows.length+' cards?'))return;const cards=rows.map((r,i)=>{const common=`<div id="q${i}" style="display:flex;justify-content:center;margin:8px"></div><b>${esc(r.studentId)}</b>`;if(layout==='full')return `<div class="qr-card full-card"><strong>SCIENCORE</strong><small>THE CORE OF SCIENCE</small>${common}<h3>${esc(r.name)}</h3><p>${esc(r.grade)}</p><hr><small>Student Identification Card</small></div>`;if(layout==='mini')return `<div class="qr-card mini-card"><strong>SCIENCORE</strong>${common}<div>${esc(r.name)}</div><small>${esc(r.grade)}</small></div>`;return `<div class="qr-card"><strong>SCIENCORE</strong>${common}</div>`;}).join('');const w=scPrint('<h1>SCIENCORE · Student Cards</h1><div class="qr-grid">'+cards+'</div>');if(!w)return;const style=w.document.createElement('style');style.textContent='.full-card{min-height:330px;border:2px solid #143a80;border-radius:14px}.full-card h3{font-size:18px;margin:8px}.mini-card{min-height:220px}.qr-card hr{margin:12px;border-color:#aaa}';w.document.head.appendChild(style);const script=w.document.createElement('script');script.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';script.onload=()=>{rows.forEach((r,i)=>new w.QRCode(w.document.getElementById('q'+i),{text:studentQrPayload(r),width:layout==='qr'?150:110,height:layout==='qr'?150:110,correctLevel:w.QRCode.CorrectLevel.M}));setTimeout(async()=>{w.focus();w.print();for(const r of rows){await savePath('qrPrintHistory/'+window.push(window.ref(window.db,'qrPrintHistory')).key,{studentKey:r.key,studentId:r.studentId,studentName:r.name,qrPayload:studentQrPayload(r),printedAt:new Date().toISOString(),kind:layout+' bulk print'});}await audit('Bulk student card print: '+rows.length+' cards ('+layout+')');},900)};script.onerror=()=>scToast('QR library could not load. Check internet connection.',false);w.document.head.appendChild(script);}
+        function exportStudentsTemplate(){downloadText('sciencore_import_template.csv','name,studentId,grade,phone,cardType,birthday,school\r\n','text/csv;charset=utf-8');}
+        function scParseCSV(str){const rows=[];let row=[],cell='',quoted=false;for(let i=0;i<str.length;i++){const c=str[i];if(c==='"'){if(quoted&&str[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}else if(c===','&&!quoted){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&str[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.trim()))rows.push(row);row=[];cell='';}else cell+=c;}row.push(cell);if(row.some(x=>x.trim()))rows.push(row);return rows;}
+        async function previewStudentCSV(e){scImportRows=[];const f=e.target.files?.[0];if(!f)return;const rows=scParseCSV((await f.text()).replace(/^\ufeff/,''));const head=rows.shift()?.map(x=>x.trim());const required=['name','studentId','grade'];if(!head||required.some(x=>!head.includes(x))){scToast('Missing required CSV headers',false);return;}const existing=await allStudentRows(),seen=new Set(existing.map(s=>String(s.studentId||'').trim()));const validGrades=['Grade 7','Grade 8','Grade 9','Grade 10','Grade 11 (O/L)'];let rejected=0;for(const row of rows){const r=Object.fromEntries(head.map((h,i)=>[h,(row[i]||'').trim()]));if(!r.name||!r.studentId||r.studentId.length>300||!validGrades.includes(r.grade)||seen.has(r.studentId)){rejected++;continue;}seen.add(r.studentId);scImportRows.push(r);}document.getElementById('ops-import-preview').textContent=`Valid: ${scImportRows.length} · Skipped: ${rejected}. Preview: ${scImportRows.slice(0,4).map(x=>x.name+' ('+x.studentId+')').join(', ')}`;document.getElementById('ops-import-confirm').classList.toggle('hidden',!scImportRows.length);}
+        async function confirmStudentCSV(){if(!scImportRows.length)return;if(!confirm(`Import ${scImportRows.length} students? Existing records will not be overwritten.`))return;const latest=new Set((await allStudentRows()).map(r=>String(r.studentId||'').trim()));let added=0,skipped=0;for(const r of scImportRows){if(latest.has(r.studentId)){skipped++;continue;}const cardType=['Full','Half','Free'].includes(r.cardType)?r.cardType:'Full';const key=window.push(window.ref(window.db,'students')).key;await savePath('students/'+key,{name:r.name,studentId:r.studentId,qrCodeValue:r.studentId,qrVersion:1,grade:r.grade,phone:r.phone||'',birthday:r.birthday||'',school:r.school||'',cardType,fees:{},joined:localDateKey(),status:'Active',discountAmount:0});latest.add(r.studentId);added++;}await audit('Bulk import: '+added+' students');scImportRows=[];document.getElementById('ops-import-confirm').classList.add('hidden');scToast(`Imported ${added}; skipped ${skipped}`);}
+        async function addPaymentPromise(){const id=document.getElementById('ops-promise-id').value.trim(),date=document.getElementById('ops-promise-date').value,amount=Number(document.getElementById('ops-promise-amount').value);const student=(await allStudentRows()).find(s=>s.studentId===id);if(!student||!date||!(amount>0))return scToast('Check student ID, date and amount',false);await savePath('paymentPromises/'+window.push(window.ref(window.db,'paymentPromises')).key,{studentKey:student.key,studentId:id,studentName:student.name,date,amount,status:'Pending',createdAt:new Date().toISOString()});await audit('Payment promise saved: '+id);scToast('Reminder saved');loadPaymentPromises();}
+        async function loadPaymentPromises(){const rows=Object.entries(await readPath('paymentPromises')).map(([key,v])=>({key,...v})).filter(v=>v.status!=='Completed').sort((a,b)=>a.date.localeCompare(b.date));document.getElementById('ops-promises').innerHTML=rows.slice(0,30).map(r=>`<div class="ops-row">${esc(r.studentName)} · ${esc(r.date)} · Rs ${Number(r.amount).toLocaleString()} <button class="ops-mini" onclick="completePaymentPromise('${r.key}')">Done</button></div>`).join('')||'<p class="ops-muted">No pending reminders</p>';}
+        async function completePaymentPromise(key){await window.update(window.ref(window.db,'paymentPromises/'+key),{status:'Completed',completedAt:new Date().toISOString()});loadPaymentPromises();}
+        async function loadOperationsAlerts(){const rows=await allStudentRows(),month=getCurrentMonthKey().key,overdue=rows.filter(r=>r.cardType!=='Free'&&r.status!=='Left Class'&&r.fees?.[month]!=='Paid');const inactive=rows.filter(r=>r.status==='Left Class'||r.status==='Temporarily Inactive');const birthdays=rows.filter(r=>r.birthday?.slice(5)===localDateKey().slice(5));document.getElementById('ops-alerts').innerHTML=`<div class="ops-row">🔴 Unpaid this month: <b>${overdue.length}</b></div><div class="ops-row">🎂 Birthdays today: <b>${birthdays.length}</b></div><div class="ops-row">⏸ Inactive / left: <b>${inactive.length}</b></div>`+overdue.slice(0,8).map(r=>`<div class="ops-row">${esc(r.name)} · ${esc(r.grade)} <a class="ops-mini" href="${smsLink(r.phone||'',`SCIENCORE: ${month} class fee is pending. Please contact us.`)}">SMS reminder</a></div>`).join('');}
+        async function loadOperationsPayments(){const rows=Object.entries(await readPath('payments')).map(([key,r])=>({key,...r})).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))).slice(0,20);document.getElementById('ops-payments').innerHTML=rows.map(p=>`<div class="ops-row"><b>${esc(p.studentName)}</b> · Rs ${Number(p.amount||0).toLocaleString()} <span class="ops-muted">${esc(p.receiptNo)} ${p.voided?' · REVERSED':''}</span>${p.voided?'':`<button class="ops-mini" onclick="reversePayment('${p.key}')">Reverse</button>`}</div>`).join('')||'<p class="ops-muted">No payments recorded.</p>';}
+        async function reversePayment(key,fromUndo=false){try{const snap=await window.get(window.ref(window.db,'payments/'+key));if(!snap.exists()||snap.val().voided){scToast('Payment already reversed or missing',false);return false;}const p=snap.val();if(!fromUndo&&!confirm(`Reverse receipt ${p.receiptNo} for Rs ${p.amount}? This changes fee status and keeps the audit trail.`))return false;const reason=prompt('Reason for reversal (required):');if(!reason?.trim())return false;const studentSnap=await window.get(window.ref(window.db,'students/'+p.studentKey));if(!studentSnap.exists()){scToast('Student record missing — manual review required',false);return false;}const student=studentSnap.val();const allPayments=Object.values(await readPath('payments'));const updates={};for(const m of p.monthKeys||[]){const coveredByOtherLiveReceipt=allPayments.some(other=>!other.voided&&other.receiptNo!==p.receiptNo&&other.studentKey===p.studentKey&&(other.monthKeys||[]).includes(m));if(student.fees?.[m]==='Paid'&&!coveredByOtherLiveReceipt)updates[`students/${p.studentKey}/fees/${m}`]='Unpaid';}updates[`payments/${key}/voided`]=true;updates[`payments/${key}/voidReason`]=reason.trim();updates[`payments/${key}/voidedAt`]=new Date().toISOString();await window.update(window.ref(window.db),updates);await audit('Reversed receipt '+p.receiptNo+': '+reason);scToast('Payment reversed; verify fee status if another receipt covers the same month');loadOperationsPayments();return true;}catch(e){console.error(e);scToast('Payment reversal failed',false);return false;}}
+        function updateOpsHealth(){const el=document.getElementById('ops-health');if(!el)return;el.textContent=`${navigator.onLine?'🟢 Online':'🔴 Offline'} · ${navigator.mediaDevices?.getUserMedia?'🟢 Camera supported':'🟠 Camera unavailable'} · ${window.db?'🟢 Firebase SDK loaded':'🔴 Firebase unavailable'} · ${JSON.parse(localStorage.getItem('sciencore-offline-attendance')||'[]').length} offline queued · SMS gateway not configured`;}
+        function toggleScannerFullscreen(){switchTab('dashboard');const e=document.getElementById('dashboard-scanner');if(!document.fullscreenElement)e.requestFullscreen?.().catch(()=>scToast('Fullscreen not supported',false));else document.exitFullscreen?.();}
+        document.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;if(e.key==='F2'){e.preventDefault();switchTab('operations');document.getElementById('ops-search').focus();}if(e.key==='F3'){e.preventDefault();switchTab('dashboard');document.getElementById('manual-id').focus();}if(e.key==='F4'){e.preventDefault();switchTab('students');}if(e.key==='Escape'&&document.fullscreenElement)document.exitFullscreen?.();});
+        window.addEventListener('online',()=>{updateOpsHealth();syncOfflineQueue().catch(console.warn);});window.addEventListener('offline',updateOpsHealth);
+
+        // SCIENCORE 3.1: additional tools from the 35-feature plan.
+        function saveAttendanceRules(){const rules={startTime:document.getElementById('ops-start-time').value||'08:00',grace:Math.max(0,Math.min(180,Number(document.getElementById('ops-grace').value)||0))};localStorage.setItem('sciencore-attendance-rules',JSON.stringify(rules));scToast('Attendance rules saved');}
+        async function renderLateAttendance(){const rows=await allStudentRows(),att=await readPath('attendance/'+localDateKey()),late=Object.entries(att).filter(([,a])=>a.late||a.attendanceStatus==='Late');document.getElementById('ops-attendance-insights').innerHTML='<b>Late today: '+late.length+'</b>'+late.map(([key,a])=>`<div class="ops-row">${esc(a.name||key)} · ${esc(a.grade||'')} · ${esc(a.time||'')}</div>`).join('')||'<div class="ops-row">No late students recorded today.</div>';}
+        async function renderAbsenceWarnings(){const students=await allStudentRows(),attAll=await readPath('attendance'),dates=Object.keys(attAll).sort().reverse().slice(0,14);const classDates=dates.filter(d=>Object.keys(attAll[d]||{}).length).slice(0,3);const warnings=students.map(st=>({...st,missed:classDates.filter(d=>!Object.prototype.hasOwnProperty.call(attAll[d]||{},st.key)).length})).filter(st=>classDates.length>=2&&st.missed>=Math.min(3,classDates.length));const el=document.getElementById('ops-attendance-insights');el.innerHTML=`<b>Repeated absence warnings · last ${classDates.length} recorded attendance dates</b>`+warnings.map(st=>`<div class="ops-row">${esc(st.name)} · ${esc(st.grade)} · absent ${st.missed} times ${st.phone?`<a class="ops-mini" href="${smsLink(st.phone,'SCIENCORE class attendance follow-up. Please contact the class teacher.')}">Contact</a>`:''}</div>`).join('')||'<div class="ops-row">No repeated absence warnings found (based on recorded attendance dates).</div>';}
+        async function replaceStudentQR(){const id=document.getElementById('ops-qr-student-id').value.trim();if(!id)return scToast('Enter a Student ID',false);const st=(await allStudentRows()).find(r=>String(r.studentId)===id);if(!st)return scToast('Student not found',false);if(!confirm(`Replace QR for ${st.name}? The current QR payload will stop working. Student ID and records remain unchanged.`))return;const token=(window.crypto&&crypto.randomUUID)?crypto.randomUUID().replace(/-/g,''):Array.from(window.crypto.getRandomValues(new Uint8Array(12)),b=>b.toString(16).padStart(2,'0')).join('');const payload='SCQ-'+token.slice(0,16).toUpperCase();await window.update(window.ref(window.db,'students/'+st.key),{qrCodeValue:payload,qrVersion:Number(st.qrVersion||1)+1,qrReplacedAt:new Date().toISOString()});await savePath('qrPrintHistory/'+window.push(window.ref(window.db,'qrPrintHistory')).key,{studentKey:st.key,studentId:st.studentId,studentName:st.name,qrPayload:payload,printedAt:new Date().toISOString(),kind:'QR replaced'});const box=document.getElementById('ops-qr-result');box.innerHTML=`<b>New QR created for ${esc(st.name)}</b><br>Student ID: ${esc(st.studentId)}<br>QR payload updated. Use Bulk QR Print or Student Profile to print the replacement.`;await audit('QR replaced for '+st.studentId);scToast('QR replaced. Old QR is now invalid.');}
+        async function showQRPrintHistory(){const rows=Object.values(await readPath('qrPrintHistory')).sort((a,b)=>String(b.printedAt||'').localeCompare(String(a.printedAt||''))).slice(0,30);document.getElementById('ops-qr-result').innerHTML=rows.map(r=>`<div class="ops-row">${esc(r.printedAt||'')} · ${esc(r.studentName||'')} · ${esc(r.studentId||'')} · ${esc(r.kind||'Print')}</div>`).join('')||'No QR print history yet.';}
+        async function runDuplicateAudit(){const rows=await allStudentRows(),groups=new Map(),idDup=[],phoneDup=[];for(const st of rows){const id=String(st.studentId||'').trim();if(id){if(groups.has('id:'+id))idDup.push([groups.get('id:'+id),st,'Student ID']);else groups.set('id:'+id,st);}const phone=String(st.phone||'').replace(/\D/g,'');if(phone.length>=9){if(groups.has('phone:'+phone))phoneDup.push([groups.get('phone:'+phone),st,'Phone']);else groups.set('phone:'+phone,st);}}const nameGroups=new Map();for(const st of rows){const n=String(st.name||'').trim().toLowerCase();if(!n)continue;if(nameGroups.has(n))idDup.push([nameGroups.get(n),st,'Same name']);else nameGroups.set(n,st);}const all=[...idDup,...phoneDup];document.getElementById('ops-duplicate-results').innerHTML=all.map(([a,b,kind])=>`<div class="ops-row">⚠️ ${esc(kind)} match: ${esc(a.name)} (${esc(a.studentId)}) ↔ ${esc(b.name)} (${esc(b.studentId)})</div>`).join('')||'<div class="ops-row">No matching IDs, phone numbers, or names detected.</div>';scToast(`Duplicate check complete · ${all.length} possible matches`);}
+        async function saveStudentDiscount(){const id=document.getElementById('ops-discount-id').value.trim(),amount=Number(document.getElementById('ops-discount-amount').value),reason=document.getElementById('ops-discount-reason').value.trim();if(!id||!Number.isFinite(amount)||amount<0)return scToast('Enter a valid ID and discount',false);const st=(await allStudentRows()).find(r=>String(r.studentId)===id);if(!st)return scToast('Student not found',false);const base=getClassFeeByGrade(st.grade);if(amount>=base)return scToast('Discount must be lower than the monthly fee',false);await window.update(window.ref(window.db,'students/'+st.key),{discountAmount:amount,discountReason:reason,discountUpdatedAt:new Date().toISOString()});await audit('Custom discount set for '+id+': Rs '+amount);document.getElementById('ops-discount-result').textContent=`${st.name}: monthly fee Rs ${(base-amount).toLocaleString()} (discount Rs ${amount.toLocaleString()})`;scToast('Discount saved');}
+        let scDashboardArrange=false;
+        function toggleDashboardArrange(){scDashboardArrange=!scDashboardArrange;setDashboardArrangeState();switchTab('dashboard');scToast(scDashboardArrange?'Arrange mode ON: drag dashboard cards':'Arrange mode OFF');}
+        function setDashboardArrangeState(){document.querySelectorAll('#dashboard-stats .sc-stat,#dashboard-grades .sc-grade').forEach(el=>{el.draggable=scDashboardArrange;el.style.cursor=scDashboardArrange?'grab':'';el.ondragstart=e=>{if(!scDashboardArrange)return;e.dataTransfer.setData('text/plain',el.outerHTML);window.scDraggedWidget=el;};el.ondragover=e=>{if(scDashboardArrange)e.preventDefault();};el.ondrop=e=>{if(!scDashboardArrange||!window.scDraggedWidget)return;e.preventDefault();const parent=el.parentElement;parent.insertBefore(window.scDraggedWidget,el);saveDashboardWidgetOrder(parent.id);};});}
+        function saveDashboardWidgetOrder(id){const parent=document.getElementById(id);if(parent)localStorage.setItem('sciencore-order-'+id,JSON.stringify([...parent.children].map(e=>e.outerHTML)));}
+        function applyDashboardWidgetOrder(){for(const id of ['dashboard-stats','dashboard-grades']){const saved=localStorage.getItem('sciencore-order-'+id);if(!saved)continue;try{const order=JSON.parse(saved),parent=document.getElementById(id);if(!parent)continue;const current=[...parent.children];const keys=order.map(html=>{const temp=document.createElement('div');temp.innerHTML=html;return temp.firstElementChild?.textContent?.trim().slice(0,40)});const used=new Set();const ordered=[];for(const key of keys){const match=current.find(el=>!used.has(el)&&el.textContent.trim().slice(0,40)===key);if(match){used.add(match);ordered.push(match)}}current.forEach(el=>{if(!used.has(el))ordered.push(el)});ordered.forEach(el=>parent.appendChild(el));}catch(e){console.warn('Widget order could not be restored',e)}}}
+        function showOfflineQueue(){const q=JSON.parse(localStorage.getItem('sciencore-offline-attendance')||'[]');const el=document.getElementById('ops-offline-status');el.textContent=q.length?`${q.length} attendance item(s) queued on this device. They have not been synced yet.`:'No offline attendance items queued.';}
+        async function syncOfflineQueue(){if(!navigator.onLine)return scToast('Internet is offline',false);const q=JSON.parse(localStorage.getItem('sciencore-offline-attendance')||'[]');if(!q.length)return scToast('Offline queue is empty');let synced=0;const remaining=[];const rows=await allStudentRows();for(const item of q){try{const st=rows.find(s=>String(s.studentId)===String(item.studentId));if(!st){remaining.push(item);continue;}const path=`attendance/${item.date}/${st.key}`;const snap=await window.get(window.ref(window.db,path));if(!snap.exists())await window.set(window.ref(window.db,path),{name:st.name,grade:st.grade,time:item.time,isoAt:item.isoAt,late:item.late,attendanceStatus:item.late?'Late':'On time',syncedFromOffline:true});synced++;}catch(e){console.warn('Offline sync item failed',e);remaining.push(item);}}localStorage.setItem('sciencore-offline-attendance',JSON.stringify(remaining));document.getElementById('ops-offline-status').textContent=`Synced ${synced} item(s) · still queued ${remaining.length}.`;await audit('Offline attendance sync: '+synced);scToast('Offline queue sync finished');updateOpsHealth();}
+        function queueOfflineAttendance(student,late,now){const q=JSON.parse(localStorage.getItem('sciencore-offline-attendance')||'[]');q.push({studentId:student.studentId,date:localDateKey(),time:now.toLocaleTimeString(),isoAt:now.toISOString(),late});localStorage.setItem('sciencore-offline-attendance',JSON.stringify(q));}
 
         window.onload = () => {
             refreshMonths(); document.getElementById("reg-joined").value=localDateKey();document.getElementById("expense-date").value=localDateKey();document.getElementById("schedule-date").value=localDateKey(); 
@@ -1510,5 +1907,24 @@ nav button{border:1px solid rgba(91,155,230,.14);transition:transform .18s,backg
             loadSettings().catch(err => console.warn("Settings unavailable:",err)).finally(() => switchTab("dashboard"));
         };
     </script>
+
+<!-- Startup repair: ensure the default Dashboard tab is shown on first load -->
+<script>
+window.addEventListener('load', function () {
+  window.setTimeout(function () {
+    try {
+      if (typeof window.switchTab === 'function') { window.switchTab('dashboard'); }
+      else {
+        var dashboard = document.getElementById('tab-dashboard');
+        if (dashboard) dashboard.classList.remove('hidden');
+      }
+    } catch (e) {
+      var dashboard = document.getElementById('tab-dashboard');
+      if (dashboard) dashboard.classList.remove('hidden');
+      console.error('SCIENCORE dashboard startup repair:', e);
+    }
+  }, 250);
+});
+</script>
 </body>
 </html>
