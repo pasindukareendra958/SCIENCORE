@@ -996,7 +996,6 @@ input,select,textarea,button{max-width:100%}
                         const attSnap = await window.get(attRef);
                         
                         const alreadyMarked = attSnap.exists();
-                        if (alreadyMarked) scBeep('duplicate');
                         if (!alreadyMarked) {
                             const now=new Date();const rules=JSON.parse(localStorage.getItem('sciencore-attendance-rules')||'{"startTime":"08:00","grace":10}');const [sh,sm]=String(rules.startTime||'08:00').split(':').map(Number);const late=now.getHours()*60+now.getMinutes()>(Number(sh||0)*60+Number(sm||0)+Number(rules.grace||0));
                             const attendanceRecord={name:foundStudent.name,grade:foundStudent.grade,time:now.toLocaleTimeString(),isoAt:now.toISOString(),late,attendanceStatus:late?'Late':'On time'};
@@ -1005,7 +1004,7 @@ input,select,textarea,button{max-width:100%}
                         }
 
                         loadTodayAttendanceLog();
-                        scBeep(true);
+                        if (alreadyMarked) scBeep('duplicate');
                         scheduleScanResultReset();
                         if (!alreadyMarked) {
                           try { await audit(`Attendance: ${foundStudent.name} (${foundStudent.grade})`); } catch(e){}
@@ -1063,7 +1062,7 @@ input,select,textarea,button{max-width:100%}
                             speechMessage = `${foundStudent.name}. පැමිණීම සාර්ථකව සටහන් කළා. ${unpaidSentence}.`;
                         }
 
-                        if (alreadyMarked) { scBeep('duplicate'); displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 අද පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml; }
+                        if (alreadyMarked) { displayHtml = `<div class="rounded-lg bg-amber-500/20 text-amber-300 p-3 mb-3 font-bold">🟡 අද පැමිණීම කලින් සටහන් කර ඇත.</div>` + displayHtml; }
                         window.scLastVerifiedStudent = { key: studentKey, name: foundStudent.name, grade: foundStudent.grade, qr: searchCode };
                         displayHtml += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"><button type="button" onclick="instantMultiPayActiveStudent()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-4 rounded-xl">💰 මුදල් ගෙවීම සටහන් කරන්න</button><button type="button" onclick="closeScanResultForNext()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-3 px-4 rounded-xl">✕ වසන්න / ඊළඟ QR එක</button></div>`;
                         resultDiv.innerHTML = displayHtml;
@@ -1089,188 +1088,57 @@ input,select,textarea,button{max-width:100%}
         }
 
         async function instantMultiPayMonths(studentKey, studentName, grade, qrCode) {
-            const requiredPin = getTodaySecurityPin();
-            const initialStudentSnap = await window.get(window.ref(window.db, `students/${studentKey}`));
-            if (!initialStudentSnap.exists()) return scToast('Student record not found', false);
-            const initialStudentData = initialStudentSnap.val();
-            const monthlyFee = Math.max(0, getClassFeeByGrade(grade) - Number(initialStudentData.discountAmount || 0));
-
-            const inputAmountStr = prompt(`💳 ${studentName} (${grade})\nමාසික ගාස්තුව: රු. ${monthlyFee}/-\nගෙවන මුදල ඇතුළත් කරන්න (මාස කිහිපයකට නම් එකතුව ඇතුළත් කරන්න):`, monthlyFee);
-            if (inputAmountStr === null) return;
-
-            const paidAmount = parseFloat(inputAmountStr);
-            if (isNaN(paidAmount) || paidAmount <= 0) {
-                alert("❌ ඇතුළත් කළ මුදල නිවැරදි නැත!");
-                return;
+            // Cash-only QR payment. Firebase access rules must enforce staff permissions.
+            const initialSnap = await window.get(window.ref(window.db, `students/${studentKey}`));
+            if (!initialSnap.exists()) return scToast('Student record not found', false);
+            const monthlyFee = Math.max(0, getClassFeeByGrade(grade) - Number(initialSnap.val().discountAmount || 0));
+            if (!(monthlyFee > 0)) return scToast('මෙම සිසුවාට ගෙවිය යුතු ගාස්තුවක් නැහැ', false);
+            const input = prompt(`💵 ${studentName} (${grade})\nමාසික ගාස්තුව: රු. ${monthlyFee}/-\nCash මුදල ඇතුළත් කරන්න:`, String(monthlyFee));
+            if (input === null) return;
+            const amount = Number(input.trim());
+            if (!Number.isFinite(amount) || amount <= 0 || !Number.isInteger(amount / monthlyFee)) {
+                alert('සම්පූර්ණ මාසික ගාස්තුවේ නිවැරදි ගුණාකාරයක් ඇතුළත් කරන්න.'); return;
             }
-
-            const enteredPin = prompt(`🔐 Admin PIN ආරක්ෂණ පියවර:\nඅද දිනට අදාළ PIN අංකය ඇතුළත් කරන්න:`);
-            if (enteredPin === null) return;
-
-            if (enteredPin.trim() === requiredPin) {
-                const paymentMethod = (prompt('ගෙවීම් ක්‍රමය ඇතුළත් කරන්න: Cash / Bank Transfer / Online', 'Cash') || 'Cash').trim();
-                if (!['Cash','Bank Transfer','Online'].includes(paymentMethod)) { alert('ගෙවීම් ක්‍රමය Cash, Bank Transfer හෝ Online විය යුතුයි.'); return; }
-                try {
-                    const snap = await window.get(window.child(window.ref(window.db), `students/${studentKey}`));
-                    if (!snap.exists()) return;
-                    const studentData = snap.val();
-                    const fees = studentData.fees || {};
-                    const currentMonth = getCurrentMonthKey();
-
-                    let unpaidMonths = [];
-                    for (let m of allMonthsList) {
-                        if (fees[m.id] === 'Unpaid' || !fees[m.id]) {
-                            unpaidMonths.push(m);
-                        }
-                        if (m.id === currentMonth.key) break;
-                    }
-
-                    let monthsToPayCount = Math.floor(paidAmount / monthlyFee);
-                    if (monthsToPayCount <= 0 || paidAmount % monthlyFee !== 0) {
-                        alert('⚠️ මේ ක්‍රමය සම්පූර්ණ මාසික ගාස්තු සඳහා පමණයි. කරුණාකර මාසික ගාස්තුවේ නිවැරදි ගුණාකාරයක් ඇතුළත් කරන්න.');
-                        return;
-                    }
-
-                    let paidMonthNames = [];
-                    let updates = {};
-
-                    for (let i = 0; i < monthsToPayCount && i < unpaidMonths.length; i++) {
-                        const targetMonth = unpaidMonths[i];
-                        updates[`students/${studentKey}/fees/${targetMonth.id}`] = "Paid";
-                        paidMonthNames.push(targetMonth.name);
-                    }
-
-                    if (monthsToPayCount > unpaidMonths.length) { alert('⚠️ ඇතුළත් කළ මුදලට සරිලන නොගෙවූ මාස ප්‍රමාණයක් නොමැත.'); return; }
-                    if (Object.keys(updates).length > 0) {
-                        const receiptRef = window.push(window.ref(window.db, 'payments'));
-                        const recordedAmount = paidMonthNames.length * monthlyFee;
-                        const receipt = {
-                            receiptNo: `SC-${localDateKey().replace(/-/g,'')}-${receiptRef.key.slice(-7).toUpperCase()}`,
-                            studentKey, studentName, studentId: studentData.studentId || qrCode,
-                            grade, months: paidMonthNames, monthKeys: unpaidMonths.slice(0,paidMonthNames.length).map(m=>m.id),
-                            amount: recordedAmount, enteredAmount: paidAmount, method: paymentMethod,
-                            date: new Date().toLocaleString('en-GB', {timeZone:'Asia/Colombo'}),
-                            createdAt: new Date().toISOString()
-                        };
-                        updates[`payments/${receiptRef.key}`] = receipt;
-                        await window.update(window.ref(window.db), updates);
-                        recordUndoAction({type:'payment',paymentKey:receiptRef.key,receiptNo:receipt.receiptNo,studentKey,studentId:receipt.studentId,studentName,monthKeys:receipt.monthKeys,amount:receipt.amount});
-                        scBeep('payment');
-
-                        // Calculate remaining unpaid months after payment
-                        let remainingUnpaidNames = [];
-                        for (let i = monthsToPayCount; i < unpaidMonths.length; i++) {
-                            remainingUnpaidNames.push(unpaidMonths[i].name);
-                        }
-
-                        // Voice Command formatting as requested
-                        const paidSentence = formatMonthsForVoice((receipt.monthKeys || []).map(id => ({id})), "received");
-                        let fullVoiceMsg = `${studentName}. රුපියල් ${recordedAmount} ක ගෙවීම සාර්ථකව සටහන් කළා. ${paidSentence}. `;
-
-                        if (remainingUnpaidNames.length > 0) {
-                            const remainingSentence = formatMonthsForVoice(remainingUnpaidNames.map(name => ({name})), "remaining");
-                            fullVoiceMsg += `${remainingSentence}.`;
-                        } else {
-                            fullVoiceMsg += `ගෙවීමට ඉතිරි මාස නැහැ. සියලුම ගාස්තු ගෙවා අවසන්.`;
-                        }
-
-                        alert(`✅ ${studentName} ගේ ${paidMonthNames.join(', ')} ගෙවීම් සාර්ථකව සටහන් විය!`);
-                        await verifyStudentByQR(qrCode, true);
-                        speakText(fullVoiceMsg);
-                        showPaymentReceipt(receipt);
-                    } else {
-                        alert("⚠️ ගෙවීමට හිඟ මාස හමු නොවීය!");
-                    }
-                } catch (error) {
-                    alert("❌ ගෙවීම් යාවත්කාලීන කිරීම අසාර්ථක විය!");
-                }
-            } else {
-                alert("❌ ඇතුළත් කළ PIN අංකය වැරදියි! ගෙවීම් යාවත්කාලීන කළ නොහැක.");
-            }
-        }
-
-        async function registerStudent(event) {
-            event.preventDefault();
-            const submitBtn = event.submitter;
-            if (submitBtn?.disabled) return;
-            if (submitBtn) submitBtn.disabled = true;
             try {
-            const name = document.getElementById('reg-name').value.trim();
-            const rawPhone = document.getElementById('reg-phone').value.trim();
-            
-            // Check QR Method
-            const radios = document.getElementsByName('qr-method');
-            let qrMethod = "auto";
-            for (let r of radios) { if (r.checked) { qrMethod = r.value; break; } }
-
-            let studentId = "";
-            if (qrMethod === 'auto') {
-                await autoGenerateStudentIdByGrade();
-                studentId = document.getElementById('reg-id').value.trim();
-            } else {
-                studentId = document.getElementById('reg-custom-id').value.trim();
-                if (!studentId) {
-                    alert("❌ කරුණාකර අභිරුචි QR / ID අංකයක් ඇතුළත් කරන්න!");
-                    return;
+                const snap = await window.get(window.ref(window.db, `students/${studentKey}`));
+                if (!snap.exists()) return scToast('Student record not found', false);
+                const data = snap.val(), fees = data.fees || {};
+                const currentMonth = getCurrentMonthKey();
+                const unpaid = allMonthsList.filter(m => m.id <= currentMonth.key && fees[m.id] !== 'Paid');
+                const count = Math.round(amount / monthlyFee);
+                if (!unpaid.length || count > unpaid.length) return scToast('ගෙවීමට ඇති මාස ගණනට වඩා වැඩි මුදලක් ඇතුළත් කර ඇත', false);
+                const selected = unpaid.slice(0, count);
+                const keys = selected.map(m => m.id);
+                const receiptRef = window.push(window.ref(window.db, 'payments'));
+                const receipt = {
+                    receiptNo: `SC-${localDateKey().replace(/-/g,'')}-${receiptRef.key.slice(-7).toUpperCase()}`,
+                    studentKey, studentName, studentId: data.studentId || qrCode, grade,
+                    months: selected.map(m => m.name), monthKeys: keys, amount, enteredAmount: amount,
+                    method: 'Cash', date: new Date().toLocaleString('en-GB', {timeZone:'Asia/Colombo'}),
+                    createdAt: new Date().toISOString()
+                };
+                const updates = {[`payments/${receiptRef.key}`]: receipt};
+                for (const key of keys) updates[`students/${studentKey}/fees/${key}`] = 'Paid';
+                await window.update(window.ref(window.db), updates);
+                recordUndoAction({type:'payment',paymentKey:receiptRef.key,receiptNo:receipt.receiptNo,studentKey,studentId:receipt.studentId,studentName,monthKeys:keys,amount});
+                scBeep('payment');
+                const remaining = unpaid.slice(count);
+                const paidSentence = formatMonthsForVoice(selected, 'received');
+                const remainingSentence = remaining.length ? formatMonthsForVoice(remaining, 'remaining') : 'ගෙවීමට ඉතිරි මාස නැහැ';
+                // Update the currently visible scan result without creating a second attendance record.
+                const box = document.getElementById('student-result');
+                if (box) {
+                    const notice = `<div class="sc-payment-success" role="status">✅ රු. ${amount.toLocaleString()} Cash ගෙවීම සාර්ථකයි · ${selected.map(m=>monthNameForVoice(m)).join(', ')}<br><small>${remaining.length ? 'ගෙවීමට ඉතිරි: '+remaining.map(m=>monthNameForVoice(m)).join(', ') : 'හිඟ මාස නැහැ'}</small></div>`;
+                    box.querySelectorAll('.sc-payment-success').forEach(n=>n.remove());
+                    box.insertAdjacentHTML('afterbegin',notice);
+                    showFullscreenScanPopup();
                 }
-            }
-
-            if (!studentId || studentId.length > 300 || !name) { alert("Invalid student name or QR content."); return; }
-            const grade = document.getElementById('reg-grade').value;
-            const cardType = document.getElementById('reg-card-type').value;
-            const initialFee = document.getElementById('reg-fee').value;
-            const currentMonth = getCurrentMonthKey();
-
-            const phone = formatPhoneForWhatsApp(rawPhone);
-
-            let feesObj = {};
-            allMonthsList.forEach(m => {
-                feesObj[m.id] = (m.id === currentMonth.key) ? initialFee : "Unpaid";
-            });
-
-            try {
-                const duplicateSnap=await window.get(window.ref(window.db,'students'));
-                let duplicate=false; duplicateSnap.forEach(row=>{if(String(row.val().studentId||'').trim()===studentId)duplicate=true;});
-                if(duplicate){alert('❌ මේ QR / Student ID එක දැනටමත් වෙනත් ළමයෙකුට භාවිත කරලා තියෙනවා.');return;}
-                const newStudentRef = window.push(window.ref(window.db, 'students'));
-                await window.set(newStudentRef, {
-                    name: name,
-                    phone: phone,
-                    studentId: studentId,
-                    qrCodeValue: studentId,
-                    qrVersion: 1,
-                    birthday: document.getElementById("reg-birthday").value || "",
-                    school: document.getElementById("reg-school").value.trim(),
-                    studentPhone: formatPhoneForWhatsApp(document.getElementById("reg-student-phone").value),
-                    joined: document.getElementById("reg-joined").value || localDateKey(),
-                    grade: grade,
-                    cardType: cardType,
-                    fees: feesObj
-                });
-
-                const qrContainer = document.getElementById('new-qr-container');
-                qrContainer.dataset.studentId = studentId;
-                qrContainer.dataset.qrPayload = studentId;
-                qrContainer.dataset.studentName = name;
-                qrContainer.innerHTML = "";
-                new QRCode(qrContainer, { text: studentId, width: 160, height: 160, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
-                document.getElementById('new-qr-text').innerText = `Name: ${name} | ID: ${studentId} | ${grade}`;
-                document.getElementById('registration-success-box').classList.remove('hidden');
-
-                document.getElementById('reg-form').reset();
-                autoGenerateStudentIdByGrade();
-                toggleQrInputMode();
-            loadSettings().catch(err => console.warn("Settings unavailable:",err)).finally(() => switchTab("dashboard"));
-                audit('Student registered: '+name);
-            } catch (error) {
-                alert("Registration failed.");
-                console.error(error);
-            }
-            } finally { if (submitBtn) submitBtn.disabled = false; }
+                scToast('Cash ගෙවීම සාර්ථකව සටහන් විය');
+                speakText(`${studentName}. රුපියල් ${amount} ක ගෙවීම සාර්ථකව සටහන් කළා. ${paidSentence}. ${remainingSentence}.`);
+                // Remain on student details with the Next QR button available in either mode.
+                if (typeof loadTodayAttendanceLog === 'function') loadTodayAttendanceLog();
+            } catch (err) { console.error('Payment error', err); scToast('ගෙවීම සටහන් කිරීම අසාර්ථකයි', false); }
         }
-
-        // Printable PNG includes the EXACT QR payload and a human-readable student ID below.
-        // The quiet zone is preserved to keep the QR readable by scanners.
         function downloadQR(containerId, filenamePrefix) {
             const container = document.getElementById(containerId);
             if (!container) return;
@@ -2088,13 +1956,13 @@ function showFullscreenScanPopup(){
  const modal=document.getElementById('sc-fullscreen-result-modal');
  const content=document.getElementById('sc-fs-modal-content');
  const source=document.getElementById('student-result');
- if(root && document.fullscreenElement===root && modal && content && source){
+ if(root && modal && content && source && window.scScanAwaitingAction){
    content.innerHTML=source.innerHTML;
    modal.hidden=false;
  }
 }
 function closeFullscreenScanPopup(){const modal=document.getElementById('sc-fullscreen-result-modal');if(modal)modal.hidden=true;}
-document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)closeFullscreenScanPopup();else if(window.scScanAwaitingAction)showFullscreenScanPopup();});
+document.addEventListener('fullscreenchange',()=>{if(window.scScanAwaitingAction)showFullscreenScanPopup();});
 window.addEventListener('DOMContentLoaded',()=>{
   try { if(typeof renderOpsPrefs==='function')renderOpsPrefs(); }catch(err){console.warn('Preferences UI not ready',err);}
   // Values are stored on every toggle/slider change and restored on the same browser.
@@ -2103,6 +1971,46 @@ window.addEventListener('DOMContentLoaded',()=>{
     el.addEventListener('input',()=>{if(typeof saveOpsPrefs==='function')saveOpsPrefs();});
   }
 });
+</script>
+
+<style id="sciencore-v48-qr-polish">
+#dashboard-scanner:fullscreen{display:block!important;position:relative!important;overflow:hidden!important;padding:0!important;background:radial-gradient(circle at 50% 35%,#15345b,#030915 72%)!important}
+#dashboard-scanner:fullscreen::before{content:'✦ SCIENCORE · QR SCANNER';position:absolute;top:max(18px,env(safe-area-inset-top));left:0;right:0;text-align:center;color:#d8f5ff;font-weight:900;letter-spacing:.14em;font-size:clamp(15px,3vw,24px);z-index:3;pointer-events:none}
+#dashboard-scanner:fullscreen>.grid:nth-of-type(2){height:100dvh!important;display:flex!important;align-items:center!important;justify-content:center!important}
+#dashboard-scanner:fullscreen>.grid:nth-of-type(2)>div:first-child{height:auto!important;max-height:calc(100dvh - 120px)!important;transform:none!important}
+#dashboard-scanner:fullscreen #reader{width:min(90vw,640px)!important;height:min(65dvh,640px)!important;max-height:65dvh!important;min-height:0!important;border:2px solid #3dd2ff!important;border-radius:24px!important;box-shadow:0 0 0 7px #38bdf81c,0 22px 60px #000a!important;overflow:hidden!important}
+#dashboard-scanner:fullscreen #reader video{width:100%!important;height:100%!important;object-fit:cover!important;border-radius:20px!important}
+#sc-fullscreen-result-modal:not([hidden]){position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;background:rgba(1,7,17,.82)!important;pointer-events:auto!important;overflow:auto!important}
+#sc-fullscreen-result-modal .sc-fs-modal-card{position:relative;width:min(96vw,540px);max-height:calc(100dvh - 32px);overflow:auto;background:#102039;border:1px solid #57c9ee;border-radius:20px;padding:18px;box-shadow:0 18px 70px #000b;pointer-events:auto}
+#sc-fullscreen-result-modal button{pointer-events:auto!important;cursor:pointer;min-height:48px}
+.sc-payment-success{padding:12px;margin-bottom:12px;border-radius:12px;background:#065f46;color:#ecfdf5;font-weight:800;text-align:center;line-height:1.7}
+#reader button:focus-visible{outline:2px solid #fbbf24}#reader button:focus:not(:focus-visible){outline:none}
+@media(max-width:700px){#dashboard-scanner:fullscreen #reader{width:92vw!important;height:min(62dvh,92vw)!important}#sc-fullscreen-result-modal .sc-fs-modal-card{padding:12px}}
+</style>
+<script id="sciencore-v48-audio-warmup">
+// Audio playback must be unlocked by a user gesture on mobile browsers.
+let scAudioContext = null;
+function scUnlockAudio(){
+ try { const AudioCtor=window.AudioContext||window.webkitAudioContext;
+   if(AudioCtor){if(!scAudioContext)scAudioContext=new AudioCtor();if(scAudioContext.state==='suspended')scAudioContext.resume().catch(()=>{});}
+   if(window.speechSynthesis){window.speechSynthesis.getVoices();window.speechSynthesis.resume();}
+ }catch(e){console.warn('Audio initialization',e)}
+}
+document.addEventListener('pointerdown',scUnlockAudio,{passive:true});
+document.addEventListener('keydown',scUnlockAudio);
+// Keep one reusable audio context instead of constructing a delayed context per scan.
+function scBeep(kind=true){
+ if(!scPrefs.beep)return;
+ try{const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return;
+  if(!scAudioContext)scAudioContext=new AudioCtor();const ctx=scAudioContext;
+  if(ctx.state==='suspended')ctx.resume().catch(()=>{});
+  const tones=kind==='duplicate'?[[420,.07],[300,.07]]:kind==='error'||kind===false?[[220,.16]]:kind==='payment'?[[660,.08],[880,.1]]:[[880,.11]];
+  let t=ctx.currentTime+.005;
+  for(const [hz,duration] of tones){const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type='sine';osc.frequency.value=hz;gain.gain.setValueAtTime(.0001,t);gain.gain.exponentialRampToValueAtTime(.09,t+.012);gain.gain.exponentialRampToValueAtTime(.0001,t+duration);osc.connect(gain);gain.connect(ctx.destination);osc.start(t);osc.stop(t+duration+.008);t+=duration+.03;}
+ }catch(e){console.warn('Beep error',e)}
+}
+// Initial voice synthesis may be delayed until the browser has loaded Sinhala voices.
+if('speechSynthesis' in window){window.speechSynthesis.getVoices();window.speechSynthesis.addEventListener?.('voiceschanged',()=>window.speechSynthesis.getVoices());}
 </script>
 </body>
 
