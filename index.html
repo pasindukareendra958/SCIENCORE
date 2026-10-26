@@ -262,6 +262,7 @@ input,select,textarea,button{max-width:100%}
   <div class="flex flex-wrap items-center justify-between gap-3"><div><div class="sc-kicker">01 / QUICK ATTENDANCE</div><h3 class="text-xl md:text-2xl font-extrabold text-white mt-1">📷 Scan &amp; Check In</h3></div><div class="sc-scanner-note">⚡ QR scan or enter an ID below · <button onclick="switchTab('operations')" class="underline text-yellow-300">Class controls</button></div></div>
         <!-- TAB 1: SCANNER -->
         <div id="dashboard-scanner" class="space-y-6 fade-in">
+            <div id="sc-fullscreen-result-modal" role="dialog" aria-modal="true" aria-label="Student scan result" hidden><div class="sc-fs-modal-card"><div id="sc-fs-modal-content"></div></div></div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="bg-slate-800/80 border border-amber-500/30 p-4 rounded-2xl flex items-center gap-3 shadow-lg card-hover">
                     <div class="p-3 bg-amber-500/10 rounded-xl text-amber-400 text-xl border border-amber-500/20">📅</div>
@@ -696,6 +697,7 @@ input,select,textarea,button{max-width:100%}
             return instantMultiPayMonths(st.key, st.name, st.grade, st.qr);
         }
         function closeScanResultForNext() {
+            window.scScanAwaitingAction=false; closeFullscreenScanPopup();
             const box = document.getElementById('student-result');
             if (box) box.innerHTML = '<div class="text-center py-10 text-slate-300"><p class="text-lg font-bold">ඊළඟ QR කේතය Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත Scanner එකට පෙන්වන්න.</p></div>';
             const manual = document.getElementById('manual-id');
@@ -858,6 +860,7 @@ input,select,textarea,button{max-width:100%}
                             { facingMode: "environment" },
                             { fps: 10, qrbox: { width: 250, height: 250 } },
                             (decodedText) => {
+                                if(window.scScanAwaitingAction) return;
                                 const cleanCode = decodedText ? decodedText.trim() : "";
                                 const now = Date.now();
                                 if (cleanCode === lastScannedId && now - lastScanTime < 4000) {
@@ -938,15 +941,16 @@ input,select,textarea,button{max-width:100%}
 
         async function verifyStudentByQR(qrCode, silent = false) {
             const resultDiv = document.getElementById('student-result');
-            if (!resultDiv) return;
+            if (!resultDiv || window.scScanAwaitingAction) return;
+            window.scScanAwaitingAction=true;
             resultDiv.innerHTML = `<p class="text-amber-400 font-semibold">Searching database...</p>`;
             const searchCode = qrCode ? qrCode.trim() : "";
             if(!navigator.onLine){
                 const cached=await allStudentRows();const student=cached.find(st=>studentQrPayload(st)===searchCode);
-                if(!student){resultDiv.innerHTML='<div class="ops-status">🔴 Offline: this QR is not in the saved device cache. Reconnect and try again.</div>';return;}
+                if(!student){window.scScanAwaitingAction=false;resultDiv.innerHTML='<div class="ops-status">🔴 Offline: this QR is not in the saved device cache. Reconnect and try again.</div>';return;}
                 const now=new Date(),rules=JSON.parse(localStorage.getItem('sciencore-attendance-rules')||'{"startTime":"08:00","grace":10}'),[sh,sm]=String(rules.startTime||'08:00').split(':').map(Number),late=now.getHours()*60+now.getMinutes()>(Number(sh||0)*60+Number(sm||0)+Number(rules.grace||0));
                 const q=JSON.parse(localStorage.getItem('sciencore-offline-attendance')||'[]');if(!q.some(x=>x.studentId===student.studentId&&x.date===localDateKey())){q.push({studentId:student.studentId,date:localDateKey(),time:now.toLocaleTimeString(),isoAt:now.toISOString(),late});localStorage.setItem('sciencore-offline-attendance',JSON.stringify(q));}
-                resultDiv.innerHTML=`<div class="ops-status"><b>📴 OFFLINE ATTENDANCE QUEUED</b><br>${esc(student.name)} · ${esc(student.grade)}<br>Student ID: ${esc(student.studentId)}<br>${late?'🟠 Late arrival':'🟢 On time'}<br>⚠️ Not yet synced to Firebase.</div>`;scBeep(true);if(!silent)speakText(`${student.name}. Offline attendance queued. Not yet synced.`);showOfflineQueue();return;
+                resultDiv.innerHTML=`<div class="ops-status"><b>📴 OFFLINE ATTENDANCE QUEUED</b><br>${esc(student.name)} · ${esc(student.grade)}<br>Student ID: ${esc(student.studentId)}<br>${late?'🟠 Late arrival':'🟢 On time'}<br>⚠️ Not yet synced to Firebase.</div>`;scBeep(true);if(!silent)speakText(`${student.name}. Offline attendance queued. Not yet synced.`);showOfflineQueue();showFullscreenScanPopup();return;
             }
 
             try {
@@ -971,7 +975,7 @@ input,select,textarea,button{max-width:100%}
                     if (foundStudent) {
                         if (window.scActiveSession?.grade && window.scActiveSession.grade !== foundStudent.grade) {
                             const ok=confirm(`⚠️ Wrong class!\nCurrent: ${window.scActiveSession.grade}\nStudent: ${foundStudent.grade}\nAllow attendance anyway?`);
-                            if(!ok){resultDiv.innerHTML='<div class="ops-status">⛔ Wrong grade — attendance not recorded.</div>';scBeep(false);return;}
+                            if(!ok){window.scScanAwaitingAction=false;resultDiv.innerHTML='<div class="ops-status">⛔ Wrong grade — attendance not recorded.</div>';scBeep(false);return;}
                         }
                         const fees = foundStudent.fees || {};
                         const cardType = foundStudent.cardType || "Full";
@@ -1063,18 +1067,22 @@ input,select,textarea,button{max-width:100%}
                         window.scLastVerifiedStudent = { key: studentKey, name: foundStudent.name, grade: foundStudent.grade, qr: searchCode };
                         displayHtml += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"><button type="button" onclick="instantMultiPayActiveStudent()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold py-3 px-4 rounded-xl">💰 මුදල් ගෙවීම සටහන් කරන්න</button><button type="button" onclick="closeScanResultForNext()" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-extrabold py-3 px-4 rounded-xl">✕ වසන්න / ඊළඟ QR එක</button></div>`;
                         resultDiv.innerHTML = displayHtml;
+                        showFullscreenScanPopup();
                         triggerVibration();
                         if (!silent) speakText(speechMessage);
 
                     } else {
+                        window.scScanAwaitingAction=false;
                         resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ Student ID / QR Code '${esc(searchCode)}' not found!</p>`; scBeep('error'); scToast('Student / QR not found',false);
                         scBeep('error'); triggerVibration();
                         if (!silent) speakText("මෙම අංකය සහිත ළමයෙක් හමු නොවීය.");
                     }
                 } else {
+                    window.scScanAwaitingAction=false;
                     resultDiv.innerHTML = `<p class="text-rose-400 font-semibold">❌ No students registered yet!</p>`;
                 }
             } catch (error) {
+                window.scScanAwaitingAction=false;
                 console.error(error);
                 resultDiv.innerHTML = `<p class="text-rose-400">Database error. Please check connection.</p>`;
             }
@@ -2054,6 +2062,46 @@ window.addEventListener('load', function () {
 window.addEventListener('DOMContentLoaded',()=>{
   const box=document.getElementById('student-result');
   if(box && !box.textContent.trim()) box.innerHTML='<div class="text-center py-5 text-slate-300"><p class="text-lg font-bold">QR එක Scan කිරීමට සූදානම්</p><p class="text-sm mt-2">ළමයාගේ QR කාඩ්පත කැමරාවට පෙන්වන්න.</p></div>';
+});
+</script>
+
+<style id="sciencore-v47-fs-camera-only">
+#sc-fullscreen-result-modal[hidden]{display:none!important}
+#dashboard-scanner:fullscreen{display:flex!important;align-items:center!important;justify-content:center!important;padding:0!important;margin:0!important;width:100vw!important;height:100dvh!important;min-height:0!important;overflow:hidden!important;background:#030910!important}
+#dashboard-scanner:fullscreen>.grid:first-of-type{display:none!important}
+#dashboard-scanner:fullscreen>.grid:nth-of-type(2){display:block!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important}
+#dashboard-scanner:fullscreen>.grid:nth-of-type(2)>div:first-child{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:100%!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+#dashboard-scanner:fullscreen>.grid:nth-of-type(2)>div:first-child>div:not(#reader){display:none!important}
+#dashboard-scanner:fullscreen>.grid:nth-of-type(2)>div:first-child>div:first-child{display:none!important}
+#dashboard-scanner:fullscreen #reader{width:min(100vw,1100px)!important;height:min(100dvh,100vw)!important;min-height:0!important;max-height:100dvh!important;max-width:100vw!important;margin:auto!important;display:flex!important;align-items:center!important;justify-content:center!important;border:0!important;background:#030910!important}
+#dashboard-scanner:fullscreen #reader video{max-width:100%!important;max-height:100dvh!important;object-fit:contain!important}
+#dashboard-scanner:fullscreen>.grid:nth-of-type(2)>div:last-child{display:none!important}
+#dashboard-scanner:fullscreen #sc-fullscreen-result-modal:not([hidden]){position:absolute!important;inset:0!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:16px!important;background:rgba(1,7,17,.77)!important;z-index:2147483000!important;overflow-y:auto!important;pointer-events:auto!important}
+#dashboard-scanner:fullscreen .sc-fs-modal-card{position:relative;width:min(96vw,530px);max-height:calc(100dvh - 32px);overflow-y:auto;background:#102039;border:1px solid #57c9ee;border-radius:20px;padding:16px;box-shadow:0 18px 70px #000b;pointer-events:auto}
+#dashboard-scanner:fullscreen .sc-fs-modal-card button{min-height:48px;pointer-events:auto;cursor:pointer}
+@media(max-width:700px){#dashboard-scanner:fullscreen .sc-fs-modal-card{padding:12px}#dashboard-scanner:fullscreen #reader{width:100vw!important}}
+</style>
+<script id="sciencore-v47-fs-popup-prefs">
+window.scScanAwaitingAction=false;
+function showFullscreenScanPopup(){
+ const root=document.getElementById('dashboard-scanner');
+ const modal=document.getElementById('sc-fullscreen-result-modal');
+ const content=document.getElementById('sc-fs-modal-content');
+ const source=document.getElementById('student-result');
+ if(root && document.fullscreenElement===root && modal && content && source){
+   content.innerHTML=source.innerHTML;
+   modal.hidden=false;
+ }
+}
+function closeFullscreenScanPopup(){const modal=document.getElementById('sc-fullscreen-result-modal');if(modal)modal.hidden=true;}
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)closeFullscreenScanPopup();else if(window.scScanAwaitingAction)showFullscreenScanPopup();});
+window.addEventListener('DOMContentLoaded',()=>{
+  try { if(typeof renderOpsPrefs==='function')renderOpsPrefs(); }catch(err){console.warn('Preferences UI not ready',err);}
+  // Values are stored on every toggle/slider change and restored on the same browser.
+  for(const id of ['ops-voice','ops-beep','ops-motion','ops-name','ops-rate','ops-volume','ops-reset','ops-qr-size']){
+    const el=document.getElementById(id);if(!el)continue;
+    el.addEventListener('input',()=>{if(typeof saveOpsPrefs==='function')saveOpsPrefs();});
+  }
 });
 </script>
 </body>
