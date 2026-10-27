@@ -418,6 +418,19 @@ input,select,textarea,button{max-width:100%}
             </div>
         </section>
 
+        <!-- Automatic grade-scoped absence report: computed from existing attendance, no destructive writes. -->
+        <section class="panel space-y-4" id="sc-absence-report" style="margin:18px 0;padding:20px;background:#17233b;border:1px solid #38516b;border-radius:18px">
+          <h2 class="text-xl font-bold text-amber-300">📋 ශ්‍රේණි අනුව පැමිණීම / නොපැමිණීම</h2>
+          <p class="text-sm text-slate-300">දිනක ශ්‍රේණියක අවම වශයෙන් එක් QR scan එකක් තිබුණොත්, එම ශ්‍රේණියේ scan නොවූ සක්‍රීය සිසුන් දවස අවසන් වූ පසු Absent ලෙස පෙන්වයි. වෙනත් ශ්‍රේණිවලට බලපාන්නේ නැහැ.</p>
+          <div class="flex flex-wrap gap-3 items-end">
+            <label class="text-sm">දිනය<br><input id="sc-absence-date" type="date" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-white" onchange="loadGradeAbsenceReport()"></label>
+            <label class="text-sm">ශ්‍රේණිය<br><select id="sc-absence-grade" class="bg-slate-900 border border-slate-600 rounded-lg p-2 text-white" onchange="loadGradeAbsenceReport()"><option value="All">සියලුම ශ්‍රේණි</option><option>Grade 7</option><option>Grade 8</option><option>Grade 9</option><option>Grade 10</option><option>Grade 11 (O/L)</option></select></label>
+            <button class="action" onclick="loadGradeAbsenceReport()">🔄 Refresh</button>
+          </div>
+          <div id="sc-absence-summary" class="text-sm text-sky-200">දිනයක් තෝරන්න.</div>
+          <div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead><tr class="border-b border-slate-600"><th class="p-2">නම</th><th class="p-2">ශ්‍රේණිය</th><th class="p-2">තත්ත්වය</th><th class="p-2">වේලාව</th></tr></thead><tbody id="sc-absence-rows"></tbody></table></div>
+        </section>
+
         <!-- TAB 3: REGISTER -->
         <section id="tab-students" class="hidden space-y-6 fade-in">
             <div class="bg-slate-800/90 p-6 rounded-2xl border border-slate-700 max-w-2xl mx-auto shadow-xl">
@@ -1273,6 +1286,7 @@ body>main{margin-left:226px!important;max-width:none!important;width:calc(100% -
         }
 
         async function loadReports() {
+            loadGradeAbsenceReport().catch(console.error);
             const tbody = document.getElementById('reports-table-body');
             tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">Loading...</td></tr>`;
             try {
@@ -1290,6 +1304,34 @@ body>main{margin-left:226px!important;max-width:none!important;width:calc(100% -
             } catch (error) { 
                 tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-rose-400">Error loading data.</td></tr>`; 
             }
+        }
+
+        async function loadGradeAbsenceReport() {
+            const dateEl=document.getElementById('sc-absence-date'), gradeEl=document.getElementById('sc-absence-grade');
+            const summary=document.getElementById('sc-absence-summary'), tbody=document.getElementById('sc-absence-rows');
+            if(!dateEl||!summary||!tbody)return;
+            if(!dateEl.value){const d=new Date();d.setDate(d.getDate()-1);dateEl.value=localDateKey(d);}
+            const date=dateEl.value, today=localDateKey(), grade=gradeEl.value;
+            tbody.innerHTML='<tr><td colspan="4" class="p-3">Loading...</td></tr>';
+            try {
+                const [students,att]=await Promise.all([allStudentRows(),readPath('attendance/'+date)]);
+                const allAttendance=att||{}, scannedGrades=new Set();
+                Object.values(allAttendance).forEach(a=>{if(a&&a.grade)scannedGrades.add(a.grade)});
+                // Current student grade is used as the roster; inactive/left students are excluded.
+                const eligible=students.filter(st=>st.status!=='Left Class'&&st.status!=='Temporarily Inactive'&&(grade==='All'||st.grade===grade));
+                const closed=date<today;
+                let present=0,absent=0,pending=0;
+                const lines=eligible.map(st=>{
+                    const scan=allAttendance[st.key], isPresent=!!scan;
+                    const isActiveGrade=scannedGrades.has(st.grade);
+                    const status=isPresent?'Present':(closed&&isActiveGrade?'Absent':'Not marked');
+                    if(isPresent)present++;else if(status==='Absent')absent++;else pending++;
+                    const color=status==='Present'?'text-emerald-400':status==='Absent'?'text-rose-400':'text-slate-400';
+                    return `<tr class="border-b border-slate-700"><td class="p-2">${esc(st.name||'')}</td><td class="p-2">${esc(st.grade||'')}</td><td class="p-2 font-bold ${color}">${status}</td><td class="p-2">${esc(scan?.time||'—')}</td></tr>`;
+                });
+                tbody.innerHTML=lines.join('')||'<tr><td colspan="4" class="p-3">මෙම ශ්‍රේණියට සිසුන් නැහැ.</td></tr>';
+                summary.textContent=`${date} · Present: ${present} · Absent: ${absent} · Not marked: ${pending}`+(closed?'':' · අද දවස අවසන් වූ පසු Absent ගණනය වේ.');
+            }catch(e){console.error('Absence report failed',e);summary.textContent='වාර්තාව ලබාගැනීමට නොහැකි විය.';tbody.innerHTML='';}
         }
 
         async function loadTodayAttendanceLog() {
